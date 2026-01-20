@@ -14,7 +14,8 @@
 
   import Template from 'components/Template';
 
-  export const allowGtm = process.env.NODE_ENV !== 'development';
+  // Use MODE instead of process.env.NODE_ENV for Webpack 5
+  export const allowGtm = typeof MODE !== 'undefined' && MODE !== 'development';
 
   let pageScreen;
   router('/_internal/styles', () => {
@@ -22,40 +23,44 @@
   });
   router.start();
 
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    release: COMMIT,
-    environment: ENV,
-    beforeSend: (event, hint) => {
-      // Skip common fetching errors during deployments
-      const error = hint.originalException;
-      if (error && error.message && error.message.match(/(failed to fetch|cache api .* not ok|networkerror)/i)) {
-        return null;
-      }
+  // Initialize Sentry
+  if (typeof SENTRY_DSN !== 'undefined' && SENTRY_DSN) {
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      release: typeof COMMIT !== 'undefined' ? COMMIT : 'dev',
+      environment: typeof ENV !== 'undefined' ? ENV : 'development',
+      beforeSend: (event, hint) => {
+        // Skip common fetching errors during deployments
+        const error = hint.originalException;
+        if (error && error.message && error.message.match(/(failed to fetch|cache api .* not ok|networkerror)/i)) {
+          return null;
+        }
 
-      event.user = { ...event.user, character: $characterId, wallet: $wallet.address };
-      event.tags = { ...event.tags, character: $characterId, wallet: $wallet.address };
-      event.extra = {
-        ...event.extra,
-        character_id: $characterId,
-        character_status: $characterStatus,
-        room: $currentRoom,
-        combat: $currentCombat,
-      };
-      return event;
-    },
-  });
-  Sentry.configureScope(scope => {
-    scope.setExtras({ session_at: Date.now() });
-    scope.setTags({
-      commit: COMMIT,
-      environment: ENV,
-      mode: MODE,
-      eth_node: ETH_URL,
-      cache_api: CACHE_API,
-      build_ts: BUILD_TIMESTAMP,
+        event.user = { ...event.user, character: $characterId, wallet: $wallet.address };
+        event.tags = { ...event.tags, character: $characterId, wallet: $wallet.address };
+        event.extra = {
+          ...event.extra,
+          character_id: $characterId,
+          character_status: $characterStatus,
+          room: $currentRoom,
+          combat: $currentCombat,
+        };
+        return event;
+      },
     });
-  });
+    
+    Sentry.configureScope(scope => {
+      scope.setExtras({ session_at: Date.now() });
+      scope.setTags({
+        commit: typeof COMMIT !== 'undefined' ? COMMIT : 'dev',
+        environment: typeof ENV !== 'undefined' ? ENV : 'development',
+        mode: typeof MODE !== 'undefined' ? MODE : 'development',
+        eth_node: typeof ETH_URL !== 'undefined' ? ETH_URL : '',
+        cache_api: typeof CACHE_API !== 'undefined' ? CACHE_API : '',
+        build_ts: typeof BUILD_TIMESTAMP !== 'undefined' ? BUILD_TIMESTAMP : 0,
+      });
+    });
+  }
 </script>
 
 <style global lang="scss">
@@ -79,17 +84,6 @@
         f.parentNode.insertBefore(j, f);
       })(window, document, 'script', 'dataLayer', 'GTM-WNQBCQ2');
     </script>
-    <!-- Hotjar Tracking Code for https://alpha.ethernal.world -->
-    <!-- <script>
-	    (function(h,o,t,j,a,r){
-	        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-	        h._hjSettings={hjid:1689486,hjsv:6};
-	        a=o.getElementsByTagName('head')[0];
-	        r=o.createElement('script');r.async=1;
-	        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-	        a.appendChild(r);
-	    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-	</script> -->
   {/if}
   <script>
     window.isUpdateAvailable = new Promise(function (resolve, reject) {
@@ -125,7 +119,7 @@
   </script>
 </svelte:head>
 
-<!-- will not preprocessed to CSS if placed in <svelte:head> -->
+<!-- Main app content -->
 <Template>
   {#if pageScreen}
     <svelte:component this="{pageScreen}" />
@@ -148,12 +142,10 @@
       <DefaultScreen text="Please wait while your wallet gets set up..." />
     {/if}
   {:else if $claim.status === 'None' && $wallet.status === 'WalletToChoose'}
-    <DefaultScreen text="Oh no. You don’t have a key" askKey="true" signIn="true" />
-  {:else if $claim.rawBalance && $claim.rawBalance.eq(0)}
-    <DefaultScreen text="The claim key ran out of $MATIC" askKey="true" signIn="true" />
+    <DefaultScreen text="Oh no. You don't have a key" askKey="true" signIn="true" />
+  {:else if $claim.rawBalance && $claim.rawBalance.eq && $claim.rawBalance.eq(0)}
+    <DefaultScreen text="The claim key ran out of ETH" askKey="true" signIn="true" />
   {:else}
     <GameScreen />
   {/if}
 </Template>
-
-<!-- <ErrorScreen error="{$wallet.status}"/> -->

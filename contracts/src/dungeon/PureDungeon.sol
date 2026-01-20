@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 library PureDungeon {
     uint256 internal constant LOCATION_ZERO = 2**255;
@@ -66,9 +67,9 @@ library PureDungeon {
             uint64 a
         )
     {
-        x = int64(location);
-        y = int64(location / 2**64);
-        z = int64(location / 2**128);
+        x = int64(uint64(location));
+        y = int64(uint64(location / 2**64));
+        z = int64(uint64(location / 2**128));
         a = uint64(location / 2**255); // = 1 for valid location
     }
 
@@ -76,7 +77,7 @@ library PureDungeon {
         int64 x,
         int64 y,
         int64 z
-    ) external pure returns (uint256 location) {
+    ) external pure returns (uint256) {
         return _location(x, y, z);
     }
 
@@ -84,7 +85,7 @@ library PureDungeon {
         int64 x,
         int64 y,
         int64 z
-    ) internal pure returns (uint256 location) {
+    ) internal pure returns (uint256) {
         return 2**255 + uint256(uint64(z)) * 2**128 + uint256(uint64(y)) * 2**64 + uint64(x);
     }
 
@@ -340,7 +341,7 @@ library PureDungeon {
         bytes32 blockHash,
         uint64 numElementalAreaInPeriod
     ) external pure returns (uint8 areaType) {
-        _generateArea(areaLoc, blockHash, numElementalAreaInPeriod);
+        return _generateArea(areaLoc, blockHash, numElementalAreaInPeriod);
     }
 
     function _generateArea(
@@ -360,7 +361,7 @@ library PureDungeon {
                     ELEMENT_AREA_10000_PROBA;
                 if (elementArea) {
                     (, ,int64 z, ) = _coordinates(areaLoc);
-                    areaType = 1 + uint8(z % 5);
+                    areaType = 1 + uint8(int8(z % 5));
                 } else {
                     areaType = 6;
                 }
@@ -434,10 +435,10 @@ library PureDungeon {
             dy = -dy;
         }
         if (dx > 2**64 / 2) {
-            dx = 2**64 - dx;
+            dx = int256(2**64) - dx;
         }
         if (dy > 2**64 / 2) {
-            dy = 2**64 - dy;
+            dy = int256(2**64) - dy;
         }
         if (dx > dy) {
             return uint256(dx);
@@ -455,9 +456,9 @@ library PureDungeon {
             y = -y;
         }
         if (x > y) {
-            return uint64(x);
+            return uint64(int64(x));
         } else {
-            return uint64(y);
+            return uint64(int64(y));
         }
     }
 
@@ -495,7 +496,7 @@ library PureDungeon {
         uint8 y
     ) internal pure returns (uint256) {
         (int64 areaX, int64 areaY, int64 floor, ) = _coordinates(areaLoc);
-        return _location(areaX * 9 - 4 + x, areaY * 9 - 4 + y, floor);
+        return _location(areaX * 9 - 4 + int64(uint64(x)), areaY * 9 - 4 + int64(uint64(y)), floor);
     }
 
     // direction based exit generation
@@ -511,7 +512,7 @@ library PureDungeon {
             exits = 0xF;
         } else {
             if (EXITS_INERTIA > uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(1)))) % 100)) {
-                exits = 2**direction;
+                exits = uint8(2) ** direction;
             }
             if (EXITS_BIFURCATION > uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(2)))) % 100)) {
                 if (
@@ -551,28 +552,28 @@ library PureDungeon {
         uint8 randLock = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(111)))) % 100);
         uint8 numLocks = randLock < (100 - LOCK_PROBABILITY) ? 0 : (randLock < (100 - TWO_LOCK_PROBABILITY) ? 1 : 2);
         if (numLocks >= 4) {
-            exits = exits | (15 * 2**4);
+            exits = exits | (15 * uint8(2) ** 4);
         } else if (numLocks == 3) {
             uint8 chosenLocks = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(112)))) % 4);
             uint8 locks = (chosenLocks + 1) * 7;
             if (locks == 21) {
-                exits = exits | (13 * 2**4);
+                exits = exits | (13 * uint8(2) ** 4);
             } else if (locks == 28) {
-                exits = exits | (11 * 2**4);
+                exits = exits | (11 * uint8(2) ** 4);
             }
             // 4 possibilities : 7 // 14 // 13 // 11
         } else if (numLocks == 2) {
             uint8 chosenLocks = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(112)))) % 6);
             uint8 locks = (chosenLocks + 1) * 3;
             if (locks == 15) {
-                exits = exits | (5 * 2**4);
+                exits = exits | (5 * uint8(2) ** 4);
             } else if (locks == 18) {
-                exits = exits | (10 * 2**4);
+                exits = exits | (10 * uint8(2) ** 4);
             }
             // 3 // 6 // 9 // 12 // 5 // 10
         } else if (numLocks == 1) {
             uint8 chosenLocks = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(112)))) % 4);
-            exits = exits | (2**chosenLocks * 2**4);
+            exits = exits | (uint8(2) ** chosenLocks * uint8(2) ** 4);
         }
         return exits;
     }
@@ -684,14 +685,14 @@ library PureDungeon {
         uint16 max,
         int64 change
     ) internal pure returns (uint16) {
-        int64 updated = int64(value) + int64(change);
-        if (updated > int64(max)) {
+        int64 updated = int64(uint64(value)) + int64(change);
+        if (updated > int64(uint64(max))) {
             return max;
         }
         if (updated <= 0) {
             return 0;
         } else {
-            return uint16(updated);
+            return uint16(int16(updated));
         }
     }
 

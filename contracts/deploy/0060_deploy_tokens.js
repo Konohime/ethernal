@@ -1,20 +1,29 @@
-module.exports = async ({ethers, deployments, network, getNamedAccounts}) => {
-  const dev_forceMine = !network.live;
+module.exports = async ({deployments, network, getNamedAccounts}) => {
   const {deploy} = deployments;
   const {deployer, dungeonOwner} = await getNamedAccounts();
 
-  const dungeonContract = await ethers.getContract('Dungeon');
+  const dungeonDeployment = await deployments.get('Dungeon');
 
   async function deployTokenContract(name) {
     return await deploy(name, {
       from: network.live ? deployer : dungeonOwner,
-      dev_forceMine,
-      proxy: 'postUpgrade',
-      args: [dungeonContract.address],
+      args: [], // Pas d'arguments au constructeur
+      proxy: {
+        proxyContract: 'EIP173Proxy',
+        execute: {
+          methodName: 'postUpgrade',
+          args: [dungeonDeployment.address],
+        },
+      },
       log: true,
+      waitConfirmations: 1,
     });
   }
+
   await deployTokenContract('Elements');
   await deployTokenContract('Gears');
   await deployTokenContract('Rooms');
 };
+
+module.exports.tags = ['Tokens', 'Elements', 'Gears', 'Rooms', 'core'];
+module.exports.dependencies = ['Dungeon'];

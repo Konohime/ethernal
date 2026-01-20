@@ -1,10 +1,9 @@
 /* eslint-disable no-throw-literal */
-const { BigNumber, utils } = require('ethers');
+import { getBytes, hexlify, AbiCoder } from 'ethers';
+import log from '../utils/log';
+import config from '../data/config';
 
-const { arrayify, hexlify, defaultAbiCoder } = utils;
-const log = require('../utils/log');
-
-const config = require('../data/config');
+const defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
 class PlayerWallet {
   constructor({ playerContract, destinationContract, playerAddress, delegateWallet, characterId }) {
@@ -18,7 +17,7 @@ class PlayerWallet {
 
   async fetchCharacterId() {
     if (!this.characterId) {
-      this.characterId = await this.playerContract.callStatic.getLastCharacterId(this.playerAddress);
+      this.characterId = await this.playerContract.getLastCharacterId(this.playerAddress);
     }
     return this.characterId;
   }
@@ -31,14 +30,15 @@ class PlayerWallet {
   async reserveGas({ limit = 400000, gasPrice = null }) {
     if (gasPrice === null) {
       const chainId = await this.provider.send('eth_chainId', []);
-      gasPrice = BigNumber.from(config(chainId).gasPrice);
+      gasPrice = BigInt(config(chainId).gasPrice);
     }
-    const gasEstimate = BigNumber.from(limit);
-    const gasLimit = gasEstimate.add(100000); // @TODO:: more accurate fix
+    const gasEstimate = BigInt(limit);
+    const gasLimit = gasEstimate + 100000n; // BigInt addition
 
-    const fee = gasPrice.mul(gasLimit);
+    const fee = gasPrice * gasLimit; // BigInt multiplication
 
-    if (fee.gt(await this.getBalance())) {
+    const balance = await this.getBalance();
+    if (fee > balance) { // BigInt comparison
       throw new Error(`not enough balance, needed: ${fee}`);
     }
 
@@ -56,11 +56,11 @@ class PlayerWallet {
       options = {};
     }
 
-    const { data } = await this.destinationContract.populateTransaction[methodName](...args);
+    const data = (await this.destinationContract[methodName].populateTransaction(...args)).data;
     const overrides = await this.reserveGas(options);
 
-    const tx = await this.playerContract.functions.callAsCharacter(
-      this.destinationContract.address,
+    const tx = await this.playerContract.callAsCharacter(
+      this.destinationContract.target, // ethers v6: .target instead of .address
       overrides.gasLimit,
       data,
       overrides,
@@ -70,16 +70,16 @@ class PlayerWallet {
       const receipt = await oldWait();
       receipt.methodName = methodName;
       receipt.args = args;
-      if (receipt.events && receipt.events.length > 0) {
-        const callEvent = receipt.events.find(({ event }) => event === 'Call');
+      if (receipt.logs && receipt.logs.length > 0) {
+        const callEvent = receipt.logs.find((log) => log.fragment?.name === 'Call');
         if (callEvent && !callEvent.args.success) {
-          const bytes = arrayify(callEvent.args[1]);
+          const bytes = getBytes(callEvent.args[1]);
           if (hexlify(bytes.slice(0, 4)) === '0x08c379a0') {
             const reason = defaultAbiCoder.decode(['string'], bytes.slice(4));
             throw { reason: reason[0], receipt };
           }
           throw { receipt, errorData: callEvent.args[1] };
-        } else {
+        } else if (callEvent) {
           // eslint-disable-next-line prefer-destructuring
           receipt.returnData = callEvent.args[1];
         }
@@ -104,4 +104,4 @@ class PlayerWallet {
   }
 }
 
-module.exports = PlayerWallet;
+export default PlayerWallet;

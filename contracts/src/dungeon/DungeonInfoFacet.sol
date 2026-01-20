@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "./DungeonFacetBase.sol";
 import "./PureDungeon.sol";
@@ -52,7 +53,7 @@ contract DungeonInfoFacet is DungeonFacetBase {
         accessory2 = character.slot_4;
         accessory3 = character.slot_5;
         floors = character.floors;
-        player = address(_charactersContract.getSubOwner(characterId));
+        player = address(uint160(_charactersContract.getSubOwner(characterId)));
         taxDueDate = _taxDueDate[player];
     }
 

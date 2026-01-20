@@ -486,23 +486,19 @@
 
 <style lang="scss">
   @import '../../styles/variables';
-
   .minimap {
     height: 100%;
     background-color: $color-background;
-
     @media screen and (min-width: $desktop-min-width) {
       width: 100%;
       background-color: $color-background;
     }
-
     &--map {
       width: 100%;
       height: 100%;
       background: transparent;
     }
-
-    :global(.leaflet-bar a, .minimap-control-btn) {
+    :global(.leaflet-bar a) {
       cursor: pointer;
       width: 36px;
       height: 32px;
@@ -513,24 +509,32 @@
     }
     :global(.minimap-control-btn) {
       cursor: pointer !important;
+      width: 36px;
+      height: 32px;
+      line-height: 32px;
+      background-color: $color-dark;
+      color: $color-light;
+      border-bottom-color: $color-grey;
       border-radius: 4px;
       border: none;
       outline: none;
       font-size: 9px;
       text-align: center;
-      line-height: 16px;
     }
     :global(.minimap-control-btn img) {
       height: 16px;
       vertical-align: middle;
     }
-    :global(.leaflet-disabled, .minimap-control-btn.disabled) {
+    :global(.leaflet-disabled) {
       background-color: $color-dark;
       color: $color-light;
       opacity: 0.48;
-    }
-    :global(.leaflet-disabled) {
       cursor: not-allowed;
+    }
+    :global(.minimap-control-btn.disabled) {
+      background-color: $color-dark;
+      color: $color-light;
+      opacity: 0.48;
     }
   }
 </style>

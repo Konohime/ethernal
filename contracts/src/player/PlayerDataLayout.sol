@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "../characters/Characters.sol";
 import "./Pool.sol";
@@ -17,14 +18,14 @@ interface Enterable {
 contract PlayerDataLayout {
     uint256 internal MIN_BALANCE; // = 5000000000000000;
 
-    struct Player {
+    struct PlayerStruct {
         uint128 energy;
         uint128 freeEnergy;
     }
 
     address payable _feeRecipient;
     mapping(address => address) _delegates;
-    mapping(address => Player) _players;
+    mapping(address => PlayerStruct) _players;
     mapping(address => uint256) _lastCharacterIds;
 
     Characters _charactersContract;

@@ -7,6 +7,7 @@ import log from 'utils/log';
 import PlayerWallet from 'lib/PlayerWallet';
 import { locationToCoordinates, coordinatesToLocation } from 'utils/utils';
 import cacheUrl from 'lib/cacheUrl';
+import { get } from 'svelte/store';
 
 const config = require('../data/config');
 
@@ -27,10 +28,11 @@ class Dungeon {
   constructor({ ethersProvider, wallet, contract, playerContract, transferer, ubf }) {
     this.provider = ethersProvider;
     this.wallet = wallet; // to perform tx on behalf of current user
-    this.contract = new ethers.Contract(contract.address, contract.abi, this.provider);
-    this.playerContract = new ethers.Contract(playerContract.address, playerContract.abi, this.provider);
-    this.transferer = new ethers.Contract(transferer.address, transferer.abi, this.provider);
-    this.ubf = new ethers.Contract(ubf.address, ubf.abi, this.provider);
+    // En ethers v6, .target remplace .address, et les contrats sont déjà créés
+    this.contract = contract.target ? contract : new ethers.Contract(contract.address, contract.abi, this.provider);
+    this.playerContract = playerContract.target ? playerContract : new ethers.Contract(playerContract.address, playerContract.abi, this.provider);
+    this.transferer = transferer.target ? transferer : new ethers.Contract(transferer.address, transferer.abi, this.provider);
+    this.ubf = ubf.target ? ubf : new ethers.Contract(ubf.address, ubf.abi, this.provider);
   }
 
   static moveToDirection({ from, to }) {
@@ -81,8 +83,9 @@ class Dungeon {
       delegateWallet: this.delegateWallet,
     });
 
-    const chainId = await this.provider.send('eth_chainId', []);
-    const gasPrice = ethers.BigNumber.from(config(chainId).gasPrice);
+    const network = await this.provider.getNetwork();
+    const chainId = network.chainId.toString();
+    const gasPrice = BigInt(config(chainId).gasPrice);
     this.defaultOpts = {
       gas: 4000000,
       gasPrice,
@@ -460,7 +463,7 @@ class Dungeon {
   async sendGearsToVault(gearIds) {
     return nprogress.observe(
       this.transferWallet
-        .tx('batchTransferGearOut', this.character, this.wallet.getAddress(), gearIds)
+        .tx('batchTransferGearOut', this.character, get(this.wallet).address, gearIds)
         .then(tx => tx.wait()),
     );
   }
@@ -478,7 +481,7 @@ class Dungeon {
     }
     return nprogress.observe(
       this.transferWallet
-        .tx('batchTransferElementsOut', this.character, this.wallet.getAddress(), elements)
+        .tx('batchTransferElementsOut', this.character, get(this.wallet).address, elements)
         .then(tx => tx.wait()),
     );
   }
@@ -490,7 +493,7 @@ class Dungeon {
    * @returns {Promise<Boolean>} is approved?
    */
   async isCarrierApproved(nft = 'Gears') {
-    return this.wallet.call(nft, 'isApprovedForAll', this.wallet.getAddress(), this.transferer.address);
+    return this.wallet.call(nft, 'isApprovedForAll', get(this.wallet).address, this.transferer.address);
   }
 
   /**
@@ -554,7 +557,7 @@ class Dungeon {
   }
 
   async isDungeonApproved(nft = 'Elements') {
-    return this.wallet.call(nft, 'isApprovedForAll', this.wallet.getAddress(), this.contract.address);
+    return this.wallet.call(nft, 'isApprovedForAll', get(this.wallet).address, this.contract.address);
   }
 
   /**
@@ -645,7 +648,7 @@ class Dungeon {
    * @return {Promise<*>} { amount, ubfBalance, slot, claimed, untilNextSlot }
    */
   async ubfInfo() {
-    return this.wallet.call('UBF', 'getInfo', this.wallet.getAddress());
+    return this.wallet.call('UBF', 'getInfo', get(this.wallet).address);
   }
 
   /**

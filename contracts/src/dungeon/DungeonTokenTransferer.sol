@@ -1,6 +1,7 @@
-pragma solidity 0.6.5;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
+import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./DungeonInfoFacet.sol";
 import "./DungeonMovementFacet.sol";
 import "./PureDungeon.sol";
@@ -74,7 +75,7 @@ contract DungeonTokenTransferer is Proxied, DungeonTokenTransfererDataLayout {
 
     function batchTransferGearIn(uint256 characterId, uint256[] calldata ids) external useCarrier(characterId) {
         address sender = _msgSender();
-        require(_characters.getSubOwner(characterId) == uint256(sender), "subOwner is not sender");
+        require(_characters.getSubOwner(characterId) == uint256(uint160(sender)), "subOwner is not sender");
         _gears.batchTransferFrom(sender, address(_dungeon), ids);
         _gears.subBatchTransferFrom(address(_dungeon), 0, characterId, ids);
     }
@@ -96,7 +97,7 @@ contract DungeonTokenTransferer is Proxied, DungeonTokenTransfererDataLayout {
 
     function batchTransferElementsIn(uint256 characterId, uint256[] calldata amounts) external useCarrier(characterId) {
         address sender = _msgSender();
-        require(_characters.getSubOwner(characterId) == uint256(sender), "subOwner is not sender");
+        require(_characters.getSubOwner(characterId) == uint256(uint160(sender)), "subOwner is not sender");
         for (uint256 i = 0; i < amounts.length; i++) {
             uint256 amount = amounts[i];
             if (amount > 0) {
@@ -221,7 +222,7 @@ contract DungeonTokenTransferer is Proxied, DungeonTokenTransfererDataLayout {
         emit Exchange(seller.characterId, buyer.characterId, seller, buyer);
     }
 
-    function _msgSender() internal returns (address) {
+    function _msgSender() internal view returns (address) {
         return msg.sender; // TODO ?
     }
 

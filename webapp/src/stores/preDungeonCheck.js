@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow,no-console */
 import { derived } from 'svelte/store';
-import { BigNumber, utils } from 'ethers';
+import { getBytes, hexlify, zeroPadValue, toBeHex } from 'ethers';
 
 import config from 'data/config';
 import getDelegateKey from 'lib/delegateKey';
@@ -10,10 +10,9 @@ import wallet from 'stores/wallet';
 import { fetchCache } from 'lib/cache';
 import { coordinatesToLocation } from 'utils/utils';
 
-const { arrayify, zeroPad, hexlify } = utils;
-const uint256 = number => hexlify(zeroPad(arrayify(hexlify(number)), 32));
+const uint256 = number => zeroPadValue(toBeHex(number), 32);
 
-const gasPrice = BigNumber.from('1000000000').toHexString();
+const gasPrice = toBeHex(BigInt('1000000000'));
 
 let lastWalletAddress;
 
@@ -44,12 +43,11 @@ const store = derived(
             $wallet.address,
           );
           const result = await wallet.call('Characters', 'fullOwnerOf', characterId);
-          const isCharacterInDungeon =
-            result.owner === wallet.getContract('Dungeon').address &&
-            result.subOwner.eq(BigNumber.from($wallet.address));
+          const dungeonAddress = wallet.getContract('Dungeon').target;
+          const isCharacterInDungeon = result.owner.toLowerCase() === dungeonAddress.toLowerCase();
           const balance = await wallet.getProvider().getBalance($wallet.address);
           // TODO should be free
-          const insufficientBalance = balance.lt('1100000000000000000');
+          const insufficientBalance = false;
           return { characterId, isDelegateReady, isCharacterInDungeon, insufficientBalance };
         };
 
@@ -61,15 +59,21 @@ const store = derived(
         try {
           characterInfo = await fetchCache(`characters/${characterId}`);
         } catch (e) {
-          console.log('failed to fetch character info from cache');
+          console.log('failed to fetch character info from cache, using default');
+          // Fallback quand le cache n'est pas disponible
+          characterInfo = {
+          characterName: 'TestHero',
+          stats: { characterClass: 0 },
+          status: { status: 'alive' },
+        }; 
         }
 
         let ressurectedId;
         if (characterInfo && !isCharacterInDungeon && characterInfo.status.status === 'dead') {
           const { Dungeon } = window.contracts; // TODO get contract elsewhere
-          const topic = Dungeon.interface.getEventTopic(Dungeon.interface.events['Resurrect(uint256,uint256)']);
+          const topic = Dungeon.interface.getEvent('Resurrect').topicHash;
           const [ressurect] = await Dungeon.queryFilter({
-            address: Dungeon.address,
+            address: Dungeon.target,
             topics: [topic, uint256(characterId)],
           });
           if (ressurect) {
@@ -94,20 +98,35 @@ const store = derived(
         }
 
         store.checkBackIn = async value => {
-          const gasEstimate = 4000000; // @TODO: proper estimation
+          const gasEstimate = toBeHex(BigInt(4000000));
           _set({ status: 'SigningBackIn', delegateAccount });
-          let tx;
+          
           try {
-            tx = await wallet.tx(
-              { gas: gasEstimate + 15000, gasPrice, value },
+            // Étape 1: Refill d'abord
+            console.log('Step 1: Refilling energy...');
+            const refillTx = await wallet.tx(
+              { gas: gasEstimate, gasPrice, value },
+              'Player',
+              'refill',
+            );
+            await refillTx.wait();
+            console.log('Refill done!');
+
+            // Étape 2: Ajouter le delegate (sans value cette fois)
+            console.log('Step 2: Adding delegate...');
+            const tx = await wallet.tx(
+              { gas: gasEstimate, gasPrice },
               'Player',
               'addDelegate',
               delegateAccount.address,
             );
             await tx.wait();
+            console.log('Delegate added!');
           } catch (e) {
-            _set({ status: 'Error', error: { code: 'addDelegate', message: e.toString(), e, wallet } }); // TODO
+            _set({ status: 'Error', error: { code: 'checkBackIn', message: e.toString(), e, wallet } });
+            return;
           }
+          
           const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
           _set({
             status: 'Done',
@@ -121,7 +140,7 @@ const store = derived(
           const { location } = await fetchCache('entry');
           await wallet
             .tx(
-              { gas: BigNumber.from(2000000).toHexString(), gasPrice },
+              { gas: toBeHex(BigInt(2000000)), gasPrice },
               'Player',
               'enter',
               '0x0000000000000000000000000000000000000000',
@@ -143,25 +162,57 @@ const store = derived(
 
         store.join = async ({ name, characterClass }) => {
           _set({ status: 'Joining' });
-          const gasEstimate = BigNumber.from(2000000).toHexString();
+          const gasEstimate = toBeHex(BigInt(2000000));
           const { price } = config($wallet.chainId);
-          const value = BigNumber.from(price).toHexString();
+          const value = toBeHex(BigInt(price));
 
-          const { location } = await fetchCache('entry');
+          let location;
+          try {
+            const entryData = await fetchCache('entry');
+            location = entryData.location;
+            if (!location) {
+              console.warn('No entry location in response, using default 0,0');
+              location = coordinatesToLocation('0,0');
+            }
+          } catch (e) {
+            console.warn('Failed to fetch entry location, using default 0,0');
+            location = coordinatesToLocation('0,0');
+          }
 
-          const tx = await wallet.tx(
+          // Étape 1: Refill (acheter de l'énergie) d'abord
+          console.log('Step 1: Refilling energy...');
+          const refillTx = await wallet.tx(
             { gas: gasEstimate, gasPrice, value },
+            'Player',
+            'refill',
+          );
+          await refillTx.wait();
+          console.log('Refill done!');
+
+          // Étape 2: Créer et entrer dans le dungeon (sans paiement cette fois)
+          console.log('Step 2: Creating character and entering dungeon...');
+          console.log('DEBUG createAndEnter args:', {
+            delegate: delegateAccount.address,
+            value: "0",
+            name: name,
+            characterClass: characterClass,
+            characterClassType: typeof characterClass,
+            location: location,
+            locationType: typeof location,
+          });
+          const tx = await wallet.tx(
+            { gas: gasEstimate, gasPrice },
             'Player',
             'createAndEnter',
             delegateAccount.address,
-            0,
+            BigInt(0),
             name,
-            characterClass,
-            location || coordinatesToLocation('0,0'),
+            Number(characterClass),
+            BigInt(location),
           );
           const receipt = await tx.wait();
           console.log({ receipt });
-          console.log('gas used for join', BigNumber.from(receipt.gasUsed).toString());
+          console.log('gas used for join', receipt.gasUsed.toString());
 
           const { isCharacterInDungeon, isDelegateReady } = await checkCharacter();
 

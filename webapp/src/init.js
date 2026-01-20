@@ -1,3 +1,6 @@
+/**
+ * App initialization - runs before App.svelte
+ */
 import { getParamsFromURLHash, getParamsFromURL, rebuildLocationHash } from 'utils/web';
 import { CURRENT_GAME_VERSION, CURRENT_PREDUNGEON_VERSION } from 'data/constants';
 
@@ -25,7 +28,7 @@ if (!preDungeonVersion || parseInt(preDungeonVersion, 10) < CURRENT_PREDUNGEON_V
 }
 
 // Determine current hash parameters
-if (process.browser) {
+if (typeof window !== 'undefined') {
   window.params = getParamsFromURL();
   window.hashParams = getParamsFromURLHash();
 

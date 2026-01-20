@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "./DungeonFacetBase.sol";
 import "./PureDungeon.sol";
@@ -26,7 +27,7 @@ contract DungeonActionsFacet is DungeonFacetBase {
     function buyRoom(uint256 characterId) external onlyPlayer {
         uint256 location = _characters[characterId].location;
         uint256 owner = _roomsContract.subOwnerOf(location);
-        require(_taxDueDate[address(owner)] < block.timestamp, "not foreclosed");
+        require(_taxDueDate[address(uint160(owner))] < block.timestamp, "not foreclosed");
         _elementsContract.subBurnFrom(characterId, PureDungeon.COINS, 2);
         uint256 buyer = _charactersContract.getSubOwner(characterId);
         _initializeTaxDueDate(buyer);
@@ -37,23 +38,23 @@ contract DungeonActionsFacet is DungeonFacetBase {
         uint256 owner = _roomsContract.subOwnerOf(location);
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
-        _roomsContract.subTransferFrom(address(this), owner, uint256(address(this)), location);
+        _roomsContract.subTransferFrom(address(this), owner, uint256(uint160(address(this))), location);
     }
 
     function deactivateRoom(uint256 characterId, uint256 location) external onlyPlayer {
         uint256 owner = _roomsContract.subOwnerOf(location);
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
-        _elementsContract.transferFrom(address(owner), address(0), PureDungeon.COINS, 100);
-        _roomsContract.transferFrom(address(this), address(owner), location);
+        _elementsContract.transferFrom(address(uint160(owner)), address(0), PureDungeon.COINS, 100);
+        _roomsContract.transferFrom(address(this), address(uint160(owner)), location);
     }
 
     function activateRoom(uint256 characterId, uint256 location) external onlyPlayer {
         uint256 player = _charactersContract.getSubOwner(characterId);
-        uint256 owner = uint256(_roomsContract.ownerOf(location));
-        require(owner != uint256(address(this)), "not deactivated");
+        uint256 owner = uint256(uint160(_roomsContract.ownerOf(location)));
+        require(owner != uint256(uint160(address(this))), "not deactivated");
         require(owner == player, "not owner");
-        _roomsContract.transferFrom(address(owner), address(this), location);
+        _roomsContract.transferFrom(address(uint160(owner)), address(this), location);
         _initializeTaxDueDate(owner);
         _roomsContract.subTransferFrom(address(this), 0, owner, location);
     }
@@ -62,7 +63,7 @@ contract DungeonActionsFacet is DungeonFacetBase {
         uint256 owner = _roomsContract.subOwnerOf(location);
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
-        _elementsContract.transferFrom(address(owner), address(0), PureDungeon.COINS, 20);
+        _elementsContract.transferFrom(address(uint160(owner)), address(0), PureDungeon.COINS, 20);
         _customRoomNames[location] = name;
         emit RoomName(location, name, characterId);
     }
@@ -71,8 +72,8 @@ contract DungeonActionsFacet is DungeonFacetBase {
 
     function payRoomsTax(uint256 characterId, uint256 periods) external onlyPlayer {
         require(periods > 0, "one period atleast");
-        address owner = address(_charactersContract.getSubOwner(characterId));
-        uint256 rooms = _roomsContract.subBalanceOf(uint256(owner));
+        address owner = address(uint160(_charactersContract.getSubOwner(characterId)));
+        uint256 rooms = _roomsContract.subBalanceOf(uint256(uint160(owner)));
         require(rooms > 0, "not dungeon keeper");
         uint256 tax = PureDungeon._roomsTax(rooms, periods);
         _elementsContract.transferFrom(owner, address(0), PureDungeon.COINS, tax);

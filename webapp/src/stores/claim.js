@@ -1,5 +1,5 @@
 import { derived } from 'svelte/store';
-import { Wallet, BigNumber, utils } from 'ethers';
+import { Wallet, formatUnits } from 'ethers';
 
 import wallet from 'stores/wallet';
 import log from 'utils/log';
@@ -10,15 +10,12 @@ const claimKey = hashParams.dungeonKey;
 const clearClaimKey = () => {
   delete hashParams.dungeonKey;
   rebuildLocationHash(hashParams);
-  hashParams.dungeonKey = claimKey; // keep it in memory // @TODO: remove, local wallet creation need to be driven by claim
+  hashParams.dungeonKey = claimKey; // keep it in memory
 };
-
-// @TODO: ?const allowLocalKey = typeof window.params.allowLocalKey !== 'undefined'? window.params.allowLocalKey !== 'false' : false;
 
 let $claim = {
   status: claimKey ? 'Loading' : 'None',
   claimKey,
-  // allowLocalKey
 };
 window.$claim = $claim;
 
@@ -32,12 +29,12 @@ const store = derived(
       set($claim);
     };
 
-    const gasPrice = BigNumber.from('1000000000'); // await provider.getGasPrice();
-    const gasLimit = BigNumber.from(21000);
-    const gasFee = gasLimit.mul(gasPrice);
-    const extraValue = BigNumber.from('100000000000000');
-    const minimum = gasFee.add(extraValue);
-    const maximum = BigNumber.from('4000000000000000000'); // @TODO: config)
+    const gasPrice = BigInt('1000000000');
+    const gasLimit = BigInt(21000);
+    const gasFee = gasLimit * gasPrice;
+    const extraValue = BigInt('100000000000000');
+    const minimum = gasFee + extraValue;
+    const maximum = BigInt('4000000000000000000');
 
     if (claimKey && typeof $claim.rawBalance === 'undefined') {
       try {
@@ -46,10 +43,10 @@ const store = derived(
         if (provider) {
           (async () => {
             let claimBalance = await wallet.getFallbackProvider().getBalance(claimWallet.address);
-            if (claimBalance.lt(minimum)) {
-              claimBalance = BigNumber.from(0);
+            if (claimBalance < minimum) {
+              claimBalance = BigInt(0);
             }
-            if (claimBalance.gt(maximum)) {
+            if (claimBalance > maximum) {
               claimBalance = maximum;
             }
             // eslint-disable-next-line no-console
@@ -57,21 +54,21 @@ const store = derived(
               address: claimWallet.address,
               status: 'WaitingWallet',
               rawBalance: claimBalance,
-              balance: utils.formatUnits(claimBalance, 18),
+              balance: formatUnits(claimBalance, 18),
             });
             _set({
               status: 'WaitingWallet',
               rawBalance: claimBalance,
-              balance: utils.formatUnits(claimBalance, 18),
+              balance: formatUnits(claimBalance, 18),
             });
           })();
         }
       } catch (e) {
-        const claimBalance = BigNumber.from(0);
+        const claimBalance = BigInt(0);
         _set({
           status: 'WaitingWallet',
           rawBalance: claimBalance,
-          balance: utils.formatUnits(claimBalance, 18),
+          balance: formatUnits(claimBalance, 18),
         });
       }
     }
@@ -118,12 +115,12 @@ const store = derived(
       const claimBalance = await provider.getBalance(claimWallet.address);
       log.trace({ claimBalance });
 
-      const claimValue = BigNumber.from('5000000000000000000'); // @TODO: from Config 5 DAI
-      if (claimBalance.gte(minimum)) {
+      const claimValue = BigInt('5000000000000000000');
+      if (claimBalance >= minimum) {
         const signer = claimWallet.connect(provider);
-        let value = claimBalance.sub(gasFee);
-        const maxValue = BigNumber.from(claimValue);
-        if (value.gt(maxValue)) {
+        let value = claimBalance - gasFee;
+        const maxValue = BigInt(claimValue);
+        if (value > maxValue) {
           value = maxValue;
         }
         _set({ status: 'Claiming' });

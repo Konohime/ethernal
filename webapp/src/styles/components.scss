@@ -271,7 +271,7 @@ a.btn {
   &:disabled,
   &[disabled] {
     opacity: 0.2 !important;
-    filter: alpha(opacity=50);
+    // filter: alpha(opacity=50);
     cursor: not-allowed;
   }
 

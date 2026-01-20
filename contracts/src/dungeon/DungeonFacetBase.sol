@@ -1,6 +1,7 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-import "buidler-deploy/solc_0.6/proxy/diamond/DiamondStorageContract.sol";
+import "../diamond/DiamondStorageContract.sol";
 import "./DungeonDataLayout.sol";
 import "./DungeonEvents.sol";
 import "./PureDungeon.sol";
@@ -296,18 +297,18 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         Room storage nextRoom = _rooms[newLocation];
         uint64 cb = currentRoom.blockNumber;
         uint64 nb = nextRoom.blockNumber;
-        uint8 exitMask = uint8(2)**direction;
-        uint8 opositeExitMask = uint8(2)**((direction + 2) % 4);
+        uint8 exitMask = uint8(2) ** direction;
+        uint8 opositeExitMask = uint8(2) ** ((direction + 2) % 4);
         if (cb < nb || nb == 0) {
             if ((currentRoom.exits & exitMask) == exitMask) {
-                if ((currentRoom.exits / 2**4) & exitMask == exitMask) {
+                if ((currentRoom.exits / 2 ** 4) & exitMask == exitMask) {
                     _handleKey(characterId, oldLocation, newLocation);
                 }
                 return newLocation;
             }
         } else if (cb > nb) {
             if ((nextRoom.exits & opositeExitMask) == opositeExitMask) {
-                if ((nextRoom.exits / 2**4) & opositeExitMask == opositeExitMask) {
+                if ((nextRoom.exits / 2 ** 4) & opositeExitMask == opositeExitMask) {
                     _handleKey(characterId, oldLocation, newLocation);
                 }
                 return newLocation;
@@ -315,11 +316,11 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         } else {
             if ((currentRoom.exits & exitMask) == exitMask || (nextRoom.exits & opositeExitMask) == opositeExitMask) {
                 if (oldLocation > newLocation) {
-                    if ((nextRoom.exits / 2**4) & opositeExitMask == opositeExitMask) {
+                    if ((nextRoom.exits / 2 ** 4) & opositeExitMask == opositeExitMask) {
                         _handleKey(characterId, oldLocation, newLocation);
                     }
                 } else {
-                    if ((currentRoom.exits / 2**4) & exitMask == exitMask) {
+                    if ((currentRoom.exits / 2 ** 4) & exitMask == exitMask) {
                         _handleKey(characterId, oldLocation, newLocation);
                     }
                 }
@@ -357,7 +358,7 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
             }
             _actualiseRoom(location);
             address benefactor = _roomBenefactor(location);
-            if (benefactor != address(0) && uint256(benefactor) != _charactersContract.getSubOwner(characterId)) {
+            if (benefactor != address(0) && uint256(uint160(benefactor)) != _charactersContract.getSubOwner(characterId)) {
                 _elementsContract.mintVault(benefactor, PureDungeon.FRAGMENTS, 1);
                 emit RoomIncome(location, benefactor, PureDungeon.FRAGMENTS, 1);
             }
@@ -392,9 +393,9 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         return owner == address(this);
     }
 
-    function _roomBenefactor(uint256 location) internal view returns (address){
+    function _roomBenefactor(uint256 location) internal view returns (address) {
         if (_isRoomActive(location)) {
-            return address(_roomsContract.subOwnerOf(location));
+            return address(uint160(_roomsContract.subOwnerOf(location)));
         } else {
             return address(0);
         }
@@ -447,8 +448,8 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
     function _initializeTaxDueDate(uint256 owner) internal {
         if (owner != 0 && _roomsContract.subBalanceOf(owner) == 0) {
             uint256 dueDate = block.timestamp + 5 days;
-            _taxDueDate[address(owner)] = dueDate;
-            emit RoomTaxPay(address(owner), 0, dueDate);
+            _taxDueDate[address(uint160(owner))] = dueDate;
+            emit RoomTaxPay(address(uint160(owner)), 0, dueDate);
         }
     }
 }

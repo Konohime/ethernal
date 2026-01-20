@@ -1,72 +1,75 @@
-const qrcode = require('qrcode');
-const {Wallet, BigNumber} = require('ethers');
 const fs = require('fs');
-const webappConfig = require('../../webapp/src/data/config');
 
-module.exports = async ({network, getChainId, getNamedAccounts, deployments}) => {
-  const {execute, deployIfDifferent, log} = deployments;
-  const chainId = await getChainId();
-  const config = webappConfig(chainId); // TODO contract expose min balance / price
-  const gasPrice = BigNumber.from(config.gasPrice); // 1000000000
-  const gas = 6000000;
+module.exports = async ({network, getNamedAccounts, deployments, ethers}) => {
+  const {execute, deploy, log} = deployments;
 
+  // Skip on live networks unless explicitly requested
   if (network.live && !process.env.GENERATE_KEYS) {
-    log('skip deployment chain, require manual intervention');
+    log('Skipping claim key generation on live network (set GENERATE_KEYS=true to enable)');
     return;
-  }
-  const dev_forceMine = true;
-
-  let offset = 0;
-  let mnemonic = 'poet state twin chunk pottery boss final sudden matter express nasty control'; // keep old claimKey for local
-  if (network.live) {
-    offset = 3200;
-    mnemonic = 'wild cement you coffee payment answer kitten garden imitate label critic company';
   }
 
   const {deployer} = await getNamedAccounts();
-  let numClaimKey = 200;
-  if (!network.live) {
-    numClaimKey = 5;
-  }
-  const random = false; // false
-  const claimKeys = [];
-  const price = BigNumber.from(config.price);
-  const claimKeyValue = price.mul(5); // ~< 5 refill
 
-  const result = await deployIfDifferent(['data'], 'Batch', {from: deployer, gas, gasPrice, dev_forceMine}, 'Batch');
-  if (!result.newlyDeployed) {
-    log('reusing Batch contract');
+  // Configuration
+  let offset = 0;
+  let mnemonic = 'poet state twin chunk pottery boss final sudden matter express nasty control';
+  let numClaimKey = 5;
+  
+  if (network.live) {
+    offset = 3200;
+    mnemonic = 'wild cement you coffee payment answer kitten garden imitate label critic company';
+    numClaimKey = 200;
   }
-  log('sending from', deployer);
+
+  // Default values
+  const claimKeyValue = ethers.parseEther('0.05'); // ~5 refills worth
+
+  // Deploy Batch contract if needed
+  const batch = await deploy('Batch', {
+    from: deployer,
+    log: true,
+    waitConfirmations: 1,
+  });
+
+  log(`Generating ${numClaimKey} claim keys...`);
+  
+  const claimKeys = [];
   const addresses = [];
-  let totalValue = BigNumber.from(0);
+  let totalValue = 0n;
+
   for (let i = offset; i < numClaimKey + offset; i++) {
-    let wallet;
-    if (random) {
-      wallet = Wallet.createRandom();
-    } else {
-      let path = "m/44'/60'/" + i + "'/0/0";
-      wallet = Wallet.fromMnemonic(mnemonic, path);
-    }
+    const path = `m/44'/60'/${i}'/0/0`;
+    const wallet = ethers.HDNodeWallet.fromMnemonic(
+      ethers.Mnemonic.fromPhrase(mnemonic),
+      path
+    );
     claimKeys.push(wallet.privateKey);
     addresses.push(wallet.address);
-    totalValue = totalValue.add(claimKeyValue);
+    totalValue += claimKeyValue;
   }
-  log(`sending ${claimKeyValue.toString()} to each of the ${numClaimKey} claimKeys...`);
+
+  log(`Sending ${ethers.formatEther(claimKeyValue)} ETH to each of ${numClaimKey} claim keys...`);
+  
   await execute(
     'Batch',
-    {from: deployer, value: totalValue.toString(), gas: 6000000, dev_forceMine},
+    {from: deployer, value: totalValue.toString(), gasLimit: 6000000},
     'transfer',
-    addresses,
+    addresses
   );
-  fs.writeFileSync('.claimKeys', JSON.stringify(claimKeys, null, 2));
-  var csv = 'key,qrURL,url,used\n';
+
+  // Save claim keys to files
+  fs.writeFileSync('.claimKeys.json', JSON.stringify(claimKeys, null, 2));
+  
+  let csv = 'key,url,used\n';
   for (const claimKey of claimKeys) {
-    const url = 'https://alpha.ethernal.world/#dungeonKey=' + claimKey;
-    const qrURL = await qrcode.toDataURL(url);
-    csv += claimKey + ',"' + qrURL + '",' + url + ',false ' + '\n';
+    const url = `https://alpha.ethernal.world/#dungeonKey=${claimKey}`;
+    csv += `${claimKey},${url},false\n`;
   }
   fs.writeFileSync('.claimKeys.csv', csv);
-  log(`${numClaimKey} generated in .claimKeys and .claimKeys.csv`);
+
+  log(`${numClaimKey} claim keys generated in .claimKeys.json and .claimKeys.csv`);
 };
+
 module.exports.tags = ['ClaimKeys'];
+module.exports.skip = async ({network}) => network.live && !process.env.GENERATE_KEYS;

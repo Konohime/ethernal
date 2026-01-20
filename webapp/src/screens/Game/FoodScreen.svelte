@@ -1,6 +1,6 @@
 <script>
   import moment from 'moment';
-  import { utils, BigNumber } from 'ethers';
+  import { formatEther } from 'ethers';
   import { derived } from 'svelte/store';
 
   import { playerEnergy, characterStatus, needFood } from 'lib/cache';
@@ -18,14 +18,14 @@
 
   const minBalance = '10000000000000000';
 
-  $: price = BigNumber.from(config($wallet.chainId).price);
-  $: food = utils.formatEther($playerEnergy);
-  $: level = BigNumber.from($playerEnergy).mul(100).div(BigNumber.from(price)).toNumber();
+  $: price = BigInt(config($wallet.chainId).price);
+  $: food = formatEther($playerEnergy);
+  $: level = Number((BigInt($playerEnergy) * 100n) / price);
   $: dead = $characterStatus === 'dead';
 
-  $: refillToMax = !($balance && BigNumber.from(price).add(minBalance).sub($playerEnergy).gt($balance));
-  $: refillBN = refillToMax ? BigNumber.from(price).sub($playerEnergy) : $balance.sub(minBalance);
-  $: refillAmount = refillBN.div('1000000000000000').toNumber() / 1000;
+  $: refillToMax = !($balance && (price + BigInt(minBalance) - BigInt($playerEnergy)) > BigInt($balance));
+  $: refillBN = refillToMax ? price - BigInt($playerEnergy) : BigInt($balance) - BigInt(minBalance);
+  $: refillAmount = Number(refillBN / 1000000000000000n) / 1000;
 
   const balance = derived([wallet, playerEnergy], async ([{ address }], set) => {
     wallet
@@ -37,9 +37,9 @@
   const ubf = derived([dungeon, playerEnergy], async ([$dungeon, _], set) => {
     const { amount, ubfBalance, nextSlotTime, claimed } = await $dungeon.ubfInfo();
     set({
-      amount: amount.div('1000000000000000').toNumber() / 1000,
-      balance: ubfBalance.div('1000000000000000').toNumber() / 1000,
-      nextSlotTime: moment.unix(nextSlotTime),
+      amount: Number(BigInt(amount) / 1000000000000000n) / 1000,
+      balance: Number(BigInt(ubfBalance) / 1000000000000000n) / 1000,
+      nextSlotTime: moment.unix(Number(nextSlotTime)),
       claimed,
     });
   });
@@ -184,30 +184,30 @@
         </h6>
         {#if $needFood && $ubf && (!$ubf.claimed || ($ubf.claimed && !$untilNext))}
           <BoxButton
-            isDisabled="{level >= 100 || dead || refillBN.eq('0')}"
+            isDisabled="{level >= 100 || dead || refillBN === 0n}"
             onClick="{claim}"
             type="full"
             loadingText="Claiming free food..."
           >
-            Claim free food & refill ({$ubf.amount} $MATIC)
+            Claim free food & refill ({$ubf.amount} $ETH)
           </BoxButton>
         {:else}
           <BoxButton
-            isDisabled="{level >= 100 || dead || refillBN.eq('0')}"
+            isDisabled="{level >= 100 || dead || refillBN === 0n}"
             onClick="{refill}"
             type="full"
             loadingText="Refilling..."
           >
             Refill
             {#if $needFood}now{/if}
-            ({refillAmount} $MATIC)
+            ({refillAmount} $ETH)
           </BoxButton>
         {/if}
       </div>
 
       <p>
-        My $MATIC Balance:
-        <span class="highlight">{($balance && $balance.div('1000000000000000').toNumber() / 1000) || '...'}</span>
+        My $ETH Balance:
+        <span class="highlight">{($balance && Number(BigInt($balance) / 1000000000000000n) / 1000) || '...'}</span>
       </p>
 
       {#if $ubf}
@@ -216,7 +216,7 @@
           <p>
             <small>
               Total Food Bank:
-              <span class="highlight">{$ubf.balance} $MATIC</span>
+              <span class="highlight">{$ubf.balance} $ETH</span>
             </small>
           </p>
           {#if $ubf.claimed && $untilNext}
@@ -227,7 +227,7 @@
           {/if}
           <p>
             Current free food:
-            <span class="highlight">{$ubf.amount} $MATIC</span>
+            <span class="highlight">{$ubf.amount} $ETH</span>
             <br />
             <small>(Claim when food bar is empty)</small>
           </p>

@@ -1,0 +1,323 @@
+{
+  "address": "0x7910a46AE16e2719A8c206f05B8943b7352A26bc",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "slot",
+          "type": "uint256"
+        }
+      ],
+      "name": "Claimed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Received",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_FOOD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "SLOT_INTERVAL",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimUBF",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        }
+      ],
+      "name": "claimUBFAsCharacter",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "getClaimAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "getInfo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "ubfBalance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "slot",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "nextSlotTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "claimed",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract Characters",
+          "name": "charactersContract",
+          "type": "address"
+        }
+      ],
+      "name": "postUpgrade",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "txCharge",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "poolFee",
+          "type": "uint256"
+        }
+      ],
+      "name": "recordCharge",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "register",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "transactionHash": "0xc1b6307d1e9cfc73ac17293d6ea0d5bedf348127c56688d0538c7b682821f3d7",
+  "receipt": {
+    "to": null,
+    "from": "0x78fAf6C26b364141fAd67c544A2DdE6Bc985baf4",
+    "contractAddress": "0x7910a46AE16e2719A8c206f05B8943b7352A26bc",
+    "transactionIndex": 16,
+    "gasUsed": "506696",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x37f63a042cc5996d25a2464539f562121c8e56babbb67f49aeb708dbdc70bb37",
+    "transactionHash": "0xc1b6307d1e9cfc73ac17293d6ea0d5bedf348127c56688d0538c7b682821f3d7",
+    "logs": [],
+    "blockNumber": 36000996,
+    "cumulativeGasUsed": "3597860",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "c3f7781b474a2ffb8b521db8cd0755da",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"slot\",\"type\":\"uint256\"}],\"name\":\"Claimed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Received\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"MAX_FOOD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SLOT_INTERVAL\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"claimUBF\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"}],\"name\":\"claimUBFAsCharacter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getClaimAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getInfo\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"ubfBalance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"slot\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nextSlotTime\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"claimed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"contract Characters\",\"name\":\"charactersContract\",\"type\":\"address\"}],\"name\":\"postUpgrade\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"txCharge\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"poolFee\",\"type\":\"uint256\"}],\"name\":\"recordCharge\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"register\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/player/UBF.sol\":\"UBF\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nabstract contract Proxied {\\n    /// @notice to be used by initialisation / postUpgrade function so that only the proxy's admin can execute them\\n    /// It also allows these functions to be called inside a contructor\\n    /// even if the contract is meant to be used without proxy\\n    modifier proxied() {\\n        address proxyAdminAddress = _proxyAdmin();\\n        // With hardhat-deploy proxies\\n        // the proxyAdminAddress is zero only for the implementation contract\\n        // if the implementation contract want to be used as a standalone/immutable contract\\n        // it simply has to execute the `proxied` function\\n        // This ensure the proxyAdminAddress is never zero post deployment\\n        // And allow you to keep the same code for both proxied contract and immutable contract\\n        if (proxyAdminAddress == address(0)) {\\n            // ensure can not be called twice when used outside of proxy : no admin\\n            // solhint-disable-next-line security/no-inline-assembly\\n            assembly {\\n                sstore(\\n                    0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103,\\n                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\\n                )\\n            }\\n        } else {\\n            require(msg.sender == proxyAdminAddress);\\n        }\\n        _;\\n    }\\n\\n    modifier onlyProxyAdmin() {\\n        require(msg.sender == _proxyAdmin(), \\\"NOT_AUTHORIZED\\\");\\n        _;\\n    }\\n\\n    function _proxyAdmin() internal view returns (address ownerAddress) {\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            ownerAddress := sload(0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xaaceeafeeaf0d200ca3942d8bf14c1c4f787a77f79cc87c08bb668e65acdee29\",\"license\":\"MIT\"},\"src/characters/Characters.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./CharactersDataLayout.sol\\\";\\n\\ncontract Characters is Proxied, CharactersDataLayout {\\n    event CharacterUpdate(uint256 indexed id, address indexed owner, uint256 data);\\n    event Transfer(address indexed from, address indexed to, uint256 indexed id);\\n\\n    function postUpgrade() external proxied {\\n        if (nextId == 0) {\\n            nextId = 1;\\n        }\\n    }\\n\\n    function getSubOwner(uint256 id) external view returns (uint256) {\\n        return _subOwner[id][_owners[id]];\\n    }\\n\\n    function setSubOwner(uint256 id, uint256 subOwner) external {\\n        require(msg.sender == _owners[id], \\\"only owner is able to set sub owner\\\");\\n        _setSubOwnerFor(id, msg.sender, subOwner);\\n    }\\n\\n    function _setSubOwnerFor(\\n        uint256 id,\\n        address owner,\\n        uint256 subOwner\\n    ) internal {\\n        // TODO emit SubOwnerTransferEvent\\n        _subOwner[id][owner] = subOwner;\\n    }\\n\\n    function mintTo(address to) external returns (uint256) {\\n        return _mint(to);\\n    }\\n\\n    // subowner is uint(address) of player currently\\n    // when subowner == 0 character is considered not in the dungeon\\n    function mint(uint256 subOwner) external returns (uint256) {\\n        uint256 id = _mint(msg.sender);\\n        _setSubOwnerFor(id, msg.sender, subOwner);\\n        return id;\\n    }\\n\\n    function _mint(address to) internal returns (uint256) {\\n        uint256 id = nextId++;\\n        _owners[id] = to;\\n        _numPerOwners[to]++;\\n        emit Transfer(address(0), to, id);\\n        return id;\\n    }\\n\\n    function getData(uint256 id) external view returns (uint256) {\\n        return _data[id][msg.sender];\\n    }\\n\\n    function getDataFor(uint256 id, address owner) external view returns (uint256) {\\n        return _data[id][owner];\\n    }\\n\\n    // TODO only dungeon should be able to set data\\n    // currently this can be called by the player when characters is outside of dungeon\\n    function setData(uint256 id, uint256 data) external {\\n        require(msg.sender == _ownerOf(id), \\\"only owner is allowed to set data\\\");\\n        _setDataFor(id, msg.sender, data);\\n    }\\n\\n    function _setDataFor(\\n        uint256 id,\\n        address owner,\\n        uint256 data\\n    ) internal {\\n        _data[id][owner] = data;\\n        emit CharacterUpdate(id, owner, data);\\n    }\\n\\n    function _ownerOf(uint256 id) internal view returns (address) {\\n        return _owners[id];\\n    }\\n\\n    function fullOwnerOf(uint256 id) external view returns (address owner, uint256 subOwner) {\\n        owner = _ownerOf(id);\\n        subOwner = _subOwner[id][owner];\\n    }\\n\\n    // EIP-721 Standard\\n    function ownerOf(uint256 id) external view returns (address tokenOwner) {\\n        tokenOwner = _ownerOf(id);\\n        require(tokenOwner != address(0), \\\"token does not exist\\\");\\n    }\\n\\n    function balanceOf(address who) external view returns (uint256) {\\n        require(who != address(0), \\\"zero address\\\");\\n        return _numPerOwners[who];\\n    }\\n\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 id\\n    ) external {\\n        require(from != address(0), \\\"from is zero address\\\");\\n        require(to != address(0), \\\"to is zero address\\\");\\n        address owner = _owners[id];\\n        require(owner == from, \\\"from is not owner\\\");\\n        _subOwner[id][owner] = 0;\\n        _owners[id] = to;\\n        _numPerOwners[from]--;\\n        _numPerOwners[to]++;\\n    }\\n\\n    function supportsInterface(bytes4 id) external pure returns (bool) {\\n        // TODO metadata || id == 0x5b5e139f;\\n        return id == 0x01ffc9a7 || id == 0x80ac58cd;\\n    }\\n}\\n\",\"keccak256\":\"0xcc9355031d7447f7b27da41ff240cfdf96cc59c5d4e273d3f7940ce95b22ef30\",\"license\":\"MIT\"},\"src/characters/CharactersDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract CharactersDataLayout {\\n    uint256 nextId;\\n    mapping(uint256 => address) _owners;\\n    mapping(address => uint256) _numPerOwners;\\n    mapping(uint256 => mapping(address => uint256)) _subOwner;\\n    mapping(uint256 => mapping(address => uint256)) _data;\\n}\\n\",\"keccak256\":\"0x8b2acf9ac90aabf99ea230bfdefd3a9fbe70851f94cc5be2c331543560d7f811\",\"license\":\"MIT\"},\"src/player/Player.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./PlayerDataLayout.sol\\\";\\nimport \\\"../utils/MetaTransactionReceiver.sol\\\";\\nimport \\\"./Pool.sol\\\";\\nimport \\\"../utils/Constants.sol\\\";\\n\\ncontract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants {\\n    event Call(bool success, bytes returnData);\\n    event Refill(address indexed playerAddress, uint256 newEnergy);\\n\\n    function postUpgrade(\\n        Characters charactersContract,\\n        address payable feeRecipient,\\n        uint256 minBalance,\\n        Pool pool\\n    ) external proxied {\\n        // TODO _setTrustedForwarder(...);\\n        _charactersContract = charactersContract;\\n        _feeRecipient = feeRecipient;\\n        MIN_BALANCE = minBalance;\\n        _pool = pool;\\n        pool.register();\\n    }\\n\\n    function register() external {\\n        if (msg.sender != address(_holder)) {\\n            require(address(_holder) == address(0), \\\"holder already set\\\");\\n            _holder = Enterable(msg.sender);\\n        }\\n    }\\n\\n    function getLastCharacterId(address playerAddress) external view returns (uint256) {\\n        return _lastCharacterIds[playerAddress];\\n    }\\n\\n    function getEnergy(address playerAddress) external view returns (uint256 energy, uint256 freeEnergy) {\\n        PlayerStruct storage player = _players[playerAddress];\\n        energy = player.energy;\\n        freeEnergy = player.freeEnergy;\\n    }\\n\\n    // TODO remove ?\\n    function getPlayerInfo(address playerAddress, uint256 characterId)\\n        external\\n        view\\n        returns (uint256 energy, uint256 freeEnergy)\\n    {\\n        PlayerStruct storage player = _players[playerAddress];\\n        energy = player.energy;\\n        freeEnergy = player.freeEnergy;\\n    }\\n\\n    function createAndEnter(\\n        address payable newDelegate,\\n        uint256 value,\\n        string calldata name,\\n        uint8 class,\\n        uint256 location\\n    ) external payable {\\n        address payable sender = _msgSender();\\n        uint256 characterId = _charactersContract.mintTo(address(_holder));\\n        _enter(sender, newDelegate, characterId, value, name, class, location);\\n    }\\n\\n    function enter(\\n        address payable newDelegate,\\n        uint256 characterId,\\n        uint256 value,\\n        string calldata name,\\n        uint8 class,\\n        uint256 location\\n    ) external payable {\\n        address payable sender = _msgSender();\\n        _charactersContract.transferFrom(sender, address(_holder), characterId);\\n        _enter(sender, newDelegate, characterId, value, name, class, location);\\n    }\\n\\n    function _enter(\\n        address payable sender,\\n        address payable newDelegate,\\n        uint256 characterId,\\n        uint256 value,\\n        string memory name,\\n        uint8 class,\\n        uint256 location\\n    ) internal {\\n        require(msg.value >= value, \\\"msg.value < value\\\");\\n        if (msg.value > value) {\\n            _refill(sender, sender, msg.value - value);\\n        }\\n        if (newDelegate != address(0)) {\\n            _addDelegate(sender, newDelegate);\\n        }\\n        _holder.enter{value: value}(sender, characterId, name, class, location);\\n        _lastCharacterIds[sender] = characterId;\\n    }\\n\\n    function callAsCharacter(\\n        address destination,\\n        uint256 gasLimit,\\n        bytes calldata data\\n    ) external returns (bool success, bytes memory returnData) {\\n        address sender = _msgSender();\\n        // TODO check death ?\\n        require(destination != address(this), \\\"cannot call itself\\\");\\n        // TODO block data if == `enter(address sender, uint256 characterId, bytes data)`\\n        uint256 initialGas = gasleft();\\n        uint256 characterId = _getFirstParam(data);\\n        require(_charactersContract.ownerOf(characterId) == address(_holder), \\\"_holder does not own character\\\");\\n        uint256 playerAddress = _charactersContract.getSubOwner(characterId);\\n        if (uint256(uint160(sender)) != playerAddress) {\\n            require(uint256(uint160(_delegates[sender])) == playerAddress, \\\"sender is not delegate of character's player\\\");\\n        }\\n\\n        (success, returnData) = _executeWithSpecificGas(destination, gasLimit, data);\\n\\n        PlayerStruct storage player = _players[address(uint160(playerAddress))];\\n        uint256 energy = player.energy;\\n        uint256 txCharge = ((initialGas - gasleft()) + 10000) * tx.gasprice;\\n        uint256 freeEnergyFee = (txCharge * 10) / 100; // 10% extra is used for free energy\\n\\n        uint256 poolFee = txCharge * 10; // 1000% is used for UBF\\n\\n        require(energy >= freeEnergyFee + poolFee, \\\"not enough energy\\\");\\n        energy -= (freeEnergyFee + poolFee);\\n        _pool.recordCharge{value: poolFee}(sender, txCharge, poolFee);\\n\\n        if (msg.sender == sender) {\\n            // not metatx : use local private key so need to recharge local balance // TODO remove (once metatx is enabled)\\n            if (msg.sender.balance < MIN_BALANCE) {\\n                uint256 balanceToGive = MIN_BALANCE - msg.sender.balance;\\n                if (balanceToGive >= energy) {\\n                    balanceToGive = energy;\\n                    energy = 0;\\n                } else {\\n                    energy -= balanceToGive;\\n                }\\n\\n                if (balanceToGive > 0) {\\n                    payable(msg.sender).transfer(balanceToGive);\\n                }\\n            }\\n        }\\n        player.freeEnergy += uint128(freeEnergyFee);\\n        player.energy = uint128(energy);\\n\\n        emit Call(success, returnData);\\n    }\\n\\n    function isDelegateFor(address delegate, address playerAddress) external view returns (bool) {\\n        return _delegates[delegate] == playerAddress;\\n    }\\n\\n    function refillAccount(address account) public payable {\\n        address payable sender = _msgSender();\\n        _refill(sender, account, msg.value);\\n    }\\n\\n    function refill() public payable {\\n        address payable sender = _msgSender();\\n        _refill(sender, sender, msg.value);\\n    }\\n\\n    function _refill(\\n        address payable sender,\\n        address account,\\n        uint256 value\\n    ) internal returns (uint256 refund) {\\n        uint128 energy = _players[account].energy;\\n        energy += uint128(value);\\n        if (energy > uint128(MAX_FOOD)) {\\n            energy = uint128(MAX_FOOD);\\n            refund = energy - MAX_FOOD;\\n        }\\n        _players[account].energy = energy;\\n        emit Refill(account, energy);\\n        if (refund > 0) {\\n            sender.transfer(refund);\\n        }\\n    }\\n\\n    // TODO add Events for Delegates\\n    function addDelegate(address payable _delegate) public payable {\\n        address payable sender = _msgSender();\\n        if (msg.value > 0) {\\n            _refill(sender, sender, msg.value);\\n        }\\n        _addDelegate(sender, _delegate);\\n    }\\n\\n    function _addDelegate(address sender, address payable _delegate) internal {\\n        require(_delegate != address(0), \\\"no zero address delegate\\\");\\n        require(_players[sender].energy >= uint128(MIN_BALANCE), \\\"not enough energy\\\");\\n        _players[sender].energy -= uint128(MIN_BALANCE);\\n        _delegate.transfer(MIN_BALANCE);\\n        _delegates[_delegate] = sender;\\n    }\\n\\n    function _getFirstParam(bytes memory data) internal pure returns (uint256) {\\n        if (data.length < 36) {\\n            return 0;\\n        }\\n        uint256 value;\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            value := mload(add(data, 36))\\n        }\\n        return value;\\n    }\\n\\n    function _executeWithSpecificGas(\\n        address to,\\n        uint256 gasLimit,\\n        bytes memory data\\n    ) internal returns (bool success, bytes memory returnData) {\\n        (success, returnData) = to.call{gas: gasLimit}(data);\\n        assert(gasleft() > gasLimit / 63);\\n        // not enough gas provided, assert to throw all gas // TODO use EIP-1930\\n    }\\n}\\n\",\"keccak256\":\"0x49f830f50e3c428ccb861f9b72937daa6d7aac6f4911bc79dfb62aa3da670605\",\"license\":\"MIT\"},\"src/player/PlayerDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"../characters/Characters.sol\\\";\\nimport \\\"./Pool.sol\\\";\\n\\ninterface Enterable {\\n    // TODO generalize?\\n    function enter(\\n        address sender,\\n        uint256 characterId,\\n        string calldata data,\\n        uint8 class,\\n        uint256 location\\n    ) external payable;\\n}\\n\\ncontract PlayerDataLayout {\\n    uint256 internal MIN_BALANCE; // = 5000000000000000;\\n\\n    struct PlayerStruct {\\n        uint128 energy;\\n        uint128 freeEnergy;\\n    }\\n\\n    address payable _feeRecipient;\\n    mapping(address => address) _delegates;\\n    mapping(address => PlayerStruct) _players;\\n    mapping(address => uint256) _lastCharacterIds;\\n\\n    Characters _charactersContract;\\n    Enterable _holder;\\n\\n    Pool _pool;\\n}\\n\",\"keccak256\":\"0x425a6f4162bfc88f62c9dde5a91ac1b4453aeff3ab8bd95c2d09f1ac0ed19b4b\",\"license\":\"MIT\"},\"src/player/Pool.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ninterface Pool {\\n    function register() external;\\n\\n    function recordCharge(\\n        address account,\\n        uint256 txCharge,\\n        uint256 poolFee\\n    ) external payable;\\n}\\n\",\"keccak256\":\"0x7d71d072fee4819c7665f60218a458806c67b9f38bd75566e12f2145cc3b549f\",\"license\":\"MIT\"},\"src/player/UBF.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"./Player.sol\\\";\\nimport \\\"./Pool.sol\\\";\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./UBFDataLayout.sol\\\";\\nimport \\\"../utils/MetaTransactionReceiver.sol\\\";\\nimport \\\"../utils/Constants.sol\\\";\\n\\n// TODO MetaTransactionReceiver\\ncontract UBF is Proxied, UBFDataLayout, Pool, Constants {\\n\\n    uint256 public constant SLOT_INTERVAL = 23 hours;\\n\\n    event Received(address from, uint256 amount);\\n    event Claimed(address account, uint256 amount, uint256 slot);\\n\\n    function postUpgrade(Characters charactersContract) external proxied {\\n        // TODO _setTrustedForwarder(...);\\n        _charactersContract = charactersContract;\\n    }\\n\\n    function register() external override {\\n        if (msg.sender != address(_playerContract)) {\\n            require(address(_playerContract) == address(0), \\\"ALREADY_REGISTERED\\\");\\n            _playerContract = Player(msg.sender);\\n        }\\n    }\\n\\n    receive() external payable {\\n        emit Received(msg.sender, msg.value);\\n    }\\n\\n    function recordCharge(\\n        address account,\\n        uint256 txCharge,\\n        uint256 poolFee\\n    ) external override payable {\\n        require(msg.sender == address(_playerContract), \\\"NOT_AUTHORIZED\\\");\\n        uint256 slot = block.timestamp / SLOT_INTERVAL;\\n        _timeSlots[account][slot] += txCharge; // keep track if we decided later to use it\\n    }\\n\\n    function claimUBF() external {\\n        _claimUBF(msg.sender);\\n    }\\n\\n    function claimUBFAsCharacter(uint256 characterId) external {\\n        require(msg.sender == address(_playerContract), \\\"NOT_AUTHORIZED\\\");\\n        address account = address(uint160(_charactersContract.getSubOwner(characterId)));\\n        _claimUBF(account);\\n    }\\n\\n    function getInfo(address account) external view returns (uint256 amount, uint256 ubfBalance, uint256 slot, uint256 nextSlotTime, bool claimed) {\\n        amount = _getClaimAmount(account);\\n        ubfBalance = address(this).balance;\\n        slot = block.timestamp / SLOT_INTERVAL;\\n        nextSlotTime = 2 * SLOT_INTERVAL + block.timestamp - block.timestamp % SLOT_INTERVAL;\\n        claimed = _claimedSlots[account][slot - 1];\\n    }\\n\\n    function getClaimAmount(address account) external view returns (uint256 amount) {\\n        return _getClaimAmount(account);\\n    }\\n\\n    function _claimUBF(address account) internal {\\n        uint256 slot = block.timestamp / SLOT_INTERVAL;\\n        require(slot != 0, \\\"WAIT_NEXT_SLOT\\\");\\n        require(!_claimedSlots[account][slot - 1], \\\"ALREADY_CLAIMED\\\");\\n\\n        uint256 amount = _getClaimAmount(account);\\n        require(amount > 0, \\\"NOTHING_TO_CLAIM\\\");\\n        _claimedSlots[account][slot - 1] = true; // only record as claimed if there was something to get\\n        _playerContract.refillAccount{value: amount}(account);\\n        emit Claimed(account, amount, slot - 1);\\n    }\\n\\n    function _getClaimAmount(address account) internal view returns (uint256 amount) {\\n        uint256 ubfBalance = address(this).balance;\\n        (uint256 energy, ) = _playerContract.getEnergy(account);\\n        if (energy > MAX_FOOD) {\\n            amount = 0;\\n        } else {\\n            amount = (_linear(1000, ubfBalance, 0) * (((MAX_FOOD - energy) * 10000) / MAX_FOOD)) / 10000;\\n            if (amount > ubfBalance) {\\n                amount = ubfBalance; // cap so that it works\\n            }\\n            if (energy + amount > MAX_FOOD) {\\n                amount = MAX_FOOD - energy;\\n            }\\n        }\\n    }\\n\\n    function _linear(\\n        uint56 a10000th,\\n        uint256 x,\\n        uint256 b\\n    ) internal pure returns (uint256 y) {\\n        y = ((a10000th * x) / 10000) + b;\\n    }\\n}\\n\",\"keccak256\":\"0xd71a6e9779589554ec08256e73ace093b69efa5be122f0b8f6dfc90f894bc088\",\"license\":\"MIT\"},\"src/player/UBFDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"./Player.sol\\\";\\nimport \\\"../characters/Characters.sol\\\";\\n\\ncontract UBFDataLayout {\\n    Player _playerContract;\\n    Characters _charactersContract;\\n    mapping(address => mapping(uint256 => uint256)) _timeSlots;\\n    mapping(address => mapping(uint256 => bool)) _claimedSlots;\\n}\\n\",\"keccak256\":\"0x3025533739088faf984a9b3ad1d90791b3ca3a06d05afd2670fd6061495b4859\",\"license\":\"MIT\"},\"src/utils/Constants.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract Constants {\\n    uint256 public constant MAX_FOOD = 1000000000000000;\\n}\\n\",\"keccak256\":\"0x1c472889b99bb7a6cbb81bca4961a0ab74f21409a367351234ee0b3a4d5097fa\",\"license\":\"MIT\"},\"src/utils/MetaTransactionReceiver.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nabstract contract MetaTransactionReceiver {\\n    bytes32 constant FORWARDER_STORAGE_POSITION = 0xbda473cae6459373242ba82cd14b3b8493956b600be62b2478f52616c8a283de;\\n\\n    function isTrustedForwarder(address forwarder) external view returns (bool) {\\n        return _isTrustedForwarder(forwarder);\\n    }\\n\\n    function _msgSender() internal view returns (address payable sender) {\\n        sender = payable(msg.sender);\\n        if (_isTrustedForwarder(msg.sender)) {\\n            bytes memory data = msg.data;\\n            uint256 length = msg.data.length;\\n            assembly {\\n                sender := mload(add(data, length))\\n            }\\n        }\\n    }\\n\\n    function _isTrustedForwarder(address trustedForwarder) internal view returns (bool) {\\n        address currentForwarder;\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            currentForwarder := sload(FORWARDER_STORAGE_POSITION)\\n        }\\n        return currentForwarder == trustedForwarder;\\n    }\\n\\n    function _setTrustedForwarder(address trustedForwarder) internal {\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            sstore(FORWARDER_STORAGE_POSITION, trustedForwarder)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x42c77fecc9a7d2dcbc7c99d4fb9288e4a1812b25431b7475c1b5013c3a393993\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x6080806040523461001657610831908161001c8239f35b600080fdfe608060409080825260049081361015610050575b5050361561002057600080fd5b807f88a5966d370b9919b20f3e2c13ff65706f196a4e32cc2c12bf57088f885258749151338152346020820152a1005b600090813560e01c9081631aa3a0081461039c575080631e42fdd01461037e57806341db47a0146102da578063820bef3414610281578063b7ad765c14610261578063c79b2430146101e0578063dde070e8146101b3578063ef737545146101915763ffdd5cf10361001357823461018d57602036600319011261018d576100d661041a565b916100e0836106b8565b924792620143709283420492620286e04281019586821161017a574206420301948511610167576001600160a01b03168152600360205281812060001984018481116101545760a0985091839160ff9382526020522054169381519586526020860152840152606083015215156080820152f35b634e487b7160e01b835260118952602483fd5b634e487b7160e01b825260118852602482fd5b634e487b7160e01b845260118a52602484fd5b5080fd5b50823461018d578160031936011261018d576020905166038d7ea4c680008152f35b50823461018d57602036600319011261018d576020906101d96101d461041a565b6106b8565b9051908152f35b50903461018d57602036600319011261018d57356001600160a01b038181169182900361025d577fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103805482168061024f5750555b6bffffffffffffffffffffffff60a01b600154161760015580f35b915050330315610234575080fd5b8280fd5b503461027e578060031936011261027e5761027b336104cd565b80f35b80fd5b5082606036600319011261018d5761029761041a565b82546001600160a01b0391906102b09083163314610435565b1682526002602052808220620143704204835260205281206102d56024358254610472565b905580f35b50913461025d57602036600319011261025d5782546001600160a01b0391906103069083163314610435565b60208260015416936024835180968193630607176160e31b83528035908301525afa90811561037557508390610342575b61027b9250166104cd565b506020823d821161036d575b8161035b60209383610495565b8101031261025d5761027b9151610337565b3d915061034e565b513d85823e3d90fd5b50823461018d578160031936011261018d5760209051620143708152f35b8391503461025d578260031936011261025d578254916001600160a01b038316338190036103c8578480f35b6103e45750506001600160a01b03191633178155818080808480f35b62461bcd60e51b825260209082015260126024820152711053149150511657d49151d254d51154915160721b6044820152606490fd5b600435906001600160a01b038216820361043057565b600080fd5b1561043c57565b60405162461bcd60e51b815260206004820152600e60248201526d1393d517d055551213d49256915160921b6044820152606490fd5b9190820180921161047f57565b634e487b7160e01b600052601160045260246000fd5b90601f8019910116810190811067ffffffffffffffff8211176104b757604052565b634e487b7160e01b600052604160045260246000fd5b62014370420480156106825760018060a01b039182811692600084815260209060038252604093848220600019870196871161066e57868352835260ff85832054166106385761051c906106b8565b92831561060157868252600383528482208683528352848220805460ff19166001179055815416803b1561018d57908084926024875180958193631383ec7d60e21b83528c60048401525af180156105f5576105a8575b505082519485528401528201527f987d620f307ff6b94d58743cb7a7509f24071586a77759b77c2d4e29f75a2f9a90606090a1565b67ffffffffffffffff82116105e157508352817f987d620f307ff6b94d58743cb7a7509f24071586a77759b77c2d4e29f75a2f9a610573565b634e487b7160e01b81526041600452602490fd5b508451903d90823e3d90fd5b845162461bcd60e51b815260048101849052601060248201526f4e4f5448494e475f544f5f434c41494d60801b6044820152606490fd5b845162461bcd60e51b815260048101849052600f60248201526e1053149150511657d0d31052535151608a1b6044820152606490fd5b634e487b7160e01b83526011600452602483fd5b60405162461bcd60e51b815260206004820152600e60248201526d15d0525517d391561517d4d313d560921b6044820152606490fd5b6000805460408051638fc0f5eb60e01b81526001600160a01b03948516600482015247959491929091839183916024918391165afa9182156107f25783926107c4575b505066038d7ea4c6800090818111600014610717575090925050565b6103e885810290810486036107b05761271080910482840394848611610788578286028681048414858714171561079c57859004918281029281840414901517156107885750049480861161077e575b508461077291610472565b1161077a5750565b9150565b9450610772610767565b634e487b7160e01b81526011600452602490fd5b634e487b7160e01b82526011600452602482fd5b634e487b7160e01b84526011600452602484fd5b90809250813d83116107eb575b6107db8183610495565b8101031261018d575138806106fb565b503d6107d1565b513d84823e3d90fdfea264697066735822122036fc60902c8e142e85e9415248b0a1cc9ec02b4639381d902db0165b98cb54c164736f6c63430008140033",
+  "deployedBytecode": "0x608060409080825260049081361015610050575b5050361561002057600080fd5b807f88a5966d370b9919b20f3e2c13ff65706f196a4e32cc2c12bf57088f885258749151338152346020820152a1005b600090813560e01c9081631aa3a0081461039c575080631e42fdd01461037e57806341db47a0146102da578063820bef3414610281578063b7ad765c14610261578063c79b2430146101e0578063dde070e8146101b3578063ef737545146101915763ffdd5cf10361001357823461018d57602036600319011261018d576100d661041a565b916100e0836106b8565b924792620143709283420492620286e04281019586821161017a574206420301948511610167576001600160a01b03168152600360205281812060001984018481116101545760a0985091839160ff9382526020522054169381519586526020860152840152606083015215156080820152f35b634e487b7160e01b835260118952602483fd5b634e487b7160e01b825260118852602482fd5b634e487b7160e01b845260118a52602484fd5b5080fd5b50823461018d578160031936011261018d576020905166038d7ea4c680008152f35b50823461018d57602036600319011261018d576020906101d96101d461041a565b6106b8565b9051908152f35b50903461018d57602036600319011261018d57356001600160a01b038181169182900361025d577fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103805482168061024f5750555b6bffffffffffffffffffffffff60a01b600154161760015580f35b915050330315610234575080fd5b8280fd5b503461027e578060031936011261027e5761027b336104cd565b80f35b80fd5b5082606036600319011261018d5761029761041a565b82546001600160a01b0391906102b09083163314610435565b1682526002602052808220620143704204835260205281206102d56024358254610472565b905580f35b50913461025d57602036600319011261025d5782546001600160a01b0391906103069083163314610435565b60208260015416936024835180968193630607176160e31b83528035908301525afa90811561037557508390610342575b61027b9250166104cd565b506020823d821161036d575b8161035b60209383610495565b8101031261025d5761027b9151610337565b3d915061034e565b513d85823e3d90fd5b50823461018d578160031936011261018d5760209051620143708152f35b8391503461025d578260031936011261025d578254916001600160a01b038316338190036103c8578480f35b6103e45750506001600160a01b03191633178155818080808480f35b62461bcd60e51b825260209082015260126024820152711053149150511657d49151d254d51154915160721b6044820152606490fd5b600435906001600160a01b038216820361043057565b600080fd5b1561043c57565b60405162461bcd60e51b815260206004820152600e60248201526d1393d517d055551213d49256915160921b6044820152606490fd5b9190820180921161047f57565b634e487b7160e01b600052601160045260246000fd5b90601f8019910116810190811067ffffffffffffffff8211176104b757604052565b634e487b7160e01b600052604160045260246000fd5b62014370420480156106825760018060a01b039182811692600084815260209060038252604093848220600019870196871161066e57868352835260ff85832054166106385761051c906106b8565b92831561060157868252600383528482208683528352848220805460ff19166001179055815416803b1561018d57908084926024875180958193631383ec7d60e21b83528c60048401525af180156105f5576105a8575b505082519485528401528201527f987d620f307ff6b94d58743cb7a7509f24071586a77759b77c2d4e29f75a2f9a90606090a1565b67ffffffffffffffff82116105e157508352817f987d620f307ff6b94d58743cb7a7509f24071586a77759b77c2d4e29f75a2f9a610573565b634e487b7160e01b81526041600452602490fd5b508451903d90823e3d90fd5b845162461bcd60e51b815260048101849052601060248201526f4e4f5448494e475f544f5f434c41494d60801b6044820152606490fd5b845162461bcd60e51b815260048101849052600f60248201526e1053149150511657d0d31052535151608a1b6044820152606490fd5b634e487b7160e01b83526011600452602483fd5b60405162461bcd60e51b815260206004820152600e60248201526d15d0525517d391561517d4d313d560921b6044820152606490fd5b6000805460408051638fc0f5eb60e01b81526001600160a01b03948516600482015247959491929091839183916024918391165afa9182156107f25783926107c4575b505066038d7ea4c6800090818111600014610717575090925050565b6103e885810290810486036107b05761271080910482840394848611610788578286028681048414858714171561079c57859004918281029281840414901517156107885750049480861161077e575b508461077291610472565b1161077a5750565b9150565b9450610772610767565b634e487b7160e01b81526011600452602490fd5b634e487b7160e01b82526011600452602482fd5b634e487b7160e01b84526011600452602484fd5b90809250813d83116107eb575b6107db8183610495565b8101031261018d575138806106fb565b503d6107d1565b513d84823e3d90fdfea264697066735822122036fc60902c8e142e85e9415248b0a1cc9ec02b4639381d902db0165b98cb54c164736f6c63430008140033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 11040,
+        "contract": "src/player/UBF.sol:UBF",
+        "label": "_playerContract",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_contract(Player)10551"
+      },
+      {
+        "astId": 11043,
+        "contract": "src/player/UBF.sol:UBF",
+        "label": "_charactersContract",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_contract(Characters)464"
+      },
+      {
+        "astId": 11049,
+        "contract": "src/player/UBF.sol:UBF",
+        "label": "_timeSlots",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))"
+      },
+      {
+        "astId": 11055,
+        "contract": "src/player/UBF.sol:UBF",
+        "label": "_claimedSlots",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_contract(Characters)464": {
+        "encoding": "inplace",
+        "label": "contract Characters",
+        "numberOfBytes": "20"
+      },
+      "t_contract(Player)10551": {
+        "encoding": "inplace",
+        "label": "contract Player",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => mapping(uint256 => bool))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint256,t_bool)"
+      },
+      "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => mapping(uint256 => uint256))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint256,t_uint256)"
+      },
+      "t_mapping(t_uint256,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_uint256,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

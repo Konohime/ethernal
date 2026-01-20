@@ -1,6 +1,7 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-import "buidler-deploy/solc_0.6/proxy/Proxied.sol";
+import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./ERC721TokenDataLayout.sol";
 
 contract ERC721Token is Proxied, ERC721TokenDataLayout {

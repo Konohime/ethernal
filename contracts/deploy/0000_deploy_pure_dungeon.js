@@ -1,14 +1,21 @@
-module.exports = async ({deployments, network, getNamedAccounts}) => {
-  const dev_forceMine = !network.live;
+module.exports = async ({deployments, getNamedAccounts}) => {
   const {deploy} = deployments;
   const {deployer} = await getNamedAccounts();
-  const PureDungeon = await deploy('PureDungeon', {from: deployer, dev_forceMine, log: true});
+  
+  const PureDungeon = await deploy('PureDungeon', {
+    from: deployer,
+    log: true,
+    waitConfirmations: 1,
+  });
+  
   await deploy('ReadOnlyDungeon', {
     from: deployer,
-    dev_forceMine,
     libraries: {
       PureDungeon: PureDungeon.address,
     },
     log: true,
+    waitConfirmations: 1,
   });
 };
+
+module.exports.tags = ['PureDungeon', 'ReadOnlyDungeon', 'core'];

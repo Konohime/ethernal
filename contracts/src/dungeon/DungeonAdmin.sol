@@ -1,5 +1,5 @@
-pragma solidity 0.6.5;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "./DungeonAdminFacet.sol";
 
@@ -18,12 +18,12 @@ contract DungeonAdmin {
     DungeonAdminFacet _dungeon;
     address _backendAddress;
 
-    constructor(address backendAddress) public {
+    constructor(address backendAddress) {
         _backendAddress = backendAddress;
     }
 
     function forward(address to, bytes memory data) public payable onlyBackend returns (bool success) {
-        return _dungeon.forward.value(msg.value)(to, data);
+        return _dungeon.forward{value: msg.value}(to, data);
     }
 
     modifier onlyBackend() {

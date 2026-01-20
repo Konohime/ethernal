@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 interface Pool {
     function register() external;

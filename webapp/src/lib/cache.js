@@ -2,7 +2,7 @@
 import io from 'socket.io-client';
 import { writable, get, derived } from 'svelte/store';
 import { subscribe } from 'svelte/internal';
-import { BigNumber } from 'ethers';
+// BigNumber removed - using native BigInt in ethers v6
 import retry from 'p-retry';
 import equal from 'fast-deep-equal';
 import log from 'utils/log';
@@ -1316,7 +1316,7 @@ export const combatLog = derived([currentDuel], async ([$currentDuel], set) => {
 
 export const needFood = derived([playerEnergy, wallet], ([$playerEnergy, $wallet], set) => {
   if ($playerEnergy) {
-    set(BigNumber.from($playerEnergy).lt(BigNumber.from(config($wallet.chainId).minBalance).mul(5)));
+    set(BigInt($playerEnergy) < BigInt(config($wallet.chainId).minBalance) * 5n);
     // set(true);
   }
 });

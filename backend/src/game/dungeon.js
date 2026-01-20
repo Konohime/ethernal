@@ -46,7 +46,9 @@ class Dungeon {
   }
 
   async init() {
-    const [{ blockNumber }] = await pastEvents('Dungeon', 'RoomDiscovered', [uint256(coordinatesToLocation('0,0'))]);
+    const startBlock = process.env.START_BLOCK ? parseInt(process.env.START_BLOCK) : 0;
+    const roomEvents = await pastEvents('Dungeon', 'RoomDiscovered', [uint256(coordinatesToLocation('0,0'))], startBlock);
+    const [{ blockNumber }] = roomEvents.length > 0 ? roomEvents : [{ blockNumber: startBlock }];
     this.firstBlock = blockNumber;
     console.log('first dungeon block', this.firstBlock);
 

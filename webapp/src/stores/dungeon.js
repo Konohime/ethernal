@@ -12,9 +12,12 @@ export const loadDungeon = async $wallet => {
   const delegateAccount = getDelegateKey($wallet.address);
   const key = delegateAccount.privateKey;
   const player = $wallet.address.toLowerCase();
-
+  
+  const provider = wallet.getProvider();
+  console.log('Provider:', provider);
+  
   const dungeon = new Dungeon({
-    ethersProvider: window.provider, // @TODO: fix
+    ethersProvider: provider,
     wallet,
     contract: wallet.getContract('Dungeon'),
     playerContract: wallet.getContract('Player'),

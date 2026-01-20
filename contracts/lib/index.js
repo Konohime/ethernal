@@ -1,4 +1,4 @@
-const {deployments, getNamedAccounts, ethers} = require('@nomiclabs/buidler');
+const {deployments, getNamedAccounts, ethers} = require('hardhat');
 const {assert} = require('chai');
 const {Wallet, BigNumber, Contract} = require('ethers');
 const PlayerWallet = require('../../webapp/src/lib/PlayerWallet'); // TODO better way to share code

@@ -1,0 +1,1083 @@
+{
+  "address": "0x94cCFC3fadf335B6EC25Dce648b25E6759086049",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "oldLocation",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "newLocation",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "mode",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "path",
+          "type": "uint256"
+        }
+      ],
+      "name": "CharacterMoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "monsterId",
+          "type": "uint256"
+        }
+      ],
+      "name": "Death",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "Enter",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "gearId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "slotType",
+          "type": "uint8"
+        }
+      ],
+      "name": "Equip",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "hp",
+          "type": "uint16"
+        }
+      ],
+      "name": "Heal",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "newLevel",
+          "type": "uint16"
+        }
+      ],
+      "name": "LevelUp",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint64",
+          "name": "id",
+          "type": "uint64"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint8",
+          "name": "status",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "data",
+          "type": "string"
+        }
+      ],
+      "name": "QuestUpdate",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "areaLocation",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "blockNumber",
+          "type": "uint64"
+        }
+      ],
+      "name": "RandomEvent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "gearId",
+          "type": "uint256"
+        }
+      ],
+      "name": "Recycle",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "deadCharacterId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newCharacterId",
+          "type": "uint256"
+        }
+      ],
+      "name": "Resurrect",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "blockHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "exits",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "kind",
+          "type": "uint8"
+        }
+      ],
+      "name": "RoomActualised",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "blockNumber",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "direction",
+          "type": "uint8"
+        }
+      ],
+      "name": "RoomDiscovered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "RoomIncome",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        }
+      ],
+      "name": "RoomName",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tax",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newDueDate",
+          "type": "uint256"
+        }
+      ],
+      "name": "RoomTaxPay",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "TAX_PERIOD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        }
+      ],
+      "name": "abandonRoom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        }
+      ],
+      "name": "activateRoom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256[8]",
+          "name": "amounts",
+          "type": "uint256[8]"
+        }
+      ],
+      "name": "addBounty",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyRoom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        }
+      ],
+      "name": "deactivateRoom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "location",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "nameRoom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "periods",
+          "type": "uint256"
+        }
+      ],
+      "name": "payRoomsTax",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "characterId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "gearIds",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "recycle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "args": [],
+  "numDeployments": 1,
+  "linkedData": {
+    "readOnlyDungeon": "0x60808060405234610016576119f4908161001c8239f35b600080fdfe608060408181526004918236101561001657600080fd5b600090813560e01c9081630ececfea14610e3457508063213ee14314610a235780632f58779614610a0457806330ad9329146109ba5780633683dee114610893578063467b47931461075557806356b5c381146106f25780637a923474146106c95780639f7cb08e14610649578063a48378ff1461062a578063acda69ca14610556578063b0ca9dfe1461053a578063c3aab23c146103f9578063d5763a80146103ad578063d667fd0414610356578063ed53a62414610318578063f090aca8146102fc578063f6940ac714610152578063fcaf8951146101285763ff5335fa1461010057600080fd5b34610125576020366003190112610125575061011e6020923561197a565b9051908152f35b80fd5b50903461014e5760209060ff61014661014036610f23565b9161153a565b915191168152f35b5080fd5b50346101255760031960603682011261014e578335906044359067ffffffffffffffff918281168091036102f85761018984611015565b505060001960079290920b828112159392846102e9575b50836102dd575b50826102cc575b5081156102c0575b50156101d157505050506020915060ff6006915b5191168152f35b6009826101dd85611253565b16029182169182036102ad57819082610286575b50601911905061027657606460ff6127108551602081019085825260243588820152600360fa1b60608201526041815261022a81611051565b5190200616116102765761023f600591611015565b5091505060070b0760ff166001019260ff841161026357505060ff602092916101ca565b634e487b7160e01b825260119052602490fd5b50506020915060ff6006916101ca565b9050810190811161029a57601990386101f1565b634e487b7160e01b835260118552602483fd5b634e487b7160e01b845260118652602484fd5b600a91501015386101b6565b600191925060070b131590386101ae565b600112159250386101a7565b600783900b12159350386101a0565b8480fd5b50903461014e5760209061011e61031236610f47565b9061194a565b50346101255760a036600319011261012557606435908115158203610125575060209261011e91610347610f13565b916044359060243590356110c5565b5091346103a95760203660031901126103a95760a092503581519161ffff808360e81c168452808360a81c1660208501528260b81c169083015263ffffffff8160c81c16606083015260f81c6080820152f35b8280fd5b5091346103a95760603660031901126103a957358060070b81036103a957602435908160070b82036103f557604435938460070b850361012557509261011e91602094610f91565b8380fd5b50903461014e57602036600319011261014e5782359160ff83169283810361014e578251610160810181811067ffffffffffffffff821117610527578452828152600a60208201526031848201526077606082015260d0608082015261014860a082015261020c60c082015261033a60e08201526104f5610100820152610e46610120820152611aee610140820152600b8510156105145790611fe0929161ffff93849260051b1601511693600881116000146104cd5750505060609250600a906101ec5b81519384526020840152820152f35b826005816104e6816104e0600896611937565b16611482565b1604160190828211610501575060609450600a9291166104be565b634e487b7160e01b815260118652602490fd5b634e487b7160e01b835260328652602483fd5b634e487b7160e01b845260418752602484fd5b50903461014e5760209061011e61055036610f47565b9061140b565b50903461014e5760c036600319011261014e57610571610f5d565b60243560ff811681036103f557610586610efe565b906064359161ffff9384841684036106265760843594851685036106265760a4359663ffffffff88168098036101255750602096936105fb610621946105e961011e989561060e9561ffff60e81b9060e81b169060ff60f81b9060f81b16610f6e565b60e09190911b60ff60e01b1690610f6e565b60d09190911b61ffff60d01b1690610f6e565b60c09190911b61ffff60c01b1690610f6e565b610f6e565b8680fd5b5034610125576020366003190112610125575061011e60209235611457565b5034610125576020366003190112610125575063ffffffff61069560c09335908160f81c61ffff808460e81c169360ff8160e01c169363ffffffff838360d01c16938360c01c16921690565b949190929660ff8151988161ffff97888097168c521660208b015216908801521660608601521660808401521660a0820152f35b50903461014e57602036600319011261014e5760209061ffff6106ea610f5d565b169051908152f35b509190346103a957600a919261070736610f47565b939004600101806001116107425783810293818504149015171561072f576020838351908152f35b634e487b7160e01b815260118452602490fd5b634e487b7160e01b825260118552602482fd5b50903461014e57602036600319011261014e5782359167ffffffffffffffff908184116101255736602385011215610125578385013591821161012557602494600594368785881b830101116103a95794929190819582945b8486106107bf576020888851908152f35b9091929394966107fd8989841b85010135908160f81c61ffff808460e81c169360ff8160e01c169363ffffffff838360d01c16938360c01c16921690565b509360019350617fff925061081590841c8316611937565b9061ffff80808416961691161461085c575b50505061083391610f6e565b96600019811461084a5760010194939291906107ae565b634e487b7160e01b8552601184528885fd5b8293921c16820180921161088157610833929161087891610f6e565b90913880610827565b634e487b7160e01b8752601186528a87fd5b5034610125576108a236610f23565b9091925060196108b18461136a565b0480156109b2575b6108f76108ee8287516020810190888252878a820152601960fa1b6060820152604181526108e681611051565b5190206110a5565b8260011c610f6e565b9182156109a9575b60ff169384600214610991575b61094e929360088311610988575b6109459183918851906020820192835289820152606560f81b6060820152604181526108e681611051565b9060011c610f6e565b91821561097f575b60011461096a575b82519182526020820152f35b90806109799160021c90610f6e565b9061095e565b60019250610956565b6008925061091a565b6109a28361094e9460021c90610f6e565b925061090c565b600192506108ff565b5060016108b9565b5034610125576020366003190112610125575067ffffffffffffffff6109e260809335611015565b92949182519560070b865260070b602086015260070b90840152166060820152f35b5034610125576020366003190112610125575061011e602092356111cb565b50903461014e5760c036600319011261014e57823592602492833593610a47610efe565b916064359360ff9485811681036103a957610a60610f13565b9060a435958787168097036102f857610a7a908a8c61153a565b9884610a90610a888d6111cb565b94939c611015565b50509060070b159081610e28575b5015610acc57505050505050505060609381600160029217915b818551961686521660208501521690820152f35b9a939699909294979598915b8681169b8b8d11610e12575082516020810187815260f89290921b6001600160f81b031916818501526041808201869052600360f81b606183015260428252608082019067ffffffffffffffff821183831017610e02575084525190206001908c90868316831415906014900689168180610df0575b15610b7f5750505080600295179b5b878114610b6d5701939a93610ad8565b634e487b7160e01b8a52601189528a8afd5b600292888416841415928380610dc4575b15610ba35750505050600395179b610b5d565b8c808b969394959616141580928193610d51575b5015610bcc575050505050878095179b610b5d565b60089485808c1614159485610bfc575b5050505050600014610bf257600595179b610b5d565b50939a8490610b5d565b600391929394955014938415610d46575b8415610d2d575b8415610d14575b8415610cfb575b8415610cd5575b8415610caf575b8415610c89575b8415610c4c575b505050508d38808080610bdc565b604d149350909183610c81575b5082610c79575b5081610c71575b5038808f80610c3e565b905038610c67565b915038610c60565b925038610c59565b9350604e841480610ca8575b80610ca1575b93610c37565b5080610c9b565b5082610c95565b9350604e841480610cce575b80610cc7575b93610c30565b5082610cc1565b5081610cbb565b9350604e841480610cf4575b80610ced575b93610c29565b5080610ce7565b5081610ce1565b9350604f841480610d0d575b93610c22565b5082610d07565b9350604f841480610d26575b93610c1b565b5080610d20565b9350604f841480610d3f575b93610c14565b5081610d39565b605081149450610c0d565b905084148015610dba575b8015610da8575b8015610d96575b8015610d77575b38610bb7565b50604e831480610d8f575b8015610d71575084610d71565b5080610d82565b50604f83148015610d6a575084610d6a565b50604f83148015610d63575080610d63565b5060508314610d5c565b508583148015610de6575b80610b905750604f82148015610b90575080610b90565b5060508214610dcf565b50801580610b4e575060508314610b4e565b634e487b7160e01b8c528a528b8bfd5b9550509850965050925060609650819350610ab8565b905060070b1538610a9e565b918491503461012557836003193601126101255750610ed5610eea610ef093610eda610ed5610ee4610eda963593610eca60ff60098c82826024359660208101908c82528885820152603360f91b606082015260418152610e9481611051565b51902006169481519060208201928b8452820152606760f81b606082015260418152610ebf81611051565b519020061695611015565b5099919890986119a9565b6112cb565b9060070b906111a3565b946119a9565b90610f91565b815190815260026020820152f35b6044359060ff82168203610f0e57565b600080fd5b6084359060ff82168203610f0e57565b6060906003190112610f0e57600435906024359060443560ff81168103610f0e5790565b6040906003190112610f0e576004359060243590565b6004359061ffff82168203610f0e57565b91908201809211610f7b57565b634e487b7160e01b600052601160045260246000fd5b909167ffffffffffffffff9067ffffffffffffffff60801b608082901b16908216808204600160801b1490151715610f7b57600160ff1b908101908110610f7b576fffffffffffffffff00000000000000008285169460401b1693808504600160401b1490151715610f7b576110129361100a91610f6e565b911690610f6e565b90565b67ffffffffffffffff9081811660070b92828260401c1660070b928260801c1660070b9160ff1c90565b60ff60019116019060ff8211610f7b57565b6080810190811067ffffffffffffffff82111761106d57604052565b634e487b7160e01b600052604160045260246000fd5b90601f8019910116810190811067ffffffffffffffff82111761106d57604052565b81156110af570690565b634e487b7160e01b600052601260045260246000fd5b9192909360ff600191160361115c57600f90611154575b60ff60646040516020810190858252876040820152600360f91b60608201526041815261110881611051565b5190200691161161111b57505050600090565b6111469260405190602082019283526040820152600760f81b6060820152604181526108e681611051565b60018101809111610f7b5790565b5060196110dc565b50505050600090565b60070b677fffffffffffffff198114610f7b5760000390565b60070b60040190677fffffffffffffff8213677fffffffffffffff19831217610f7b57565b9060070b9060070b0190677fffffffffffffff198212677fffffffffffffff831317610f7b57565b6111d761101291611015565b509160079190600081840b12611234576111f260099161117e565b830b05915b600082820b126112155761120c60099261117e565b900b0590610f91565b60099061122c611227610eea94611165565b61117e565b900b05611165565b600961124561122761124d93611165565b840b05611165565b916111f7565b61125c90611015565b50819050826000600782900b126112b9575b5060008160070b126112a9575b508060070b8260070b1360001461129a575067ffffffffffffffff1690565b905067ffffffffffffffff1690565b6112b39150611165565b3861127b565b6112c4919350611165565b913861126e565b60070b6003190190677fffffffffffffff198212677fffffffffffffff831317610f7b57565b60070b90677fffffffffffffff198212677fffffffffffffff831317610f7b57565b600791820b910b0390677fffffffffffffff198212677fffffffffffffff831317610f7b57565b600160ff1b8114610f7b5760000390565b90600160401b60008382039312818412811691841390151617610f7b57565b61137661137f91611015565b505091906112f1565b60070b90600082126113f6575b611395906112f1565b60070b600081126113e8575b6780000000000000008083136113d8575b81136113ca575b808213156113c5575090565b905090565b6113d39061134b565b6113b9565b916113e29061134b565b916113b2565b6113f19061133a565b6113a1565b906114036113959161133a565b91905061138c565b9061142d61141b61142593611015565b5050939092611015565b505092611313565b60070b9060008212611444575b6113959192611313565b6114506113959261133a565b915061143a565b600160ff1b81036114685750600090565b61147360199161136a565b0460010180600111610f7b5790565b801561151157808060011461150a57600214611504576001908161013382101682600b831016176114f357906003815b8082116114ca5750508161ffff048111610f7b570290565b90928061ffff048111610f7b578184166114ea575b800292811c906114b2565b809202916114df565b600391500a9061ffff8211610f7b57565b50600890565b5050600190565b50600090565b80156115345760ff8111610f7b576001901b9060ff8211610f7b57565b50600190565b909160ff916004916000908416838103611738575050600f935b8360646040516020810190858252846040820152606f60f81b60608201526041815261157f81611051565b5190200616600090603c811060001461171c5750508360005b168381106115ab57505050505060f01790565b8491906003810361163c5750604080516020810194855290810191909152600760fc1b60608201526007926115fe91600391906115f581606181015b03601f198101835282611083565b5190201661103f565b160291821691820361162757506015810361161a575060d01790565b601c036110125760b01790565b601190634e487b7160e01b6000525260246000fd5b909150600281036116b257506116898460066003946115e761167f8496604051928391602083019586909160419282526020820152600760fc1b60408201520190565b519020061661103f565b16029182169182036116275750600f81036116a5575060501790565b6012036110125760a01790565b6001919293959450146116c7575b5050905090565b604080516020810193845290810191909152600760fc1b6060820152611700916003916116f781606181016115e7565b51902016611517565b821b91610ff060f08416931683036116275750178038806116c0565b605a91501060001461173057836001611598565b836002611598565b6040959195856064825160208101908782528685820152600160f81b60608201526041815261176681611051565b5190200616605711611926575b856064825160208101908782528685820152600160f91b60608201526041815261179c81611051565b51902006166028116117b0575b5050611554565b85818487939995995183606460208301836117e1868d84909160419282526020820152600360f81b60408201520190565b03936117f5601f1995868101835282611083565b5190200616601911156118565750505050508015801561184c575b156118225750600a17935b38806117a9565b80600196929614908115611841575b501561181b57936005179361181b565b905060031438611831565b5080600214611810565b9151602081018881526040820192909252600360f81b6060820152606192830181526064926118859082611083565b5190200616603211156118da5750806118a257506008179361181b565b600181036118b55750600117935b61181b565b600281036118c757506002179361181b565b6003959195036118b0579382179361181b565b9190806118ed575060029150179361181b565b600181036118fd5750179361181b565b9091506002810361191257506008179361181b565b6003959195036118b057936001179361181b565b955061193181611517565b95611773565b9061ffff809216600101918211610f7b57565b906119549161140b565b6001600160ff1b0381168103610f7b5760059060011b0480156000146110125750600190565b6119839061136a565b6001600160ff1b0381168103610f7b5760069060011b0480156000146110125750600190565b60099060070b02908160070b918203610f7b5756fea26469706673582212203c4c43883a7319f368409400962e63e23b1d5d86c7925e44e3f62a0da6e003f964736f6c63430008140033"
+  },
+  "solcInputHash": "3705cadeb86e4cfd473ba34c32cdc277",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"oldLocation\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"newLocation\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"mode\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"}],\"name\":\"CharacterMoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"monsterId\",\"type\":\"uint256\"}],\"name\":\"Death\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"player\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"Enter\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"gearId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"slotType\",\"type\":\"uint8\"}],\"name\":\"Equip\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"hp\",\"type\":\"uint16\"}],\"name\":\"Heal\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"newLevel\",\"type\":\"uint16\"}],\"name\":\"LevelUp\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"uint8\",\"name\":\"status\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"}],\"name\":\"QuestUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"areaLocation\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"blockNumber\",\"type\":\"uint64\"}],\"name\":\"RandomEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"gearId\",\"type\":\"uint256\"}],\"name\":\"Recycle\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"deadCharacterId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newCharacterId\",\"type\":\"uint256\"}],\"name\":\"Resurrect\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"blockHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"exits\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"kind\",\"type\":\"uint8\"}],\"name\":\"RoomActualised\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"blockNumber\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"direction\",\"type\":\"uint8\"}],\"name\":\"RoomDiscovered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"RoomIncome\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"}],\"name\":\"RoomName\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tax\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newDueDate\",\"type\":\"uint256\"}],\"name\":\"RoomTaxPay\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"TAX_PERIOD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"}],\"name\":\"abandonRoom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"}],\"name\":\"activateRoom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"},{\"internalType\":\"uint256[8]\",\"name\":\"amounts\",\"type\":\"uint256[8]\"}],\"name\":\"addBounty\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"}],\"name\":\"buyRoom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"}],\"name\":\"deactivateRoom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"location\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"nameRoom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"periods\",\"type\":\"uint256\"}],\"name\":\"payRoomsTax\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"characterId\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"gearIds\",\"type\":\"uint256[]\"}],\"name\":\"recycle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/dungeon/DungeonActionsFacet.sol\":\"DungeonActionsFacet\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nabstract contract Proxied {\\n    /// @notice to be used by initialisation / postUpgrade function so that only the proxy's admin can execute them\\n    /// It also allows these functions to be called inside a contructor\\n    /// even if the contract is meant to be used without proxy\\n    modifier proxied() {\\n        address proxyAdminAddress = _proxyAdmin();\\n        // With hardhat-deploy proxies\\n        // the proxyAdminAddress is zero only for the implementation contract\\n        // if the implementation contract want to be used as a standalone/immutable contract\\n        // it simply has to execute the `proxied` function\\n        // This ensure the proxyAdminAddress is never zero post deployment\\n        // And allow you to keep the same code for both proxied contract and immutable contract\\n        if (proxyAdminAddress == address(0)) {\\n            // ensure can not be called twice when used outside of proxy : no admin\\n            // solhint-disable-next-line security/no-inline-assembly\\n            assembly {\\n                sstore(\\n                    0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103,\\n                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\\n                )\\n            }\\n        } else {\\n            require(msg.sender == proxyAdminAddress);\\n        }\\n        _;\\n    }\\n\\n    modifier onlyProxyAdmin() {\\n        require(msg.sender == _proxyAdmin(), \\\"NOT_AUTHORIZED\\\");\\n        _;\\n    }\\n\\n    function _proxyAdmin() internal view returns (address ownerAddress) {\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            ownerAddress := sload(0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xaaceeafeeaf0d200ca3942d8bf14c1c4f787a77f79cc87c08bb668e65acdee29\",\"license\":\"MIT\"},\"src/characters/Characters.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./CharactersDataLayout.sol\\\";\\n\\ncontract Characters is Proxied, CharactersDataLayout {\\n    event CharacterUpdate(uint256 indexed id, address indexed owner, uint256 data);\\n    event Transfer(address indexed from, address indexed to, uint256 indexed id);\\n\\n    function postUpgrade() external proxied {\\n        if (nextId == 0) {\\n            nextId = 1;\\n        }\\n    }\\n\\n    function getSubOwner(uint256 id) external view returns (uint256) {\\n        return _subOwner[id][_owners[id]];\\n    }\\n\\n    function setSubOwner(uint256 id, uint256 subOwner) external {\\n        require(msg.sender == _owners[id], \\\"only owner is able to set sub owner\\\");\\n        _setSubOwnerFor(id, msg.sender, subOwner);\\n    }\\n\\n    function _setSubOwnerFor(\\n        uint256 id,\\n        address owner,\\n        uint256 subOwner\\n    ) internal {\\n        // TODO emit SubOwnerTransferEvent\\n        _subOwner[id][owner] = subOwner;\\n    }\\n\\n    function mintTo(address to) external returns (uint256) {\\n        return _mint(to);\\n    }\\n\\n    // subowner is uint(address) of player currently\\n    // when subowner == 0 character is considered not in the dungeon\\n    function mint(uint256 subOwner) external returns (uint256) {\\n        uint256 id = _mint(msg.sender);\\n        _setSubOwnerFor(id, msg.sender, subOwner);\\n        return id;\\n    }\\n\\n    function _mint(address to) internal returns (uint256) {\\n        uint256 id = nextId++;\\n        _owners[id] = to;\\n        _numPerOwners[to]++;\\n        emit Transfer(address(0), to, id);\\n        return id;\\n    }\\n\\n    function getData(uint256 id) external view returns (uint256) {\\n        return _data[id][msg.sender];\\n    }\\n\\n    function getDataFor(uint256 id, address owner) external view returns (uint256) {\\n        return _data[id][owner];\\n    }\\n\\n    // TODO only dungeon should be able to set data\\n    // currently this can be called by the player when characters is outside of dungeon\\n    function setData(uint256 id, uint256 data) external {\\n        require(msg.sender == _ownerOf(id), \\\"only owner is allowed to set data\\\");\\n        _setDataFor(id, msg.sender, data);\\n    }\\n\\n    function _setDataFor(\\n        uint256 id,\\n        address owner,\\n        uint256 data\\n    ) internal {\\n        _data[id][owner] = data;\\n        emit CharacterUpdate(id, owner, data);\\n    }\\n\\n    function _ownerOf(uint256 id) internal view returns (address) {\\n        return _owners[id];\\n    }\\n\\n    function fullOwnerOf(uint256 id) external view returns (address owner, uint256 subOwner) {\\n        owner = _ownerOf(id);\\n        subOwner = _subOwner[id][owner];\\n    }\\n\\n    // EIP-721 Standard\\n    function ownerOf(uint256 id) external view returns (address tokenOwner) {\\n        tokenOwner = _ownerOf(id);\\n        require(tokenOwner != address(0), \\\"token does not exist\\\");\\n    }\\n\\n    function balanceOf(address who) external view returns (uint256) {\\n        require(who != address(0), \\\"zero address\\\");\\n        return _numPerOwners[who];\\n    }\\n\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 id\\n    ) external {\\n        require(from != address(0), \\\"from is zero address\\\");\\n        require(to != address(0), \\\"to is zero address\\\");\\n        address owner = _owners[id];\\n        require(owner == from, \\\"from is not owner\\\");\\n        _subOwner[id][owner] = 0;\\n        _owners[id] = to;\\n        _numPerOwners[from]--;\\n        _numPerOwners[to]++;\\n    }\\n\\n    function supportsInterface(bytes4 id) external pure returns (bool) {\\n        // TODO metadata || id == 0x5b5e139f;\\n        return id == 0x01ffc9a7 || id == 0x80ac58cd;\\n    }\\n}\\n\",\"keccak256\":\"0xcc9355031d7447f7b27da41ff240cfdf96cc59c5d4e273d3f7940ce95b22ef30\",\"license\":\"MIT\"},\"src/characters/CharactersDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract CharactersDataLayout {\\n    uint256 nextId;\\n    mapping(uint256 => address) _owners;\\n    mapping(address => uint256) _numPerOwners;\\n    mapping(uint256 => mapping(address => uint256)) _subOwner;\\n    mapping(uint256 => mapping(address => uint256)) _data;\\n}\\n\",\"keccak256\":\"0x8b2acf9ac90aabf99ea230bfdefd3a9fbe70851f94cc5be2c331543560d7f811\",\"license\":\"MIT\"},\"src/diamond/DiamondStorageContract.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\n/**\\n * @title DiamondStorageContract\\n * @dev Base contract for Diamond Standard (EIP-2535) storage pattern\\n * This is a recreation of the buidler-deploy DiamondStorageContract for Solidity 0.8+\\n */\\nabstract contract DiamondStorageContract {\\n    \\n    struct DiamondStorage {\\n        // Owner of the contract\\n        address contractOwner;\\n        // maps function selectors to the facets that execute the functions\\n        // and maps the selectors to their position in the selectorSlots array\\n        mapping(bytes4 => bytes32) facets;\\n        // array of slots of function selectors\\n        // each slot holds 8 function selectors\\n        mapping(uint256 => bytes32) selectorSlots;\\n        // The number of function selectors in selectorSlots\\n        uint16 selectorCount;\\n        // Used to query if a contract implements an interface\\n        // Used to implement ERC-165\\n        mapping(bytes4 => bool) supportedInterfaces;\\n    }\\n\\n    // Storage position for DiamondStorage\\n    // keccak256(\\\"diamond.standard.diamond.storage\\\")\\n    bytes32 constant DIAMOND_STORAGE_POSITION = 0xc8fcad8db84d3cc18b4c41d551ea0ee66dd599cde068d998e57d5e09332c131c;\\n\\n    /**\\n     * @dev Returns the DiamondStorage struct at the defined storage position\\n     */\\n    function diamondStorage() internal pure returns (DiamondStorage storage ds) {\\n        bytes32 position = DIAMOND_STORAGE_POSITION;\\n        assembly {\\n            ds.slot := position\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xc4527b6b62276e166e78e41c2f2562c9c1d312b3fded0e7784ecd349a0fd37f3\",\"license\":\"MIT\"},\"src/dungeon/DungeonActionsFacet.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"./DungeonFacetBase.sol\\\";\\nimport \\\"./PureDungeon.sol\\\";\\nimport \\\"../utils/BlockHashRegister.sol\\\";\\nimport \\\"../characters/Characters.sol\\\";\\nimport \\\"../tokens/Elements.sol\\\";\\nimport \\\"../tokens/Gears.sol\\\";\\nimport \\\"../player/Player.sol\\\";\\n\\ncontract DungeonActionsFacet is DungeonFacetBase {\\n    function recycle(uint256 characterId, uint256[] calldata gearIds) external onlyPlayer {\\n        CharacterData memory data = _getCharacterData(characterId);\\n        require(data.hp > 0, \\\"your character is dead\\\");\\n        uint256 reward = 0;\\n        for (uint256 i = 0; i < gearIds.length; i++) {\\n            uint256 id = gearIds[i];\\n            require(characterId == _gearsContract.subOwnerOf(id), \\\"has to be owner of gear\\\");\\n            reward += PureDungeon._recyclingReward(_gearsContract.getData(id));\\n            _gearsContract.subBurn(id);\\n            emit Recycle(characterId, id);\\n        }\\n        _elementsContract.mint(characterId, PureDungeon.FRAGMENTS, reward);\\n    }\\n\\n    function buyRoom(uint256 characterId) external onlyPlayer {\\n        uint256 location = _characters[characterId].location;\\n        uint256 owner = _roomsContract.subOwnerOf(location);\\n        require(_taxDueDate[address(uint160(owner))] < block.timestamp, \\\"not foreclosed\\\");\\n        _elementsContract.subBurnFrom(characterId, PureDungeon.COINS, 2);\\n        uint256 buyer = _charactersContract.getSubOwner(characterId);\\n        _initializeTaxDueDate(buyer);\\n        _roomsContract.subTransferFrom(address(this), owner, buyer, location);\\n    }\\n\\n    function abandonRoom(uint256 characterId, uint256 location) external onlyPlayer {\\n        uint256 owner = _roomsContract.subOwnerOf(location);\\n        uint256 player = _charactersContract.getSubOwner(characterId);\\n        require(owner == player, \\\"not owner\\\");\\n        _roomsContract.subTransferFrom(address(this), owner, uint256(uint160(address(this))), location);\\n    }\\n\\n    function deactivateRoom(uint256 characterId, uint256 location) external onlyPlayer {\\n        uint256 owner = _roomsContract.subOwnerOf(location);\\n        uint256 player = _charactersContract.getSubOwner(characterId);\\n        require(owner == player, \\\"not owner\\\");\\n        _elementsContract.transferFrom(address(uint160(owner)), address(0), PureDungeon.COINS, 100);\\n        _roomsContract.transferFrom(address(this), address(uint160(owner)), location);\\n    }\\n\\n    function activateRoom(uint256 characterId, uint256 location) external onlyPlayer {\\n        uint256 player = _charactersContract.getSubOwner(characterId);\\n        uint256 owner = uint256(uint160(_roomsContract.ownerOf(location)));\\n        require(owner != uint256(uint160(address(this))), \\\"not deactivated\\\");\\n        require(owner == player, \\\"not owner\\\");\\n        _roomsContract.transferFrom(address(uint160(owner)), address(this), location);\\n        _initializeTaxDueDate(owner);\\n        _roomsContract.subTransferFrom(address(this), 0, owner, location);\\n    }\\n\\n    function nameRoom(uint256 characterId, uint256 location, string calldata name) external onlyPlayer {\\n        uint256 owner = _roomsContract.subOwnerOf(location);\\n        uint256 player = _charactersContract.getSubOwner(characterId);\\n        require(owner == player, \\\"not owner\\\");\\n        _elementsContract.transferFrom(address(uint160(owner)), address(0), PureDungeon.COINS, 20);\\n        _customRoomNames[location] = name;\\n        emit RoomName(location, name, characterId);\\n    }\\n\\n    uint256 public constant TAX_PERIOD = 5 days;\\n\\n    function payRoomsTax(uint256 characterId, uint256 periods) external onlyPlayer {\\n        require(periods > 0, \\\"one period atleast\\\");\\n        address owner = address(uint160(_charactersContract.getSubOwner(characterId)));\\n        uint256 rooms = _roomsContract.subBalanceOf(uint256(uint160(owner)));\\n        require(rooms > 0, \\\"not dungeon keeper\\\");\\n        uint256 tax = PureDungeon._roomsTax(rooms, periods);\\n        _elementsContract.transferFrom(owner, address(0), PureDungeon.COINS, tax);\\n        _taxDueDate[owner] += TAX_PERIOD * periods;\\n        require(_taxDueDate[owner] < block.timestamp + TAX_PERIOD * 2, \\\"cannot prepay more\\\");\\n        emit RoomTaxPay(owner, tax, _taxDueDate[owner]);\\n    }\\n\\n    function addBounty(uint256 characterId, uint256 location, uint256[8] calldata amounts) external onlyPlayer {\\n        _actualiseRoom(location);\\n        for (uint256 i = 0; i < amounts.length; i++) {\\n            if (amounts[i] > 0) {\\n                _elementsContract.subTransferFrom(characterId, PureDungeon._locationToBounty(location), i+1, amounts[i]);\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xb408b6b8d2bf1ce004e28ca411a43d28938ed3255b992fba44655fb32e85f1b7\",\"license\":\"MIT\"},\"src/dungeon/DungeonDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"../utils/BlockHashRegister.sol\\\";\\nimport \\\"../characters/Characters.sol\\\";\\nimport \\\"../tokens/Elements.sol\\\";\\nimport \\\"../tokens/Gears.sol\\\";\\nimport \\\"../tokens/Rooms.sol\\\";\\nimport \\\"../player/Player.sol\\\";\\n\\ncontract DungeonDataLayout {\\n    struct Room {\\n        uint64 blockNumber;\\n        uint64 monsterBlockNumber;\\n        uint64 numActiveCharacters;\\n        uint8 direction;\\n        uint8 exits;\\n        uint8 kind;\\n        uint8 areaAtDiscovery;\\n        uint8 lastRoomIndex;\\n        uint8 index;\\n        uint256 discoverer;\\n        uint64 randomEvent;\\n    }\\n\\n    struct Character {\\n        uint256 location;\\n        uint8 direction;\\n        int64 floors;\\n        uint256 slot_1; // attack // TODO store this on character NFT ?\\n        uint256 slot_2; // defense // TODO store this on character NFT ?\\n        uint256 slot_3; // accessory 1 // TODO store this on character NFT ?\\n        uint256 slot_4; // accessory 2 // TODO store this on character NFT ?5\\n        uint256 slot_5; // accessory 3 // TODO store this on character NFT ?\\n    }\\n\\n    struct Area {\\n        uint8 areaType;\\n        uint8 discovered; // record room types already discovered : temple, teleport ...\\n        uint8 lastRoomIndex; // track what was the index of the room discovered first in last block\\n        uint8 currentIndex; // track the index of room discovered in the same block\\n        uint256 lastRoom; // last room disovered in a block, used for area blockHash too\\n        uint64 eventBlockNumber;\\n    }\\n\\n    mapping(uint256 => Character) _characters;\\n    mapping(uint256 => Room) _rooms;\\n    mapping(uint256 => Area) _areas;\\n\\n    struct AreaCounter {\\n        uint64 lastPeriod;\\n        uint64 numAreas;\\n    }\\n    AreaCounter _areaCounter;\\n\\n    address _adminContract;\\n    BlockHashRegister _blockHashRegister;\\n    Characters _charactersContract;\\n    Elements _elementsContract;\\n    Gears _gearsContract;\\n    Rooms _roomsContract;\\n    Player _playerContract;\\n\\n    mapping(uint256 => mapping(uint256 => mapping(uint256 => bool))) _unlockedExits;\\n\\n    struct Quest {\\n        uint8 status;\\n        string data;\\n    }\\n    mapping(uint256 => mapping(uint64 => Quest)) _quests; // _quests[character][id]\\n\\n    mapping(address => uint256) _taxDueDate;\\n\\n    mapping(uint256 => string) _customRoomNames;\\n}\\n\",\"keccak256\":\"0x70162642f692c54d2566c92ab3822b4c6d2ed179591165037aaea975990dd2ab\",\"license\":\"MIT\"},\"src/dungeon/DungeonEvents.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract DungeonEvents {\\n    event RoomDiscovered(uint256 indexed location, uint64 blockNumber, uint8 direction);\\n    event RoomActualised(uint256 indexed location, bytes32 blockHash, uint8 exits, uint8 kind);\\n    event CharacterMoved(\\n        uint256 indexed characterId,\\n        uint256 indexed oldLocation,\\n        uint256 indexed newLocation,\\n        uint8 mode,\\n        uint256 path\\n    );\\n    event Enter(uint256 indexed characterId, address indexed player, string name);\\n    event Death(uint256 indexed characterId, uint256 monsterId);\\n    event LevelUp(uint256 indexed characterId, uint16 newLevel);\\n    event Equip(uint256 characterId, uint256 gearId, uint8 slotType);\\n    event Resurrect(uint256 indexed deadCharacterId, uint256 newCharacterId);\\n    event Heal(uint256 indexed characterId, uint16 hp);\\n    event RandomEvent(uint256 indexed areaLocation, uint64 blockNumber);\\n    event Recycle(uint256 indexed characterId, uint256 gearId);\\n    event QuestUpdate(uint256 indexed characterId, uint64 indexed id, uint8 indexed status, string data);\\n    event RoomTaxPay(address indexed owner, uint256 tax, uint256 newDueDate);\\n    event RoomIncome(uint256 indexed location, address indexed owner, uint256 id, uint256 amount);\\n    event RoomName(uint256 indexed location, string name, uint256 characterId);\\n}\\n\",\"keccak256\":\"0xf66026ea03c69423579146b584b537cce0b04de850375c415e1eac548fcb7b58\",\"license\":\"MIT\"},\"src/dungeon/DungeonFacetBase.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"../diamond/DiamondStorageContract.sol\\\";\\nimport \\\"./DungeonDataLayout.sol\\\";\\nimport \\\"./DungeonEvents.sol\\\";\\nimport \\\"./PureDungeon.sol\\\";\\nimport \\\"../utils/BlockHashRegister.sol\\\";\\nimport \\\"../characters/Characters.sol\\\";\\nimport \\\"../tokens/Elements.sol\\\";\\nimport \\\"../tokens/Gears.sol\\\";\\nimport \\\"../player/Player.sol\\\";\\n\\nabstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondStorageContract {\\n    uint256 internal constant MAX_GEARS = 10;\\n\\n\\n    modifier onlyOwner() {\\n        DiamondStorage storage ds = diamondStorage();\\n        require(msg.sender == ds.contractOwner, \\\"Only owner is allowed to perform this action\\\");\\n        _;\\n    }\\n\\n    modifier onlyAdmin() {\\n        require(msg.sender == _adminContract, \\\"NOT_AUTHORIZED_ADMIN\\\");\\n        _;\\n    }\\n\\n    modifier onlyPlayer() {\\n        require(msg.sender == address(_playerContract), \\\"only players allowed\\\");\\n        _;\\n    }\\n\\n    function _actualiseRoom(uint256 location) internal {\\n        Room storage room = _rooms[location];\\n        require(room.blockNumber > 0, \\\"room not created yet\\\");\\n        if (room.kind == 0) {\\n            bytes32 blockHash = _blockHashRegister.get(room.blockNumber);\\n            if (blockHash == 0) {\\n                // skip as block is not actualised or not in register\\n                return;\\n            }\\n            _actualiseArea(location, blockHash);\\n            (uint8 exits, uint8 kind, uint8 area_discovered) = PureDungeon._generateRoom(\\n                location,\\n                blockHash,\\n                room.direction,\\n                room.areaAtDiscovery,\\n                room.lastRoomIndex,\\n                room.index\\n            );\\n            room.exits = exits;\\n            room.kind = kind;\\n            uint256 areaLoc = PureDungeon._getAreaLoc(location);\\n            Area storage area = _areas[areaLoc];\\n            if (area.discovered != area_discovered) {\\n                area.discovered = area_discovered;\\n            }\\n            emit RoomActualised(location, blockHash, exits, kind);\\n            uint8 areaType = _areas[areaLoc].areaType;\\n            if (room.discoverer != 0) {\\n                CharacterData memory characterData = _getCharacterData(room.discoverer);\\n                (uint256 numGold, uint256 numElements) = PureDungeon._computeRoomDiscoveryReward(\\n                    location,\\n                    blockHash,\\n                    characterData.class\\n                );\\n                if (areaType <= 5) {\\n                    _elementsContract.mint(room.discoverer, areaType, numElements);\\n                }\\n                _elementsContract.mint(room.discoverer, 6, numGold);\\n            }\\n        }\\n        _actualiseRandomEvent(PureDungeon._getAreaLoc(location)); // room actualisation take precedence // monster\\n    }\\n\\n    function _actualiseArea(uint256 location, bytes32 blockHash) internal {\\n        uint256 areaLoc = PureDungeon._getAreaLoc(location);\\n        uint8 areaType = _areas[areaLoc].areaType;\\n        if (areaType == 0) {\\n            uint64 currentNumAreas = _areaCounter.numAreas;\\n            areaType = PureDungeon._generateArea(areaLoc, blockHash, currentNumAreas);\\n            _areas[areaLoc].areaType = areaType;\\n            if (areaType != 6) {\\n                uint64 period = uint64(block.timestamp / 23 hours);\\n                if (_areaCounter.lastPeriod != period) {\\n                    _areaCounter.lastPeriod = period;\\n                    _areaCounter.numAreas = 1;\\n                } else {\\n                    _areaCounter.numAreas = currentNumAreas + 1;\\n                }\\n            }\\n        }\\n    }\\n\\n    struct CharacterData {\\n        uint8 class;\\n        uint16 level;\\n        uint32 xp;\\n        uint16 maxHP;\\n        uint16 hp;\\n    }\\n\\n    function _setCharacterData(uint256 characterId, CharacterData memory characterData) internal {\\n        uint256 data = ((uint256(characterData.class) << 248) +\\n            (uint256(characterData.level) << 232) +\\n            (uint256(characterData.xp) << 200) +\\n            (uint256(characterData.maxHP) << 184) +\\n            (uint256(characterData.hp) << 168));\\n        _charactersContract.setData(characterId, data);\\n    }\\n\\n    function _getCharacterData(uint256 characterId) internal view returns (CharacterData memory) {\\n        uint256 data = _charactersContract.getData(characterId);\\n        (uint16 level, uint16 hp, uint16 maxHP, uint32 xp, uint8 class) = PureDungeon._decodeCharacterData(data);\\n        return CharacterData(class, level, xp, maxHP, hp);\\n    }\\n\\n    function _actualiseRandomEvent(uint256 areaLoc) internal {\\n        Area storage area = _areas[areaLoc];\\n        uint64 blockNumber = area.eventBlockNumber;\\n        if (blockNumber != 0) {\\n            bytes32 blockHash = _blockHashRegister.get(blockNumber);\\n            if (blockHash == 0) {\\n                // skip as block is not actualised or not in register\\n                return;\\n            }\\n            (uint256 roomLocation, uint64 randomEvent) = PureDungeon._generateRandomEvent(areaLoc, blockHash);\\n            uint256 monsterIndex = _checkMonsterBlockNumber(roomLocation);\\n            Room storage room = _rooms[roomLocation];\\n            if (room.randomEvent != 2\\n                && room.numActiveCharacters == 0\\n                && monsterIndex == 0\\n                && room.kind != 0\\n            ) {\\n                room.randomEvent = randomEvent;\\n            }\\n            area.eventBlockNumber = 0;\\n        }\\n    }\\n\\n    /// @dev to be valid it require the room to be actualised first\\n    function _checkMonster(uint256 location) internal view returns (uint256) {\\n        uint256 monsterIndex = _checkMonsterBlockNumber(location);\\n        // if (monsterIndex == 0) {\\n        //     if (_roomEvents[location] == 1)  { //TODO monster indicator\\n        //         return 1;\\n        //     }\\n        //     return 0;\\n        // }\\n        return monsterIndex;\\n    }\\n\\n    function _checkMonsterBlockNumber(uint256 location) internal view returns (uint256) {\\n        uint64 monsterBlockNumber = _rooms[location].monsterBlockNumber;\\n        if (monsterBlockNumber == 0) {\\n            // no monsters\\n            return 0;\\n        }\\n        bytes32 monsterBlockHash = _blockHashRegister.get(monsterBlockNumber);\\n        if (monsterBlockHash == 0) {\\n            // skip as monster block is not actualised\\n            return 0;\\n        }\\n        bool newlyDiscoveredRoom = monsterBlockNumber == _rooms[location].blockNumber;\\n        return\\n            PureDungeon._generateMonsterIndex(\\n                location,\\n                monsterBlockHash,\\n                1,\\n                newlyDiscoveredRoom,\\n                _rooms[location].kind\\n            );\\n    }\\n\\n    struct GearData {\\n        uint16 level;\\n        uint8 slot;\\n        uint8 classBits; // bit array of allowed classes indexed by lsb\\n        uint16 durability;\\n        uint16 maxDurability; // gear is unbreakable when maxDurablity is 0\\n        uint32 template;\\n    }\\n\\n    function _setGearData(uint256 gearId, GearData memory gear) internal {\\n        uint256 data = PureDungeon._encodeGearData(\\n            gear.level,\\n            gear.slot,\\n            gear.classBits,\\n            gear.durability,\\n            gear.maxDurability,\\n            gear.template\\n        );\\n        _gearsContract.setData(gearId, data);\\n    }\\n\\n    function _getGearData(uint256 gearId) internal view returns (GearData memory) {\\n        uint256 data = _gearsContract.getData(gearId);\\n        (\\n            uint16 level,\\n            uint8 slot,\\n            uint8 classBits,\\n            uint16 durability,\\n            uint16 maxDurability,\\n            uint32 template\\n        ) = PureDungeon._decodeGearData(data);\\n        return GearData(level, slot, classBits, durability, maxDurability, template);\\n    }\\n\\n    function _addInitialGears(uint256 characterId) internal {\\n        uint256 attackGearData = PureDungeon._encodeGearData(0, 0, 15, 10, 10, 1);\\n        uint256 defenseGearData = PureDungeon._encodeGearData(0, 1, 15, 10, 10, 4);\\n        uint256 attackGear = _gearsContract.mint(characterId, attackGearData);\\n        _equip(characterId, 0, 0, attackGear, 0);\\n        uint256 defenseGear = _gearsContract.mint(characterId, defenseGearData);\\n        _equip(characterId, 0, 0, defenseGear, 1);\\n    }\\n\\n    // TODO restrict transfer of equiped items\\n    function _equip(\\n        uint256 characterId,\\n        uint16 level,\\n        uint8 class,\\n        uint256 id,\\n        uint8 slot\\n    ) internal {\\n        GearData memory gear = _getGearData(id);\\n        require(gear.level <= level, \\\"gear Level too high\\\");\\n        require((gear.classBits >> class) & 1 != 0, \\\"invalid class\\\");\\n        if (slot == 0) {\\n            require(gear.slot == 0, \\\"only attack gear on slot 0\\\");\\n            _characters[characterId].slot_1 = id;\\n        } else if (slot == 1) {\\n            require(gear.slot == 1, \\\"only defense gear on slot 1\\\");\\n            _characters[characterId].slot_2 = id;\\n        } else if (slot == 2) {\\n            require(gear.slot == 2, \\\"only accessories on slot 2\\\");\\n            _characters[characterId].slot_3 = id;\\n        } else if (slot == 3) {\\n            require(gear.slot == 2, \\\"only accessories on slot 3\\\");\\n            _characters[characterId].slot_4 = id;\\n        } else if (slot == 4) {\\n            require(gear.slot == 2, \\\"only accessories on slot 4\\\");\\n            _characters[characterId].slot_5 = id;\\n        }\\n        emit Equip(characterId, id, gear.slot);\\n    }\\n\\n    function _handleKey(\\n        uint256 characterId,\\n        uint256 location,\\n        uint256 location2\\n    ) internal {\\n        uint256 location1 = location;\\n        if (location1 > location2) {\\n            location1 = location2;\\n            location2 = location;\\n        }\\n        if (!_isUnlocked(characterId, location1, location2)) {\\n            require(_elementsContract.subBalanceOf(characterId, PureDungeon.KEYS) > 0, \\\"no key\\\");\\n            _elementsContract.subBurnFrom(characterId, PureDungeon.KEYS, 1);\\n            _unlockedExits[characterId][location1][location2] = true;\\n        }\\n    }\\n\\n    function _isUnlocked(\\n        uint256 characterId,\\n        uint256 location1,\\n        uint256 location2\\n    ) internal view returns (bool) {\\n        return _unlockedExits[characterId][location1][location2];\\n    }\\n\\n    function _getAreaTypeForRoom(uint256 location) internal view returns (uint8) {\\n        return _areas[PureDungeon._getAreaLoc(location)].areaType;\\n    }\\n\\n    function _moveTo(\\n        uint256 characterId,\\n        uint256 oldLocation,\\n        uint8 direction\\n    ) internal returns (uint256) {\\n        (int64 x, int64 y, int64 z, ) = PureDungeon._coordinates(oldLocation);\\n        if (PureDungeon.NORTH == direction) {\\n            y--;\\n        } else if (PureDungeon.EAST == direction) {\\n            x++;\\n        } else if (PureDungeon.SOUTH == direction) {\\n            y++;\\n        } else if (PureDungeon.WEST == direction) {\\n            x--;\\n        } else {\\n            revert(\\\"impossible direction\\\");\\n        }\\n        uint256 newLocation = PureDungeon._location(x, y, z);\\n        Room storage currentRoom = _rooms[oldLocation];\\n        Room storage nextRoom = _rooms[newLocation];\\n        uint64 cb = currentRoom.blockNumber;\\n        uint64 nb = nextRoom.blockNumber;\\n        uint8 exitMask = uint8(2) ** direction;\\n        uint8 opositeExitMask = uint8(2) ** ((direction + 2) % 4);\\n        if (cb < nb || nb == 0) {\\n            if ((currentRoom.exits & exitMask) == exitMask) {\\n                if ((currentRoom.exits / 2 ** 4) & exitMask == exitMask) {\\n                    _handleKey(characterId, oldLocation, newLocation);\\n                }\\n                return newLocation;\\n            }\\n        } else if (cb > nb) {\\n            if ((nextRoom.exits & opositeExitMask) == opositeExitMask) {\\n                if ((nextRoom.exits / 2 ** 4) & opositeExitMask == opositeExitMask) {\\n                    _handleKey(characterId, oldLocation, newLocation);\\n                }\\n                return newLocation;\\n            }\\n        } else {\\n            if ((currentRoom.exits & exitMask) == exitMask || (nextRoom.exits & opositeExitMask) == opositeExitMask) {\\n                if (oldLocation > newLocation) {\\n                    if ((nextRoom.exits / 2 ** 4) & opositeExitMask == opositeExitMask) {\\n                        _handleKey(characterId, oldLocation, newLocation);\\n                    }\\n                } else {\\n                    if ((currentRoom.exits / 2 ** 4) & exitMask == exitMask) {\\n                        _handleKey(characterId, oldLocation, newLocation);\\n                    }\\n                }\\n                return newLocation;\\n            }\\n        }\\n        revert(\\\"cant move this way\\\");\\n    }\\n\\n    function _move(\\n        uint256 characterId,\\n        uint256 location,\\n        uint8 direction\\n    ) internal {\\n        Character storage character = _characters[characterId];\\n        Room storage currentRoom = _rooms[character.location];\\n        Room storage nextRoom = _rooms[location];\\n        uint64 blockNumber;\\n        if (nextRoom.blockNumber == 0) {\\n            _discoverRoom(location, characterId, direction);\\n        } else {\\n            // TODO should we actualiseRoom first, before monster ?\\n            // TODO can we remove num active characters check?\\n            if (\\n                nextRoom.monsterBlockNumber == 0\\n                    && nextRoom.numActiveCharacters == 0\\n                    && nextRoom.randomEvent != 2\\n                    && _roomsContract.getData(location) == 0\\n            ) {\\n                blockNumber = uint64(block.number);\\n                _blockHashRegister.request();\\n                if (nextRoom.monsterBlockNumber == 0) {\\n                    nextRoom.monsterBlockNumber = blockNumber;\\n                }\\n            }\\n            _actualiseRoom(location);\\n            address benefactor = _roomBenefactor(location);\\n            if (benefactor != address(0) && uint256(uint160(benefactor)) != _charactersContract.getSubOwner(characterId)) {\\n                _elementsContract.mintVault(benefactor, PureDungeon.FRAGMENTS, 1);\\n                emit RoomIncome(location, benefactor, PureDungeon.FRAGMENTS, 1);\\n            }\\n        }\\n        uint256 areaLoc = PureDungeon._getAreaLoc(location);\\n        Area storage area = _areas[areaLoc];\\n        if (area.eventBlockNumber == 0 && block.number % 3 == 0) {\\n            if (blockNumber == 0) {\\n                blockNumber = uint64(block.number);\\n                _blockHashRegister.request();\\n            }\\n            area.eventBlockNumber = blockNumber;\\n            emit RandomEvent(areaLoc, blockNumber);\\n        }\\n        currentRoom.numActiveCharacters--;\\n        nextRoom.numActiveCharacters++;\\n        character.location = location;\\n        character.direction = direction;\\n        _increaseHPXP(characterId);\\n    }\\n\\n    function _increaseHPXP(uint256 characterId) internal {\\n        CharacterData memory characterData = _getCharacterData(characterId);\\n        if (characterData.hp < characterData.maxHP) {\\n            characterData.hp += 1;\\n            _setCharacterData(characterId, characterData);\\n        }\\n    }\\n\\n    function _isRoomActive(uint256 location) internal view returns (bool) {\\n        address owner = _roomsContract.ownerOf(location);\\n        return owner == address(this);\\n    }\\n\\n    function _roomBenefactor(uint256 location) internal view returns (address) {\\n        if (_isRoomActive(location)) {\\n            return address(uint160(_roomsContract.subOwnerOf(location)));\\n        } else {\\n            return address(0);\\n        }\\n    }\\n\\n    function _pay(uint256 characterId, uint256 location, uint256 id, uint256 amount) internal {\\n        address benefactor = _roomBenefactor(location);\\n        if (benefactor != address(0)) {\\n            uint256 share = amount / 5;\\n            if (share > 0) {\\n                _elementsContract.subTransferFrom(characterId, 0, id, share);\\n                _elementsContract.transferFrom(address(this), benefactor, id, share);\\n                emit RoomIncome(location, benefactor, id, share);\\n            }\\n            _elementsContract.subBurnFrom(characterId, id, amount - share);\\n        } else {\\n            _elementsContract.subBurnFrom(characterId, id, amount);\\n        }\\n    }\\n\\n    function _discoverRoom(\\n        uint256 location,\\n        uint256 discoverer,\\n        uint8 direction\\n    ) internal {\\n        Area storage area = _areas[PureDungeon._getAreaLoc(location)];\\n        if (area.lastRoom > 0) {\\n            // area is also actualised with room when necessary\\n            _actualiseRoom(area.lastRoom);\\n            area.lastRoomIndex = area.currentIndex;\\n            area.lastRoom = 0;\\n        }\\n        _elementsContract.subBurnFrom(discoverer, PureDungeon.FRAGMENTS, PureDungeon._discoveryCost(location));\\n        Room storage nextRoom = _rooms[location];\\n        nextRoom.blockNumber = uint64(block.number);\\n        nextRoom.monsterBlockNumber = uint64(block.number);\\n        nextRoom.direction = direction;\\n        nextRoom.areaAtDiscovery = area.discovered;\\n        nextRoom.index = area.currentIndex++;\\n        nextRoom.lastRoomIndex = area.lastRoomIndex;\\n        nextRoom.discoverer = discoverer;\\n        area.lastRoom = location;\\n        _blockHashRegister.request();\\n        uint256 discovererOwner = _charactersContract.getSubOwner(discoverer);\\n        _initializeTaxDueDate(discovererOwner);\\n        _roomsContract.mintId(location, discovererOwner);\\n        emit RoomDiscovered(location, uint64(block.number), nextRoom.direction);\\n    }\\n\\n    function _initializeTaxDueDate(uint256 owner) internal {\\n        if (owner != 0 && _roomsContract.subBalanceOf(owner) == 0) {\\n            uint256 dueDate = block.timestamp + 5 days;\\n            _taxDueDate[address(uint160(owner))] = dueDate;\\n            emit RoomTaxPay(address(uint160(owner)), 0, dueDate);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x733160bc199104f585801b788acc558c02dc856858344d32a731427b4cb3ca96\",\"license\":\"MIT\"},\"src/dungeon/PureDungeon.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nlibrary PureDungeon {\\n    uint256 internal constant LOCATION_ZERO = 2**255;\\n    uint256 internal constant BOUNTY = 2**254;\\n\\n    uint8 internal constant ROOM_TYPE_NORMAL = 1;\\n    uint8 internal constant ROOM_TYPE_TELEPORT = 2;\\n    uint8 internal constant ROOM_TYPE_TEMPLE = 3;\\n    uint8 internal constant ROOM_TYPE_LORE = 4;\\n    uint8 internal constant ROOM_TYPE_CARRIER = 5;\\n\\n    uint8 internal constant EXITS_INERTIA = 87;\\n    uint8 internal constant EXITS_BIFURCATION = 40;\\n    uint8 internal constant EXITS_BOTH_BIFURCATION = 25;\\n\\n    uint8 internal constant NORTH = 0;\\n    uint8 internal constant EAST = 1;\\n    uint8 internal constant SOUTH = 2;\\n    uint8 internal constant WEST = 3;\\n    uint8 internal constant DOWN = 4;\\n\\n    uint8 internal constant COINS = 6;\\n    uint8 internal constant KEYS = 7;\\n    uint8 internal constant FRAGMENTS = 8;\\n\\n    uint8 internal constant WARRIOR = 0;\\n    uint8 internal constant EXPLORER = 1;\\n    uint8 internal constant MAGE = 2;\\n    uint8 internal constant BARBARIAN = 3;\\n\\n    uint8 internal constant CLASS_BONUS = 4; // 100/4 = 25%\\n\\n    uint8 internal constant LEVEL_RING_WIDTH = 25;\\n    uint16 internal constant ELEMENT_AREA_10000_PROBA = 100; // 1%\\n    uint8 internal constant NUM_ELEMENT_AREA_PER_PERIOD = 10;\\n\\n    uint8 internal constant LOCK_PROBABILITY = 40;\\n    uint8 internal constant TWO_LOCK_PROBABILITY = 10;\\n\\n    uint8 internal constant MONSTER_SPAWN = 15;\\n\\n    uint8 internal constant INITIAL_HP = 16;\\n    uint8 internal constant HP_INCREASE = 10;\\n\\n    function coordinates(uint256 location)\\n        external\\n        pure\\n        returns (\\n            int64 x,\\n            int64 y,\\n            int64 z,\\n            uint64 a\\n        )\\n    {\\n        return _coordinates(location);\\n    }\\n\\n    function _coordinates(uint256 location)\\n        internal\\n        pure\\n        returns (\\n            int64 x,\\n            int64 y,\\n            int64 z,\\n            uint64 a\\n        )\\n    {\\n        x = int64(uint64(location));\\n        y = int64(uint64(location / 2**64));\\n        z = int64(uint64(location / 2**128));\\n        a = uint64(location / 2**255); // = 1 for valid location\\n    }\\n\\n    function location(\\n        int64 x,\\n        int64 y,\\n        int64 z\\n    ) external pure returns (uint256) {\\n        return _location(x, y, z);\\n    }\\n\\n    function _location(\\n        int64 x,\\n        int64 y,\\n        int64 z\\n    ) internal pure returns (uint256) {\\n        return 2**255 + uint256(uint64(z)) * 2**128 + uint256(uint64(y)) * 2**64 + uint64(x);\\n    }\\n\\n    function _locationToBounty(uint256 location) internal pure returns (uint256 bounty){\\n        return location - LOCATION_ZERO + BOUNTY;\\n    }\\n\\n    function _bountyToLocation(uint256 bounty) internal pure returns (uint256 location){\\n        return location - BOUNTY + LOCATION_ZERO;\\n    }\\n\\n    function generateMonsterIndex(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint256 numMonsters,\\n        bool newlyDiscoveredRoom,\\n        uint8 roomKind\\n    ) external pure returns (uint256) {\\n        return _generateMonsterIndex(location, blockHash, numMonsters, newlyDiscoveredRoom, roomKind);\\n    }\\n\\n    function _generateMonsterIndex(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint256 numMonsters,\\n        bool newlyDiscoveredRoom,\\n        uint8 roomKind\\n    ) internal pure returns (uint256) {\\n        if (roomKind != ROOM_TYPE_NORMAL) {\\n            return 0;\\n        }\\n        uint8 spawnRate = MONSTER_SPAWN;\\n        if (newlyDiscoveredRoom) {\\n            spawnRate += 10;\\n        }\\n        bool hasMonster = uint256(keccak256(abi.encodePacked(location, blockHash, uint8(6)))) % 100 < spawnRate;\\n        if (hasMonster) {\\n            return (uint256(keccak256(abi.encodePacked(location, blockHash, uint8(7)))) % numMonsters) + 1;\\n        }\\n        return 0;\\n    }\\n\\n    function computeRoomDiscoveryReward(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint8 class\\n    ) external pure returns (uint256 numGold, uint256 numElements) {\\n        return _computeRoomDiscoveryReward(location, blockHash, class);\\n    }\\n\\n    function _computeRoomDiscoveryReward(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint8 class\\n    ) internal pure returns (uint256 numGold, uint256 numElements) {\\n        uint256 ring = _getRing(location, 0);\\n        uint256 target = ring / LEVEL_RING_WIDTH;\\n        if (target == 0) {\\n            target = 1;\\n        }\\n        numElements = (target / 2) + (uint256(keccak256(abi.encodePacked(location, blockHash, uint8(100)))) % target);\\n        if (numElements == 0) {\\n            numElements = 1;\\n        }\\n        if (MAGE == class) {\\n            numElements = numElements + numElements / CLASS_BONUS;\\n        }\\n        if (target > 8) {\\n            target = 8;\\n        }\\n        numGold = (target / 2) + (uint256(keccak256(abi.encodePacked(location, blockHash, uint8(101)))) % target);\\n        if (numGold == 0) {\\n            numGold = 1;\\n        }\\n        if (EXPLORER == class) {\\n            numGold = numGold + numGold / CLASS_BONUS;\\n        }\\n    }\\n\\n    function discoveryCost(uint256 location) external pure returns (uint256 fragments) {\\n        return _discoveryCost(location);\\n    }\\n\\n    function _discoveryCost(uint256 location) internal pure returns (uint256 fragments) {\\n        if (location == LOCATION_ZERO) {\\n            return 0;\\n        } else {\\n            uint256 ring = _getRing(location, 0);\\n            return 1 + ring / LEVEL_RING_WIDTH;\\n        }\\n    }\\n\\n    function generateRandomEvent(uint256 areaLoc, bytes32 blockHash)\\n        external\\n        pure\\n        returns (uint256 roomLocation, uint64 randomEvent)\\n    {\\n        return _generateRandomEvent(areaLoc, blockHash);\\n    }\\n\\n    function _generateRandomEvent(uint256 areaLoc, bytes32 blockHash)\\n        internal\\n        pure\\n        returns (uint256 roomLocation, uint64 randomEvent)\\n    {\\n        roomLocation = _getRoomLoc(\\n            areaLoc,\\n            uint8(uint256(keccak256(abi.encodePacked(areaLoc, blockHash, uint8(102)))) % 9),\\n            uint8(uint256(keccak256(abi.encodePacked(areaLoc, blockHash, uint8(103)))) % 9)\\n        );\\n        randomEvent = 2; // for now always monster TODO :uint64(uint256(keccak256(abi.encodePacked(areaLoc, blockHash, uint8(104)))));\\n    }\\n\\n    function generateRoom(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint8 direction,\\n        uint8 areaAtDiscovery,\\n        uint8 lastIndex,\\n        uint8 index\\n    )\\n        external\\n        pure\\n        returns (\\n            uint8 exits,\\n            uint8 kind,\\n            uint8 area_discovered\\n        )\\n    {\\n        return _generateRoom(location, blockHash, direction, areaAtDiscovery, lastIndex, index);\\n    }\\n\\n    function _generateRoom(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint8 direction,\\n        uint8 areaAtDiscovery,\\n        uint8 lastIndex,\\n        uint8 index\\n    )\\n        internal\\n        pure\\n        returns (\\n            uint8 exits,\\n            uint8 kind,\\n            uint8 area_discovered\\n        )\\n    {\\n        exits = _generateExits(location, blockHash, direction);\\n        (kind, area_discovered) = _getRoomKind(location, blockHash, areaAtDiscovery, lastIndex, index);\\n    }\\n\\n    function _getRoomKind(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint8 areaAtDiscovery,\\n        uint8 lastIndex,\\n        uint8 index\\n    ) internal pure returns (uint8 kind, uint8 area_discovered) {\\n        uint256 areaLoc = _getAreaLoc(location);\\n        uint8 currentIndex = lastIndex;\\n        area_discovered = areaAtDiscovery;\\n        (int64 x, int64 y, , ) = _coordinates(location);\\n        if (x == 0 && y == 0) {\\n            // special case // cannot be discovered in batch in one block\\n            kind = ROOM_TYPE_TELEPORT;\\n            area_discovered = area_discovered | 1;\\n        } else {\\n            while (currentIndex <= index) {\\n                uint8 roll = uint8(\\n                    uint256(keccak256(abi.encodePacked(areaLoc, currentIndex, blockHash, uint8(3)))) % 20\\n                );\\n                if (!(area_discovered & 1 == 1) && (roll == 0 || currentIndex == 80)) {\\n                    // if roll or last room\\n                    kind = ROOM_TYPE_TELEPORT;\\n                    area_discovered = area_discovered | 1;\\n                } else if (\\n                    !(area_discovered & 2 == 2) &&\\n                    (roll == 1 ||\\n                        (currentIndex == 80) || // last room\\n                        (currentIndex == 79 && !(area_discovered & 1 == 1))) // second last room and teleport not found yet\\n                ) {\\n                    kind = ROOM_TYPE_TEMPLE;\\n                    area_discovered = area_discovered | 2;\\n                } else if (\\n                    !(area_discovered & 4 == 4) &&\\n                    (roll == 2 ||\\n                        (currentIndex == 80) || // last room\\n                        (currentIndex == 79 && !(area_discovered & 1 == 1)) || // second last room and teleport not found yet\\n                        (currentIndex == 79 && !(area_discovered & 2 == 2)) || // second last room and temple not found yet\\n                        (currentIndex == 78 && !(area_discovered & 1 == 1) && !(area_discovered & 2 == 2))) // third last room and neither teleport nor temple found yet\\n                ) {\\n                    kind = ROOM_TYPE_LORE;\\n                    area_discovered = area_discovered | 4;\\n                } else if (\\n                    !(area_discovered & 8 == 8) &&\\n                    (roll == 3 ||\\n                        (currentIndex == 80) || // last room\\n                        (currentIndex == 79 && !(area_discovered & 1 == 1)) || // second last room and teleport not found yet\\n                        (currentIndex == 79 && !(area_discovered & 2 == 2)) || // second last room and temple not found yet\\n                        (currentIndex == 79 && !(area_discovered & 4 == 4)) || // second last room and lore not found yet\\n                        (currentIndex == 78 && !(area_discovered & 1 == 1) && !(area_discovered & 2 == 2)) || // third last room and neither teleport nor temple found yet\\n                        (currentIndex == 78 && !(area_discovered & 1 == 1) && !(area_discovered & 4 == 4)) || // third last room and neither teleport nor lore found yet\\n                        (currentIndex == 78 && !(area_discovered & 4 == 4) && !(area_discovered & 2 == 2)) || // third last room and neither lore nor temple found yet\\n                        (currentIndex == 77 &&\\n                            !(area_discovered & 4 == 4) &&\\n                            !(area_discovered & 2 == 2) &&\\n                            !(area_discovered & 1 == 1))) // fourth last room and neither telport, temple nor lore found yet\\n                ) {\\n                    kind = ROOM_TYPE_CARRIER;\\n                    area_discovered = area_discovered | 8;\\n                } else {\\n                    kind = ROOM_TYPE_NORMAL;\\n                }\\n                currentIndex++;\\n            }\\n        }\\n    }\\n\\n    function toLevelUp(uint16 level)\\n        external\\n        pure\\n        returns (\\n            uint16 xpRequired,\\n            uint256 coinsRequired,\\n            uint8 hpIncrease\\n        )\\n    {\\n        return _toLevelUp(level);\\n    }\\n\\n    function _toLevelUp(uint16 level)\\n        internal\\n        pure\\n        returns (\\n            uint16 xpRequired,\\n            uint256 coinsRequired,\\n            uint8 hpIncrease\\n        )\\n    {\\n        uint16[11] memory xpRequirements = [0, 10, 49, 119, 208, 328, 524, 826, 1269, 3654, 6894];\\n        xpRequired = xpRequirements[level];\\n        if (level > 8) {\\n            coinsRequired = 492;\\n        } else {\\n            coinsRequired = (((1 + level) ** 3) / 5) + 8;\\n        }\\n        hpIncrease = HP_INCREASE;\\n    }\\n\\n    function generateArea(\\n        uint256 areaLoc,\\n        bytes32 blockHash,\\n        uint64 numElementalAreaInPeriod\\n    ) external pure returns (uint8 areaType) {\\n        return _generateArea(areaLoc, blockHash, numElementalAreaInPeriod);\\n    }\\n\\n    function _generateArea(\\n        uint256 areaLoc,\\n        bytes32 blockHash,\\n        uint64 numElementalAreaInPeriod\\n    ) internal pure returns (uint8 areaType) {\\n        if (_isCentreArea(areaLoc) || numElementalAreaInPeriod >= NUM_ELEMENT_AREA_PER_PERIOD) {\\n            areaType = 6;\\n        } else {\\n            uint256 roomRing = (_getAreaRing(areaLoc) * 9);\\n            if (roomRing > 0) {\\n                roomRing -= 4; // this set the value to be the one of the corner room nearest to the center\\n            }\\n            if (roomRing >= LEVEL_RING_WIDTH) {\\n                bool elementArea = uint8(uint256(keccak256(abi.encodePacked(areaLoc, blockHash, uint8(12)))) % 10000) <=\\n                    ELEMENT_AREA_10000_PROBA;\\n                if (elementArea) {\\n                    (, ,int64 z, ) = _coordinates(areaLoc);\\n                    areaType = 1 + uint8(int8(z % 5));\\n                } else {\\n                    areaType = 6;\\n                }\\n            } else {\\n                areaType = 6;\\n            }\\n        }\\n    }\\n\\n    // distance between 2 location * 0.4\\n    function teleportTax(uint256 p1, uint256 p2) external pure returns (uint256) {\\n        return _teleportTax(p1, p2);\\n    }\\n\\n    function _teleportTax(uint256 p1, uint256 p2) internal pure returns (uint256) {\\n        uint256 cost = (2 * _getRing(p1, p2)) / 5;\\n        if (cost == 0) {\\n            return 1;\\n        } else {\\n            return cost;\\n        }\\n    }\\n\\n    function carrierCost(uint256 location) external pure returns (uint256) {\\n        return _carrierCost(location);\\n    }\\n\\n    function _carrierCost(uint256 location) internal pure returns (uint256) {\\n        uint256 cost = (2 * _getRing(location, LOCATION_ZERO)) / 6;\\n        if (cost == 0) {\\n            return 1;\\n        } else {\\n            return cost;\\n        }\\n    }\\n\\n    function recyclingReward(uint256 gearData) external pure returns (uint256) {\\n        return _recyclingReward(gearData);\\n    }\\n\\n    function _recyclingReward(uint256 gearData) internal pure returns (uint256) {\\n        (uint16 level, , , uint16 durability, uint16 maxDurability, ) = _decodeGearData(gearData);\\n        uint256 reward = 1 + level / 2;\\n        if (durability == maxDurability) {\\n            reward += 1 + reward / 2;\\n        }\\n        return reward;\\n    }\\n\\n    function hpCost(uint16 hp) external pure returns (uint256) {\\n        return _hpCost(hp);\\n    }\\n\\n    function _hpCost(uint16 hp) internal pure returns (uint256) {\\n        return hp;\\n    }\\n\\n    function getRing(uint256 p1, uint256 p2) external pure returns (uint256) {\\n        return _getRing(p1, p2);\\n    }\\n\\n    function _getRing(uint256 p1, uint256 p2) internal pure returns (uint256) {\\n        (int64 x1, int64 y1, , ) = _coordinates(p1);\\n        (int64 x2, int64 y2, , ) = _coordinates(p2);\\n        int256 dx = x1 - x2;\\n        if (dx < 0) {\\n            dx = -dx;\\n        }\\n        int256 dy = y1 - y2;\\n        if (dy < 0) {\\n            dy = -dy;\\n        }\\n        if (dx > 2**64 / 2) {\\n            dx = int256(2**64) - dx;\\n        }\\n        if (dy > 2**64 / 2) {\\n            dy = int256(2**64) - dy;\\n        }\\n        if (dx > dy) {\\n            return uint256(dx);\\n        } else {\\n            return uint256(dy);\\n        }\\n    }\\n\\n    function _getAreaRing(uint256 areaLoc) internal pure returns (uint64) {\\n        (int64 x, int64 y, , ) = _coordinates(areaLoc);\\n        if (x < 0) {\\n            x = -x;\\n        }\\n        if (y < 0) {\\n            y = -y;\\n        }\\n        if (x > y) {\\n            return uint64(int64(x));\\n        } else {\\n            return uint64(int64(y));\\n        }\\n    }\\n\\n    // centre area is currently defined as the first 9 area (first area + 8 surrounding it)\\n    function _isCentreArea(uint256 areaLoc) internal pure returns (bool) {\\n        (int64 areaX, int64 areaY, , ) = _coordinates(areaLoc);\\n        return areaX >= -1 && areaY >= -1 && areaX <= 1 && areaY <= 1;\\n    }\\n\\n    function getAreaLoc(uint256 location) external pure returns (uint256) {\\n        return _getAreaLoc(location);\\n    }\\n\\n    function _getAreaLoc(uint256 location) internal pure returns (uint256) {\\n        (int64 x, int64 y, int64 z, ) = _coordinates(location);\\n        int64 areaX;\\n        if (x >= 0) {\\n            areaX = (x + 4) / 9;\\n        } else {\\n            areaX = -((-x + 4) / 9);\\n        }\\n\\n        int64 areaY;\\n        if (y >= 0) {\\n            areaY = (y + 4) / 9;\\n        } else {\\n            areaY = -((-y + 4) / 9);\\n        }\\n        return _location(areaX, areaY, z);\\n    }\\n\\n    function _getRoomLoc(\\n        uint256 areaLoc,\\n        uint8 x,\\n        uint8 y\\n    ) internal pure returns (uint256) {\\n        (int64 areaX, int64 areaY, int64 floor, ) = _coordinates(areaLoc);\\n        return _location(areaX * 9 - 4 + int64(uint64(x)), areaY * 9 - 4 + int64(uint64(y)), floor);\\n    }\\n\\n    // direction based exit generation\\n    // both exits and locks are generated\\n    // return value is encoded (uint4 locksBits, uint4 exitBits)\\n    function _generateExits(\\n        uint256 location,\\n        bytes32 blockHash,\\n        uint8 direction\\n    ) internal pure returns (uint8) {\\n        uint8 exits = 0;\\n        if (DOWN == direction) {\\n            exits = 0xF;\\n        } else {\\n            if (EXITS_INERTIA > uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(1)))) % 100)) {\\n                exits = uint8(2) ** direction;\\n            }\\n            if (EXITS_BIFURCATION > uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(2)))) % 100)) {\\n                if (\\n                    EXITS_BOTH_BIFURCATION >\\n                    uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(3)))) % 100)\\n                ) {\\n                    if (NORTH == direction || SOUTH == direction) {\\n                        exits = (exits | 8) | 2;\\n                    } else if (EAST == direction || WEST == direction) {\\n                        exits = (exits | 1) | 4;\\n                    }\\n                } else {\\n                    if (50 > uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(3)))) % 100)) {\\n                        if (NORTH == direction) {\\n                            exits |= 8;\\n                        } else if (EAST == direction) {\\n                            exits |= 1;\\n                        } else if (SOUTH == direction) {\\n                            exits |= 2;\\n                        } else if (WEST == direction) {\\n                            exits |= 4;\\n                        }\\n                    } else {\\n                        if (NORTH == direction) {\\n                            exits |= 2;\\n                        } else if (EAST == direction) {\\n                            exits |= 4;\\n                        } else if (SOUTH == direction) {\\n                            exits |= 8;\\n                        } else if (WEST == direction) {\\n                            exits |= 1;\\n                        }\\n                    }\\n                }\\n            }\\n        }\\n        uint8 randLock = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(111)))) % 100);\\n        uint8 numLocks = randLock < (100 - LOCK_PROBABILITY) ? 0 : (randLock < (100 - TWO_LOCK_PROBABILITY) ? 1 : 2);\\n        if (numLocks >= 4) {\\n            exits = exits | (15 * uint8(2) ** 4);\\n        } else if (numLocks == 3) {\\n            uint8 chosenLocks = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(112)))) % 4);\\n            uint8 locks = (chosenLocks + 1) * 7;\\n            if (locks == 21) {\\n                exits = exits | (13 * uint8(2) ** 4);\\n            } else if (locks == 28) {\\n                exits = exits | (11 * uint8(2) ** 4);\\n            }\\n            // 4 possibilities : 7 // 14 // 13 // 11\\n        } else if (numLocks == 2) {\\n            uint8 chosenLocks = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(112)))) % 6);\\n            uint8 locks = (chosenLocks + 1) * 3;\\n            if (locks == 15) {\\n                exits = exits | (5 * uint8(2) ** 4);\\n            } else if (locks == 18) {\\n                exits = exits | (10 * uint8(2) ** 4);\\n            }\\n            // 3 // 6 // 9 // 12 // 5 // 10\\n        } else if (numLocks == 1) {\\n            uint8 chosenLocks = uint8(uint256(keccak256(abi.encodePacked(location, blockHash, uint8(112)))) % 4);\\n            exits = exits | (uint8(2) ** chosenLocks * uint8(2) ** 4);\\n        }\\n        return exits;\\n    }\\n\\n    function decodeCharacterData(uint256 data)\\n        external\\n        pure\\n        returns (\\n            uint16 level,\\n            uint16 hp,\\n            uint16 maxHP,\\n            uint32 xp,\\n            uint8 class\\n        )\\n    {\\n        return _decodeCharacterData(data);\\n    }\\n\\n    function _decodeCharacterData(uint256 data)\\n        internal\\n        pure\\n        returns (\\n            uint16 level,\\n            uint16 hp,\\n            uint16 maxHP,\\n            uint32 xp,\\n            uint8 class\\n        )\\n    {\\n        class = uint8(data >> 248);\\n        level = uint16((data >> 232) % 2**16);\\n        xp = uint32((data >> 200) % 2**32);\\n        maxHP = uint16((data >> 184) % 2**16);\\n        hp = uint16((data >> 168) % 2**16);\\n    }\\n\\n    function encodeGearData(\\n        uint16 level,\\n        uint8 slot,\\n        uint8 classBits,\\n        uint16 durability,\\n        uint16 maxDurability,\\n        uint32 template\\n    ) external pure returns (uint256 data) {\\n        return _encodeGearData(level, slot, classBits, durability, maxDurability, template);\\n    }\\n\\n    function _encodeGearData(\\n        uint16 level,\\n        uint8 slot,\\n        uint8 classBits,\\n        uint16 durability,\\n        uint16 maxDurability,\\n        uint32 template\\n    ) internal pure returns (uint256 data) {\\n        return ((uint256(classBits) << 248) +\\n            (uint256(level) << 232) +\\n            (uint256(slot) << 224) +\\n            (uint256(durability) << 208) +\\n            (uint256(maxDurability) << 192) +\\n            template);\\n    }\\n\\n    function decodeGearData(uint256 data)\\n        external\\n        pure\\n        returns (\\n            uint16 level,\\n            uint8 slot,\\n            uint8 classBits,\\n            uint16 durability,\\n            uint16 maxDurability,\\n            uint32 template\\n        )\\n    {\\n        return _decodeGearData(data);\\n    }\\n\\n    function _decodeGearData(uint256 data)\\n        internal\\n        pure\\n        returns (\\n            uint16 level,\\n            uint8 slot,\\n            uint8 classBits,\\n            uint16 durability,\\n            uint16 maxDurability,\\n            uint32 template\\n        )\\n    {\\n        classBits = uint8(data >> 248);\\n        level = uint16((data >> 232) % 2**16);\\n        slot = uint8((data >> 224) % 2**8);\\n        durability = uint16((data >> 208) % 2**16);\\n        maxDurability = uint16((data >> 192) % 2**16);\\n        template = uint32(data % 2**32);\\n    }\\n\\n    function limitedChange(\\n        uint16 value,\\n        uint16 max,\\n        int64 change\\n    ) external pure returns (uint16) {\\n        return _limitedChange(value, max, change);\\n    }\\n\\n    function _limitedChange(\\n        uint16 value,\\n        uint16 max,\\n        int64 change\\n    ) internal pure returns (uint16) {\\n        int64 updated = int64(uint64(value)) + int64(change);\\n        if (updated > int64(uint64(max))) {\\n            return max;\\n        }\\n        if (updated <= 0) {\\n            return 0;\\n        } else {\\n            return uint16(int16(updated));\\n        }\\n    }\\n\\n    function roomsTax(uint256 rooms, uint256 periods) external pure returns (uint256) {\\n        return _roomsTax(rooms, periods);\\n    }\\n    function _roomsTax(uint256 rooms, uint256 periods) internal pure returns (uint256) {\\n        return (1 + rooms / 10) * periods;\\n    }\\n}\\n\",\"keccak256\":\"0xf45e13daa39a0f6e285d8249db3fa24222b619a6e5897747060b8835fbec3868\",\"license\":\"MIT\"},\"src/player/Player.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./PlayerDataLayout.sol\\\";\\nimport \\\"../utils/MetaTransactionReceiver.sol\\\";\\nimport \\\"./Pool.sol\\\";\\nimport \\\"../utils/Constants.sol\\\";\\n\\ncontract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants {\\n    event Call(bool success, bytes returnData);\\n    event Refill(address indexed playerAddress, uint256 newEnergy);\\n\\n    function postUpgrade(\\n        Characters charactersContract,\\n        address payable feeRecipient,\\n        uint256 minBalance,\\n        Pool pool\\n    ) external proxied {\\n        // TODO _setTrustedForwarder(...);\\n        _charactersContract = charactersContract;\\n        _feeRecipient = feeRecipient;\\n        MIN_BALANCE = minBalance;\\n        _pool = pool;\\n        pool.register();\\n    }\\n\\n    function register() external {\\n        if (msg.sender != address(_holder)) {\\n            require(address(_holder) == address(0), \\\"holder already set\\\");\\n            _holder = Enterable(msg.sender);\\n        }\\n    }\\n\\n    function getLastCharacterId(address playerAddress) external view returns (uint256) {\\n        return _lastCharacterIds[playerAddress];\\n    }\\n\\n    function getEnergy(address playerAddress) external view returns (uint256 energy, uint256 freeEnergy) {\\n        PlayerStruct storage player = _players[playerAddress];\\n        energy = player.energy;\\n        freeEnergy = player.freeEnergy;\\n    }\\n\\n    // TODO remove ?\\n    function getPlayerInfo(address playerAddress, uint256 characterId)\\n        external\\n        view\\n        returns (uint256 energy, uint256 freeEnergy)\\n    {\\n        PlayerStruct storage player = _players[playerAddress];\\n        energy = player.energy;\\n        freeEnergy = player.freeEnergy;\\n    }\\n\\n    function createAndEnter(\\n        address payable newDelegate,\\n        uint256 value,\\n        string calldata name,\\n        uint8 class,\\n        uint256 location\\n    ) external payable {\\n        address payable sender = _msgSender();\\n        uint256 characterId = _charactersContract.mintTo(address(_holder));\\n        _enter(sender, newDelegate, characterId, value, name, class, location);\\n    }\\n\\n    function enter(\\n        address payable newDelegate,\\n        uint256 characterId,\\n        uint256 value,\\n        string calldata name,\\n        uint8 class,\\n        uint256 location\\n    ) external payable {\\n        address payable sender = _msgSender();\\n        _charactersContract.transferFrom(sender, address(_holder), characterId);\\n        _enter(sender, newDelegate, characterId, value, name, class, location);\\n    }\\n\\n    function _enter(\\n        address payable sender,\\n        address payable newDelegate,\\n        uint256 characterId,\\n        uint256 value,\\n        string memory name,\\n        uint8 class,\\n        uint256 location\\n    ) internal {\\n        require(msg.value >= value, \\\"msg.value < value\\\");\\n        if (msg.value > value) {\\n            _refill(sender, sender, msg.value - value);\\n        }\\n        if (newDelegate != address(0)) {\\n            _addDelegate(sender, newDelegate);\\n        }\\n        _holder.enter{value: value}(sender, characterId, name, class, location);\\n        _lastCharacterIds[sender] = characterId;\\n    }\\n\\n    function callAsCharacter(\\n        address destination,\\n        uint256 gasLimit,\\n        bytes calldata data\\n    ) external returns (bool success, bytes memory returnData) {\\n        address sender = _msgSender();\\n        // TODO check death ?\\n        require(destination != address(this), \\\"cannot call itself\\\");\\n        // TODO block data if == `enter(address sender, uint256 characterId, bytes data)`\\n        uint256 initialGas = gasleft();\\n        uint256 characterId = _getFirstParam(data);\\n        require(_charactersContract.ownerOf(characterId) == address(_holder), \\\"_holder does not own character\\\");\\n        uint256 playerAddress = _charactersContract.getSubOwner(characterId);\\n        if (uint256(uint160(sender)) != playerAddress) {\\n            require(uint256(uint160(_delegates[sender])) == playerAddress, \\\"sender is not delegate of character's player\\\");\\n        }\\n\\n        (success, returnData) = _executeWithSpecificGas(destination, gasLimit, data);\\n\\n        PlayerStruct storage player = _players[address(uint160(playerAddress))];\\n        uint256 energy = player.energy;\\n        uint256 txCharge = ((initialGas - gasleft()) + 10000) * tx.gasprice;\\n        uint256 freeEnergyFee = (txCharge * 10) / 100; // 10% extra is used for free energy\\n\\n        uint256 poolFee = txCharge * 10; // 1000% is used for UBF\\n\\n        require(energy >= freeEnergyFee + poolFee, \\\"not enough energy\\\");\\n        energy -= (freeEnergyFee + poolFee);\\n        _pool.recordCharge{value: poolFee}(sender, txCharge, poolFee);\\n\\n        if (msg.sender == sender) {\\n            // not metatx : use local private key so need to recharge local balance // TODO remove (once metatx is enabled)\\n            if (msg.sender.balance < MIN_BALANCE) {\\n                uint256 balanceToGive = MIN_BALANCE - msg.sender.balance;\\n                if (balanceToGive >= energy) {\\n                    balanceToGive = energy;\\n                    energy = 0;\\n                } else {\\n                    energy -= balanceToGive;\\n                }\\n\\n                if (balanceToGive > 0) {\\n                    payable(msg.sender).transfer(balanceToGive);\\n                }\\n            }\\n        }\\n        player.freeEnergy += uint128(freeEnergyFee);\\n        player.energy = uint128(energy);\\n\\n        emit Call(success, returnData);\\n    }\\n\\n    function isDelegateFor(address delegate, address playerAddress) external view returns (bool) {\\n        return _delegates[delegate] == playerAddress;\\n    }\\n\\n    function refillAccount(address account) public payable {\\n        address payable sender = _msgSender();\\n        _refill(sender, account, msg.value);\\n    }\\n\\n    function refill() public payable {\\n        address payable sender = _msgSender();\\n        _refill(sender, sender, msg.value);\\n    }\\n\\n    function _refill(\\n        address payable sender,\\n        address account,\\n        uint256 value\\n    ) internal returns (uint256 refund) {\\n        uint128 energy = _players[account].energy;\\n        energy += uint128(value);\\n        if (energy > uint128(MAX_FOOD)) {\\n            energy = uint128(MAX_FOOD);\\n            refund = energy - MAX_FOOD;\\n        }\\n        _players[account].energy = energy;\\n        emit Refill(account, energy);\\n        if (refund > 0) {\\n            sender.transfer(refund);\\n        }\\n    }\\n\\n    // TODO add Events for Delegates\\n    function addDelegate(address payable _delegate) public payable {\\n        address payable sender = _msgSender();\\n        if (msg.value > 0) {\\n            _refill(sender, sender, msg.value);\\n        }\\n        _addDelegate(sender, _delegate);\\n    }\\n\\n    function _addDelegate(address sender, address payable _delegate) internal {\\n        require(_delegate != address(0), \\\"no zero address delegate\\\");\\n        require(_players[sender].energy >= uint128(MIN_BALANCE), \\\"not enough energy\\\");\\n        _players[sender].energy -= uint128(MIN_BALANCE);\\n        _delegate.transfer(MIN_BALANCE);\\n        _delegates[_delegate] = sender;\\n    }\\n\\n    function _getFirstParam(bytes memory data) internal pure returns (uint256) {\\n        if (data.length < 36) {\\n            return 0;\\n        }\\n        uint256 value;\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            value := mload(add(data, 36))\\n        }\\n        return value;\\n    }\\n\\n    function _executeWithSpecificGas(\\n        address to,\\n        uint256 gasLimit,\\n        bytes memory data\\n    ) internal returns (bool success, bytes memory returnData) {\\n        (success, returnData) = to.call{gas: gasLimit}(data);\\n        assert(gasleft() > gasLimit / 63);\\n        // not enough gas provided, assert to throw all gas // TODO use EIP-1930\\n    }\\n}\\n\",\"keccak256\":\"0x49f830f50e3c428ccb861f9b72937daa6d7aac6f4911bc79dfb62aa3da670605\",\"license\":\"MIT\"},\"src/player/PlayerDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"../characters/Characters.sol\\\";\\nimport \\\"./Pool.sol\\\";\\n\\ninterface Enterable {\\n    // TODO generalize?\\n    function enter(\\n        address sender,\\n        uint256 characterId,\\n        string calldata data,\\n        uint8 class,\\n        uint256 location\\n    ) external payable;\\n}\\n\\ncontract PlayerDataLayout {\\n    uint256 internal MIN_BALANCE; // = 5000000000000000;\\n\\n    struct PlayerStruct {\\n        uint128 energy;\\n        uint128 freeEnergy;\\n    }\\n\\n    address payable _feeRecipient;\\n    mapping(address => address) _delegates;\\n    mapping(address => PlayerStruct) _players;\\n    mapping(address => uint256) _lastCharacterIds;\\n\\n    Characters _charactersContract;\\n    Enterable _holder;\\n\\n    Pool _pool;\\n}\\n\",\"keccak256\":\"0x425a6f4162bfc88f62c9dde5a91ac1b4453aeff3ab8bd95c2d09f1ac0ed19b4b\",\"license\":\"MIT\"},\"src/player/Pool.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ninterface Pool {\\n    function register() external;\\n\\n    function recordCharge(\\n        address account,\\n        uint256 txCharge,\\n        uint256 poolFee\\n    ) external payable;\\n}\\n\",\"keccak256\":\"0x7d71d072fee4819c7665f60218a458806c67b9f38bd75566e12f2145cc3b549f\",\"license\":\"MIT\"},\"src/tokens/ERC1155Token.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./ERC1155TokenDataLayout.sol\\\";\\n\\ncontract ERC1155Token is Proxied, ERC1155TokenDataLayout {\\n    event TransferSingle(address indexed from, address indexed to, uint256 indexed id, uint256 amount);\\n    event TransferBatch(address indexed from, address indexed to, uint256[] indexed ids, uint256[] amounts);\\n    event SubTransferSingle(uint256 indexed from, uint256 indexed to, uint256 indexed id, uint256 amount);\\n    event SubTransferBatch(uint256 indexed from, uint256 indexed to, uint256[] indexed ids, uint256[] amounts);\\n    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);\\n\\n    function postUpgrade(address tokenOwner) public virtual proxied {\\n        _tokenOwner = tokenOwner;\\n    }\\n\\n    function mintVault(\\n        address owner,\\n        uint256 id,\\n        uint256 amount\\n    ) public {\\n        require(msg.sender == _tokenOwner, \\\"NOT_AUTHORIZED_MINT\\\");\\n        _balances[owner][id] += amount;\\n        _subBalances[0][id] += amount;\\n        emit TransferSingle(address(0), owner, id, amount);\\n        emit SubTransferSingle(0, 0, id, amount);\\n    }\\n\\n    // TODO remove after fix\\n    function mintTo(\\n        address owner,\\n        uint256 id,\\n        uint256 amount\\n    ) public {\\n        require(msg.sender == _tokenOwner, \\\"NOT_AUTHORIZED_MINT\\\");\\n        _balances[owner][id] += amount;\\n        emit TransferSingle(address(0), owner, id, amount);\\n    }\\n\\n    // TODO remove after fix\\n    function subMint(uint256 id, uint256 amount) public {\\n        require(msg.sender == _tokenOwner, \\\"NOT_AUTHORIZED_MINT\\\");\\n        _subBalances[0][id] += amount;\\n        emit SubTransferSingle(0, 0, id, amount);\\n    }\\n\\n    function mint(\\n        uint256 subOwner,\\n        uint256 id,\\n        uint256 amount\\n    ) public {\\n        require(msg.sender == _tokenOwner, \\\"NOT_AUTHORIZED_MINT\\\");\\n        _subBalances[subOwner][id] += amount;\\n        _balances[_tokenOwner][id] += amount;\\n        emit TransferSingle(address(0), _tokenOwner, id, amount);\\n        emit SubTransferSingle(0, subOwner, id, amount);\\n    }\\n\\n    function subBurnFrom(\\n        uint256 from,\\n        uint256 id,\\n        uint256 amount\\n    ) external {\\n        // cannot do any sender like in ERC721 because we would need to keep track of which owner is the balance coming from\\n        require(_tokenOwner == msg.sender || _operatorsForAll[_tokenOwner][msg.sender], \\\"NOT_AUTHORIZED_SUB_BURN\\\");\\n        uint256 currentBalance = _subBalances[from][id];\\n        require(currentBalance >= amount, \\\"does not own enough\\\");\\n        _subBalances[from][id] = currentBalance - amount;\\n        _balances[_tokenOwner][id] -= amount;\\n        emit TransferSingle(_tokenOwner, address(0), id, amount);\\n        emit SubTransferSingle(from, 0, id, amount);\\n    }\\n\\n    function batchSubBurnFrom(\\n        uint256 from,\\n        uint256[] calldata ids,\\n        uint256[] calldata amounts\\n    ) external {\\n        // cannot do any sender like in ERC721 because we would need to keep track of which owner is the balance coming from\\n        require(ids.length == amounts.length, \\\"Inconsistent length\\\");\\n        require(\\n            _tokenOwner == msg.sender || _operatorsForAll[_tokenOwner][msg.sender],\\n            \\\"NOT_AUTHORIZED_BATCH_SUB_BURN\\\"\\n        );\\n        for (uint256 i = 0; i < ids.length; i++) {\\n            uint256 id = ids[i];\\n            uint256 amount = amounts[i];\\n            uint256 currentBalance = _subBalances[from][id];\\n            require(currentBalance >= amount, \\\"does not own enough\\\");\\n            _subBalances[from][id] = currentBalance - amount;\\n            _balances[_tokenOwner][id] -= amount;\\n        }\\n        emit TransferBatch(_tokenOwner, address(0), ids, amounts);\\n        emit SubTransferBatch(from, 0, ids, amounts);\\n    }\\n\\n    function subBalanceOf(uint256 who, uint256 id) public view returns (uint256) {\\n        return _subBalances[who][id];\\n    }\\n\\n    function subBalanceOfBatch(uint256[] calldata owners, uint256[] calldata ids)\\n        external\\n        view\\n        returns (uint256[] memory)\\n    {\\n        require(owners.length == ids.length, \\\"Inconsistent array length between args\\\");\\n        uint256[] memory balances = new uint256[](ids.length);\\n        for (uint256 i = 0; i < ids.length; i++) {\\n            balances[i] = subBalanceOf(owners[i], ids[i]);\\n        }\\n        return balances;\\n    }\\n\\n    function subTransferFrom(\\n        uint256 from,\\n        uint256 to,\\n        uint256 id,\\n        uint256 amount\\n    ) external {\\n        // cannot do any sender like in ERC721 because we would need to keep track of which owner is the balance coming from\\n        require(_tokenOwner == msg.sender || _operatorsForAll[_tokenOwner][msg.sender], \\\"NOT_AUTHORIZED_SUB_TRANSFER\\\");\\n        uint256 currentBalance = _subBalances[from][id];\\n        require(currentBalance >= amount, \\\"does not own enough\\\");\\n        _subBalances[from][id] = currentBalance - amount;\\n        _subBalances[to][id] += amount;\\n        emit SubTransferSingle(from, to, id, amount);\\n    }\\n\\n    function balanceOf(address who, uint256 id) public view returns (uint256) {\\n        require(who != address(0), \\\"zero address\\\");\\n        return _balances[who][id];\\n    }\\n\\n    function balanceOfBatch(address[] calldata owners, uint256[] calldata ids)\\n        external\\n        view\\n        returns (uint256[] memory)\\n    {\\n        require(owners.length == ids.length, \\\"Inconsistent array length between args\\\");\\n        uint256[] memory balances = new uint256[](ids.length);\\n        for (uint256 i = 0; i < ids.length; i++) {\\n            balances[i] = balanceOf(owners[i], ids[i]);\\n        }\\n        return balances;\\n    }\\n\\n    // TODO ERC1155 use safe version only\\n\\n    // onwer need to take responsibility to subBurn before transfering out\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 id,\\n        uint256 amount\\n    ) external {\\n        require(from == msg.sender || _operatorsForAll[from][msg.sender], \\\"NOT_AUTHORIZED_TRANSFER\\\");\\n        uint256 currentBalance = _balances[from][id];\\n        require(currentBalance >= amount, \\\"does not own enough\\\");\\n        _balances[from][id] = currentBalance - amount;\\n        _balances[to][id] += amount;\\n        emit TransferSingle(from, to, id, amount);\\n    }\\n\\n    // onwer need to take responsibility to subBurn before transfering out\\n    function batchTransferFrom(\\n        address from,\\n        address to,\\n        uint256[] calldata ids,\\n        uint256[] calldata amounts\\n    ) external {\\n        require(ids.length == amounts.length, \\\"Inconsistent length\\\");\\n        require(to != address(0), \\\"invalid to\\\");\\n        require(from == msg.sender || _operatorsForAll[from][msg.sender], \\\"NOT_AUTHORIZED_BATCH_TRANSFER\\\");\\n        for (uint256 i = 0; i < ids.length; i++) {\\n            uint256 id = ids[i];\\n            uint256 amount = amounts[i];\\n            uint256 currentBalance = _balances[from][id];\\n            require(currentBalance >= amount, \\\"does not own enough\\\");\\n            _balances[from][id] = currentBalance - amount;\\n            _balances[to][id] += amount;\\n        }\\n        emit TransferBatch(from, to, ids, amounts);\\n    }\\n\\n    function setApprovalForAll(address operator, bool approved) external {\\n        _operatorsForAll[msg.sender][operator] = approved;\\n        emit ApprovalForAll(msg.sender, operator, approved);\\n    }\\n\\n    function isApprovedForAll(address owner, address operator) external view returns (bool) {\\n        return _operatorsForAll[owner][operator];\\n    }\\n}\\n\",\"keccak256\":\"0x52d08b3ea8077256f65fa6c867a96f1b60f1f22ab41dfb8c99b3dc353a7c067f\",\"license\":\"MIT\"},\"src/tokens/ERC1155TokenDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract ERC1155TokenDataLayout {\\n    mapping(address => mapping(uint256 => uint256)) internal _balances; // TODO pack balances into one unit256\\n    mapping(uint256 => mapping(uint256 => uint256)) internal _subBalances; // TODO pack balances into one unit256\\n    mapping(address => mapping(address => bool)) internal _operatorsForAll;\\n\\n    address _tokenOwner; //the dungeon\\n}\\n\",\"keccak256\":\"0xa1dfa3730218e982f304849baa3ed802b1a12c5ce6146b650700b8181a24c258\",\"license\":\"MIT\"},\"src/tokens/ERC721Token.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./ERC721TokenDataLayout.sol\\\";\\n\\ncontract ERC721Token is Proxied, ERC721TokenDataLayout {\\n    event Transfer(address indexed from, address indexed to, uint256 indexed id);\\n    event SubTransfer(uint256 indexed from, uint256 indexed to, uint256 indexed id);\\n    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);\\n    event DataUpdate(uint256 indexed id, uint256 indexed data);\\n\\n    function postUpgrade(address dungeon) public virtual proxied {\\n        _minter = dungeon;\\n    }\\n\\n    function subBalanceOf(uint256 subOwner) external view returns (uint256) {\\n        return _subNumNFTPerAddress[subOwner];\\n    }\\n\\n    function mint(uint256 subOwner, uint256 data) public returns (uint256 id) {\\n        require(msg.sender == _minter, \\\"NOT_AUTHORIZED_MINT\\\");\\n        id = ++_lastId;\\n        _subOwners[id] = subOwner;\\n        _subNumNFTPerAddress[subOwner]++;\\n        _owners[id] = _minter;\\n        _data[id] = data;\\n        emit DataUpdate(id, data);\\n        emit Transfer(address(0), _minter, id);\\n        emit SubTransfer(0, subOwner, id);\\n    }\\n\\n    // TODO make sure that data of gear/room in vault cannot be changed\\n    function setData(uint256 id, uint256 data) external {\\n        address owner = _owners[id];\\n        require(owner == msg.sender || _operatorsForAll[owner][msg.sender], \\\"NOT_AUTHORIZED_SET_DATA\\\");\\n        _data[id] = data;\\n        emit DataUpdate(id, data);\\n    }\\n\\n    function getData(uint256 id) external view returns (uint256) {\\n        return _data[id];\\n    }\\n\\n    function subBurn(uint256 id) external {\\n        address owner = _owners[id];\\n        require(owner == msg.sender || _operatorsForAll[owner][msg.sender], \\\"NOT_AUTHORIZED_SUB_BURN\\\");\\n        uint256 subOwner = _subOwners[id];\\n        _subOwners[id] = 0;\\n        _subNumNFTPerAddress[subOwner]--;\\n        emit SubTransfer(subOwner, 0, id);\\n    }\\n\\n    function subOwnerOf(uint256 id) public view returns (uint256) {\\n        return _subOwners[id];\\n    }\\n\\n    function ownerOf(uint256 id) public view returns (address) {\\n        address owner = _owners[id];\\n        require(owner != address(0), \\\"token does not exist\\\");\\n        return owner;\\n    }\\n\\n    function subTransferFrom(\\n        address owner,\\n        uint256 from,\\n        uint256 to,\\n        uint256 id\\n    ) external {\\n        require(owner == msg.sender || _operatorsForAll[owner][msg.sender], \\\"NOT_AUTHORIZED_SUB_TRANSFER\\\");\\n        require(owner == _owners[id], \\\"not owner\\\");\\n        uint256 subOwner = _subOwners[id];\\n        require(subOwner == from, \\\"not subOnwer\\\");\\n        _subOwners[id] = to;\\n        _subNumNFTPerAddress[subOwner]--;\\n        _subNumNFTPerAddress[to]++;\\n        emit SubTransfer(from, to, id);\\n    }\\n\\n    function subBatchTransferFrom(\\n        address owner,\\n        uint256 from,\\n        uint256 to,\\n        uint256[] calldata ids\\n    ) external {\\n        require(owner == msg.sender || _operatorsForAll[owner][msg.sender], \\\"NOT_AUTHORIZED_SUB_BATCH_TRANSFER\\\");\\n        uint256 numIds = ids.length;\\n        for (uint256 i = 0; i < numIds; i++) {\\n            uint256 id = ids[i];\\n            require(owner == _owners[id], \\\"not owner\\\");\\n            uint256 subOwner = _subOwners[id];\\n            require(subOwner == from, \\\"not subOnwer\\\");\\n            _subOwners[id] = to;\\n            emit SubTransfer(from, to, id);\\n        }\\n        _subNumNFTPerAddress[from] -= numIds;\\n        _subNumNFTPerAddress[to] += numIds;\\n    }\\n\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 id\\n    ) external {\\n        require(to != address(0), \\\"invalid to\\\");\\n        require(from == msg.sender || _operatorsForAll[from][msg.sender], \\\"NOT_AUTHORIZED_TRANSFER\\\");\\n        address owner = _owners[id];\\n        require(owner == from, \\\"not owner\\\");\\n        _owners[id] = to;\\n        uint256 subOwner = _subOwners[id];\\n        if (_subOwners[id] != 0) {\\n            _subOwners[id] = 0;\\n            _subNumNFTPerAddress[subOwner]--;\\n            emit SubTransfer(subOwner, 0, id);\\n        }\\n        emit Transfer(from, to, id);\\n    }\\n\\n    function batchTransferFrom(\\n        address from,\\n        address to,\\n        uint256[] calldata ids\\n    ) external {\\n        require(to != address(0), \\\"invalid to\\\");\\n        require(from == msg.sender || _operatorsForAll[from][msg.sender], \\\"NOT_AUTHORIZED_BATCH_TRANSFER\\\");\\n        for (uint256 i = 0; i < ids.length; i++) {\\n            uint256 id = ids[i];\\n            address owner = _owners[id];\\n            require(owner == from, \\\"not owner\\\");\\n            _owners[id] = to;\\n            uint256 subOwner = _subOwners[id];\\n            if (_subOwners[id] != 0) {\\n                _subOwners[id] = 0;\\n                _subNumNFTPerAddress[subOwner]--;\\n                emit SubTransfer(subOwner, 0, id);\\n            }\\n            emit Transfer(from, to, id); // TODO extract function (same as transferFrom)\\n        }\\n    }\\n\\n    function setApprovalForAll(address operator, bool approved) external {\\n        _operatorsForAll[msg.sender][operator] = approved;\\n        emit ApprovalForAll(msg.sender, operator, approved);\\n    }\\n\\n    function isApprovedForAll(address owner, address operator) external view returns (bool) {\\n        return _operatorsForAll[owner][operator];\\n    }\\n}\\n\",\"keccak256\":\"0x686c41cfb49f8a706a754f3c299c11b22e84c4416c1cf8d405df2e44e7f0e24d\",\"license\":\"MIT\"},\"src/tokens/ERC721TokenDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract ERC721TokenDataLayout {\\n    address internal _minter;\\n    uint256 internal _lastId;\\n    mapping(uint256 => address) internal _owners;\\n    mapping(uint256 => uint256) internal _subOwners;\\n\\n    mapping(uint256 => uint256) internal _subNumNFTPerAddress;\\n    mapping(address => uint256) internal _numNFTPerAddress;\\n    mapping(address => mapping(address => bool)) internal _operatorsForAll;\\n    mapping(uint256 => address) internal _operators;\\n\\n    mapping(uint256 => uint256) internal _data;\\n}\\n\",\"keccak256\":\"0x65eca9032ef1c725df7eacfc79958b094e833652befa8c4d7c06910d65f5ee05\",\"license\":\"MIT\"},\"src/tokens/Elements.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"./ERC1155Token.sol\\\";\\n\\ncontract Elements is ERC1155Token {\\n    function postUpgrade(address dungeon) public override {\\n        super.postUpgrade(dungeon);\\n    }\\n}\\n\",\"keccak256\":\"0x015b931e538552feea899d01804291e2f69d4320812e016e3b28e0c3687637ac\",\"license\":\"MIT\"},\"src/tokens/Gears.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"./ERC721Token.sol\\\";\\n\\ncontract Gears is ERC721Token {\\n    function postUpgrade(address dungeon) public override {\\n        super.postUpgrade(dungeon);\\n    }\\n}\\n\",\"keccak256\":\"0xe940d0e0374fdad101cab97f37e258cfe2c6f73e31394238f2125eec58ff2de7\",\"license\":\"MIT\"},\"src/tokens/Rooms.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"./ERC721Token.sol\\\";\\n\\ncontract Rooms is ERC721Token {\\n    function postUpgrade(address dungeon) public override {\\n        super.postUpgrade(dungeon);\\n    }\\n\\n    function mintId(uint256 id, uint256 subOwner) public {\\n        require(msg.sender == _minter, \\\"NOT_AUTHORIZED_MINT\\\");\\n        _subOwners[id] = subOwner;\\n        _subNumNFTPerAddress[subOwner]++;\\n        _owners[id] = _minter;\\n        emit Transfer(address(0), _minter, id);\\n        emit SubTransfer(0, subOwner, id);\\n    }\\n}\\n\",\"keccak256\":\"0xf0e626483958bb528f5b4922ea640b7a461c1df90884e666bc7e23c66d7d15df\",\"license\":\"MIT\"},\"src/utils/BlockHashRegister.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract BlockHashRegister {\\n    mapping(uint256 => bytes32) _blockHashes;\\n    uint256 _blockToActualise;\\n\\n    event HashRequest(uint256 blockNumber);\\n\\n    function get(uint256 blockNumber) external view returns (bytes32) {\\n        return _blockHashes[blockNumber];\\n    }\\n\\n    function getOrCompute(uint256 blockNumber) external view returns (bytes32) {\\n        bytes32 blockHash = _blockHashes[blockNumber];\\n        if (uint256(blockHash) == 0) {\\n            return _computeBlockHash(blockNumber);\\n        }\\n        return blockHash;\\n    }\\n\\n    function getBlockToActualise() external view returns (uint256) {\\n        return _blockToActualise;\\n    }\\n\\n    function request() external {\\n        uint256 blockNumber = _blockToActualise;\\n        if (blockNumber < block.number) {\\n            _save(blockNumber);\\n            _blockToActualise = block.number;\\n            emit HashRequest(block.number);\\n        }\\n    }\\n\\n    function save() external {\\n        uint256 blockNumber = _blockToActualise;\\n        if (blockNumber < block.number) {\\n            _save(blockNumber);\\n            _blockToActualise = 0;\\n        }\\n    }\\n\\n    function _computeBlockHash(uint256 blockNumber) internal view returns (bytes32) {\\n        if (blockNumber < 256 || blockNumber > block.number - 256) {\\n            return blockhash(blockNumber);\\n        } else {\\n            uint256 moduloBlockNumber = block.number - ((block.number - blockNumber - 1) % 256) + 1;\\n            return blockhash(moduloBlockNumber);\\n        }\\n    }\\n\\n    function _save(uint256 blockNumber) internal returns (bytes32) {\\n        bytes32 blockHash = _computeBlockHash(blockNumber);\\n        _blockHashes[blockNumber] = blockHash;\\n        return blockHash;\\n    }\\n}\\n\",\"keccak256\":\"0xf459998169e51b1d23409abbd6b4665fe58231e06d60c6c715dcb80a995d66db\",\"license\":\"MIT\"},\"src/utils/Constants.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract Constants {\\n    uint256 public constant MAX_FOOD = 400000000000000000;\\n}\\n\",\"keccak256\":\"0x6c87d8a3403e6c7f86f3c2e08f9718efdb079be6c4c967c3599b964530b5b80f\",\"license\":\"MIT\"},\"src/utils/MetaTransactionReceiver.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nabstract contract MetaTransactionReceiver {\\n    bytes32 constant FORWARDER_STORAGE_POSITION = 0xbda473cae6459373242ba82cd14b3b8493956b600be62b2478f52616c8a283de;\\n\\n    function isTrustedForwarder(address forwarder) external view returns (bool) {\\n        return _isTrustedForwarder(forwarder);\\n    }\\n\\n    function _msgSender() internal view returns (address payable sender) {\\n        sender = payable(msg.sender);\\n        if (_isTrustedForwarder(msg.sender)) {\\n            bytes memory data = msg.data;\\n            uint256 length = msg.data.length;\\n            assembly {\\n                sender := mload(add(data, length))\\n            }\\n        }\\n    }\\n\\n    function _isTrustedForwarder(address trustedForwarder) internal view returns (bool) {\\n        address currentForwarder;\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            currentForwarder := sload(FORWARDER_STORAGE_POSITION)\\n        }\\n        return currentForwarder == trustedForwarder;\\n    }\\n\\n    function _setTrustedForwarder(address trustedForwarder) internal {\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            sstore(FORWARDER_STORAGE_POSITION, trustedForwarder)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x42c77fecc9a7d2dcbc7c99d4fb9288e4a1812b25431b7475c1b5013c3a393993\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x6080806040523461001657612aac908161001c8239f35b600080fdfe60406080815260048036101561001457600080fd5b600091823560e01c8063136f6b5a14610f3e5780631ef1720a14610bfc5780632c44b2cf146109f6578381634636e9f11461084b57508063714dfc591461057a5783816387908b7f1461043457508063abcac4f414610416578063ed8f9cf9146101cb5763fee804911461008757600080fd5b346101c7576101403660031901126101c7576024908235823536610144116101c357600a546001600160a01b0395906100c390871633146112af565b6100cc82611404565b865b600881106100da578780f35b6100e3816113dc565b356100f7575b6100f2906112f2565b6100ce565b6007548716600160ff1b84018481116101b157600360fe1b85019081106101b157600183019182841161019f57908a9291610131856113dc565b35813b1561019b5786858a936084938e9783978f51998a9889976311aa10fb60e01b8952880152860152604485015260648401525af1801561019157610179575b50506100e9565b61018290611317565b61018d578738610172565b8780fd5b87513d84823e3d90fd5b8480fd5b634e487b7160e01b8b5260118552888bfd5b634e487b7160e01b8a5260118452878afd5b8580fd5b8280fd5b5082903461041257602090816003193601126101c75783359360018060a01b03926101fb84600a541633146112af565b858552848152602483862054948281600954168651938480926369f648a160e01b82528a898301525afa9182156104085787926103d9575b508082168752600d8352848720544211156103a65786978160075416803b156103a257888091606489518094819363c9b902e360e01b8352878c84015260066024840152600260448401525af1801561039857908991610384575b5050838260065416916024885180948193630607176160e31b83528a8301525afa93841561037a578894610342575b50506102c883612573565b6009541690813b1561033e5784516316ce431360e31b8152309481019485526020850191909152604084019290925260608301949094529284918491908290849082906080015b03925af190811561033557506103225750f35b61032b90611317565b6103325780f35b80fd5b513d84823e3d90fd5b8680fd5b819850809294503d8311610373575b61035b8183611376565b8101031261036e578695519188806102bd565b600080fd5b503d610351565b86513d8a823e3d90fd5b61038d90611317565b61018d57878a61028e565b87513d8b823e3d90fd5b8880fd5b5050606492519162461bcd60e51b8352820152600e60248201526d1b9bdd08199bdc9958db1bdcd95960921b6044820152fd5b9091508281813d8311610401575b6103f18183611376565b8101031261036e57519088610233565b503d6103e7565b85513d89823e3d90fd5b5080fd5b83823461041257816003193601126104125760209051620697808152f35b808484346105765761044536611299565b600a546001600160a01b039061045e90821633146112af565b8060095416908451936369f648a160e01b855283878601526020918286602481875afa958615610398578996610543575b50829060065416916024885180948193630607176160e31b83528c8301525afa91821561037a57889261050f575b50506104ca9084146113a4565b803b156101c35783516316ce431360e31b815230958101868152602081019490945260408401959095526060830191909152849184919082908490829060800161030f565b8198508092503d831161053c575b6105278183611376565b8101031261036e576104ca87965190896104bd565b503d61051d565b985094508188813d811161056f575b61055c8183611376565b8101031261036e5781899851959061048f565b503d610552565b5050fd5b50346101c75761058936611299565b600a5490936001600160a01b0392916105a590841633146112af565b841561081357826006541691845180938192630607176160e31b835284830152602094859160249485915afa90811561037a5790859189916107e2575b5016958184866009541688519283809263c9a59e4760e01b82528c898301525afa9081156103985789916107b5575b50801561077e57600a9004600101948560011161073a578186029580870483149015171561073a57889060075416803b156104125781809160848b8b519485938492637f4c824d60e11b84528b840152818a840152600660448401528c60648401525af1801561077457610760575b505062069780908082029182040361074e57868852600d84526106a7868920918254611397565b9055858752600d835284872054620d2f0042019081421161073a571015610705575050838552600d8152828520548351928352908201527fc24affdb20f6529973515c5398461c1f6228edbfac531ab49e56a11433a86c9f9190a280f35b60129060649386519362461bcd60e51b85528401528201527163616e6e6f7420707265706179206d6f726560701b6044820152fd5b82601185634e487b7160e01b600052526000fd5b50634e487b7160e01b87526011825286fd5b61076990611317565b61018d578738610680565b88513d84823e3d90fd5b865162461bcd60e51b8152808501869052601281850152713737ba10323ab733b2b7b71035b2b2b832b960711b6044820152606490fd5b90508481813d83116107db575b6107cc8183611376565b8101031261036e575138610611565b503d6107c2565b809250858092503d831161080c575b6107fb8183611376565b8101031261036e57849051386105e2565b503d6107f1565b606490602085519162461bcd60e51b835282015260126024820152711bdb99481c195c9a5bd908185d1b19585cdd60721b6044820152fd5b808484346105765761085c36611299565b600a549193916001600160a01b039061087890821633146112af565b806009541684519586916369f648a160e01b8352848684015282602460209485935afa96871561037a5788976109c4575b50818360065416916024885180948193630607176160e31b83528a8301525afa91821561037a578892610990575b50506108e49086146113a4565b808060075416951694803b1561033e578680916084875180948193637f4c824d60e11b83528b8a840152816024840152600660448401526064808401525af180156104085790879161097c575b505060095416803b156101c35783516323b872dd60e01b8152309381019384526001600160a01b0390951660208401526040830191909152849184919082908490829060600161030f565b61098590611317565b6101c3578588610931565b8198508092503d83116109bd575b6109a88183611376565b8101031261036e576108e487965190896108d7565b503d61099e565b975095508087813d81116109ef575b6109dd8183611376565b8101031261036e5787965195896108a9565b503d6109d3565b5082903461041257610a0736611299565b600a546001600160a01b039591939290610a2490871633146112af565b8560065416958351968792630607176160e31b84528484015282602460209485935afa968715610bf2578697610bc3575b50806009541684516331a9108f60e11b815286858201528381602481855afa90811561037a579083918991610b89575b501692308414610b555750610a9c879884146113a4565b803b1561033e5784516323b872dd60e01b81526001600160a01b038416858201908152306020820152604081018890529091889183919082908490829060600103925af1801561040857908791610b41575b5050610af982612573565b60095416803b156101c357859283608492865197889586946316ce431360e31b86523090860152836024860152604485015260648401525af190811561033557506103225750f35b610b4a90611317565b6101c3578588610aee565b8460649187519162461bcd60e51b8352820152600f60248201526e1b9bdd0819195858dd1a5d985d1959608a1b6044820152fd5b809250858092503d8311610bbc575b610ba28183611376565b8101031261018d5751828116810361018d5782908a610a85565b503d610b98565b9096508181813d8311610beb575b610bdb8183611376565b8101031261036e57519587610a55565b503d610bd1565b84513d88823e3d90fd5b5082903461041257806003193601126104125760249081356001600160401b0380821161019b573660238301121561019b578186013590811161019b57600595368583891b850101116101c357600a546001600160a01b0390610c6290821633146112af565b81359261ffff806080610c74876121d6565b01511615610f03578895895b838110610ccf57505050508697506007541690813b1561033e5786606492819560088851998a9788966302acc94b60e01b885287015285015260448401525af190811561033557506103225750f35b60085489516369f648a160e01b8152828e1b84018c01358882018190529187169991929160209182818f818f5afa908115610e88578f91610ed6575b508a03610e94578b51630178fe3f60e01b8152808a0185905282818f818f5afa908115610e88578f91610e5b575b50617fff600190808360e91c168201898111610e4657898116938a808260c01c169160d01c1614610e0e575b505050610d7191611397565b99803b15610e0a578d848e8b8f8490519586948593630301ea6560e51b85528401525af18015610dfe578a92918f91610ddd575b50507f87f4b7ea340c6b16973214300a3cbbb5afaf6c92389d1e81f95ffe0c07edcfb690610dd8948d51908152a26112f2565b610c80565b610deb919294959350611317565b610dfa57919088908d38610da5565b8c80fd5b8e8d51903d90823e3d90fd5b8d80fd5b8293921c168201809211610e3357610d719291610e2a91611397565b90913880610d65565b50634e487b7160e01b8f5260118a528d8ffd5b5050508d8f60118c634e487b7160e01b835252fd5b90508281813d8311610e81575b610e728183611376565b8101031261036e575138610d39565b503d610e68565b8f8e51903d90823e3d90fd5b508760178d6064938e519362461bcd60e51b85528401528201527f68617320746f206265206f776e6572206f6620676561720000000000000000006044820152fd5b90508281813d8311610efc575b610eed8183611376565b8101031261036e575138610d0b565b503d610ee3565b865162461bcd60e51b81526020818601526016818a0152751e5bdd5c8818da185c9858dd195c881a5cc81919585960521b6044820152606490fd5b50346101c75760603660031901126101c757813590602491823593604435936001600160401b039485811161018d573660238201121561018d578083013595861161018d573682878301011161018d57600a546001600160a01b039390610fa890851633146112af565b83600954168987519586926369f648a160e01b84528b8585015283876020998a935afa92831561128f578293611260575b50858782600654168b5192838092630607176160e31b82528d8a8301525afa8015611256578390611227575b611011915084146113a4565b806007541692833b156101c757608490838b519586948593637f4c824d60e11b85521688840152818a84015260066044840152601460648401525af1801561121d5761120a575b50878952600e84528589209081546001918282811c92168015611200575b878310146111ee5750601f81116111a8575b50898a601f8a11600114611119579389989693898080989495857f833228afd99eefed411de081e6bf23c4c4e2945e33997a07725ee65de5e23d519e9760609d9a9461110c575b50501b906000198660031b1c19161790555b865198878a98895288015201868601378383018501899052830152601f01601f19168101030190a280f35b86010135925085386110cf565b50828b52858b2090601f198a168c5b8181106111915750938a999794938a979360609a9793897f833228afd99eefed411de081e6bf23c4c4e2945e33997a07725ee65de5e23d519e9710611175575b505084811b0190556110e1565b8401850135600019600388901b60f8161c191690553880611168565b868301880135845592840192918801918801611128565b828b52858b20601f8a0160051c810191878b106111e4575b601f0160051c019082905b8281106111d9575050611088565b8c81550182906111cb565b90915081906111c0565b634e487b7160e01b8c5260229052848bfd5b91607f1691611076565b61121690999199611317565b9738611058565b87513d8c823e3d90fd5b508781813d831161124f575b61123d8183611376565b810103126101c7576110119051611005565b503d611233565b8a513d85823e3d90fd5b9092508681813d8311611288575b6112788183611376565b8101031261041257519138610fd9565b503d61126e565b89513d84823e3d90fd5b604090600319011261036e576004359060243590565b156112b657565b60405162461bcd60e51b81526020600482015260146024820152731bdb9b1e481c1b185e595c9cc8185b1b1bddd95960621b6044820152606490fd5b60001981146113015760010190565b634e487b7160e01b600052601160045260246000fd5b6001600160401b03811161132a57604052565b634e487b7160e01b600052604160045260246000fd5b60a081019081106001600160401b0382111761132a57604052565b608081019081106001600160401b0382111761132a57604052565b90601f801991011681019081106001600160401b0382111761132a57604052565b9190820180921161130157565b156113ab57565b60405162461bcd60e51b81526020600482015260096024820152683737ba1037bbb732b960b91b6044820152606490fd5b60088110156113ee5760051b60440190565b634e487b7160e01b600052603260045260246000fd5b60008181526001602052604081208054906001600160401b03821691821561219a5760d01c60ff1615611448575b5050506114416114469161293b565b6122b9565b565b600554604051634a83e9cd60e11b81526004810193909352602090839060249082906001600160a01b03165afa91821561218f57839261215b575b508115612155576114938461293b565b808452600260205260ff60408520541615611f2e575b5080548360c082901c60ff1660048103611d57575050600f5b60ff6064604051886020820152866040820152606f60f81b6060820152604181526114ec8161135b565b602081519101200616603c8110600014611d3d575060ff855b1660048110611bcf575060f0175b8461151d8761293b565b60ff8460e01c169060ff8560d81c16926115368a61271d565b50509060070b159081611bc3575b501561181b575050506060879260ff7f8850140926f0260fe1b422b7a0d93e7d5734e521eae9ac8969ed512cc383451593600160029117965b61ffff60c81b191683831660c81b1781831660d01b17885561159e8661293b565b96878b52600260205260408b2090815490848116858360081c1603611802575b50505081604051938a8552166020840152166040820152a283526002602052600160ff604085205416910191825491826115fa575b5050611432565b60ff611605846121d6565b5116926019611613886127be565b0480156117fa575b61165b6116528260405160208101908c8252886040820152601960fa1b60608201526041815261164a8161135b565b51902061266f565b8260011c611397565b9384156117f1575b856002146117d5575b906116af91600882116117cc575b816116a69160405160208101918d83526040820152606560f81b60608201526041815261164a8161135b565b9060011c611397565b9384156117c3575b6001146117ae575b6005821115611741575b50505060018060a01b03600754169154823b1561173d5790606484928360405195869485936302acc94b60e01b855260048501526006602485015260448401525af180156117325761171e575b8080806115f3565b6117288291611317565b6103325780611716565b6040513d84823e3d90fd5b8380fd5b6007546001600160a01b0316803b1561033e578692918360649260405196879586946302acc94b60e01b86526004860152602485015260448401525af180156117a357611790575b80806116c9565b61179c90939193611317565b9138611789565b6040513d86823e3d90fd5b92806117bd9160021c90611397565b926116bf565b600194506116b7565b6008915061167a565b93906117e8826116af9360021c90611397565b9490915061166c565b60019450611663565b50600161161b565b61ff009060081b169061ff0019161790553880806115be565b999499989391979896959290965b60ff8b60e81c1660ff8a1611611b8c575060405187602082015260ff60f81b8960f81b166040820152866041820152600360f81b6061820152604281528060808101106001600160401b03608083011117611b7857601481608060ff93016040526020815191012006166001808316141590818092611b63575b156118dd575050600160029117975b60ff808216146118c95760ff166001019790611829565b634e487b7160e01b8a52601160045260248afd5b600283811614158080611b30575b156118ff57505050600260039117976118b2565b600484811614158080611ab8575b1561192157505050506004809117976118b2565b6008938480871614159384611950575b505050506000146119465760059117976118b2565b50966001906118b2565b600314935090918315611aaa575b8315611a8e575b8315611a72575b8315611a56575b8315611a2d575b8315611a04575b83156119db575b831561199b575b50505038808080611931565b60ff8d16604d1493509091836119d3575b50826119cb575b50816119c3575b5038808061198f565b9050386119ba565b9150386119b3565b9250386119ac565b9250604e60ff8d1614806119fd575b806119f6575b92611988565b50826119f0565b50816119ea565b9250604e60ff8d161480611a26575b80611a1f575b92611981565b5081611a19565b5080611a13565b9250604e60ff8d161480611a4f575b80611a48575b9261197a565b5082611a42565b5080611a3c565b9250604f60ff8d161480611a6b575b92611973565b5081611a65565b9250604f60ff8d161480611a87575b9261196c565b5082611a81565b9250604f60ff8d161480611aa3575b92611965565b5080611a9d565b60ff8d16605014935061195e565b50600283148015611b23575b8015611b0e575b8015611af9575b8061190d5750604e60ff8d161480611af2575b801561190d57508161190d565b5083611ae5565b50604f60ff8d16148015611ad2575081611ad2565b50604f60ff8d16148015611acb575083611acb565b50605060ff8d1614611ac4565b50600182148015611b56575b806118eb5750604f60ff8c161480156118eb5750826118eb565b50605060ff8c1614611b3c565b508015806118a35750605060ff8b16146118a3565b634e487b7160e01b8a52604160045260248afd5b849998507f8850140926f0260fe1b422b7a0d93e7d5734e521eae9ac8969ed512cc38345159396975060ff9060609392969b61157d565b905060070b1538611544565b60038103611c6857506040805160208101888152918101869052600760fc1b606082015260079160ff91611c2091600391611c1781606181015b03601f198101835282611376565b5190201661265d565b16028060ff811603611c545760ff8116601503611c41575060d0175b611513565b60ff601c911603611c3c5760b017611513565b634e487b7160e01b86526011600452602486fd5b60028103611ce45750600360ff611cb18160068a604051611ca781611c098d602083019586909160419282526020820152600760fc1b60408201520190565b519020061661265d565b16028060ff811603611c545760ff8116600f03611cd15750605017611513565b60ff6012911603611c3c5760a017611513565b600103611c3c576040805160208101888152918101869052600760fc1b6060820152611d2391600391611d1a8160618101611c09565b51902016612a53565b60041b610ff0811660f0821603611c545760f01617611513565b605a1115611d4e5760ff6001611505565b60ff6002611505565b60ff606460405160208101908a8252886040820152600160f81b606082015260418152611d838161135b565b5190200616605711611f1d575b60ff606460405160208101908a8252886040820152600160f91b606082015260418152611dbc8161135b565b5190200616602811611dcf575b506114c2565b6040805160208101898152918101879052600360f81b6060820152604181528891601f199160ff91606491611e05606182611376565b519020061660191115611e5c57505080158015611e52575b15611e2d5750600a175b38611dc9565b80600114908115611e47575b5015611e2757600517611e27565b905060031438611e39565b5080600214611e1d565b6040805160208101938452908101889052600360f81b60608201526061918201815260ff92606492909190611e919082611376565b519020061660321115611ede5780611eac5750600817611e27565b60018103611ebe57506001175b611e27565b60028103611ecf5750600217611e27565b600303611eb957600417611e27565b80611eec5750600217611e27565b60018103611efd5750600417611e27565b60028103611f0e5750600817611e27565b600303611eb957600117611e27565b9050611f2881612a53565b90611d90565b6001600160401b0360035460401c1690611f478161271d565b505060001960079290920b828112159283612146575b508261213a575b508161212b575b508015612120575b1561203f5760069081905b8652600260205260ff604087209116908160ff1982541617905503156114a9576001600160401b036201437042041660035491816001600160401b0384161415600014611fef5750600160401b91506fffffffffffffffffffffffffffffffff196003541617176003555b386114a9565b60019150016001600160401b03811161202b5767ffffffffffffffff60401b9060401b169067ffffffffffffffff60401b191617600355611fe9565b634e487b7160e01b85526011600452602485fd5b60096001600160401b0361205283612878565b1602806001600160401b03811603611c54576001600160401b038116806120f6575b60191190506120ec57606460ff6127106040516020810190858252886040820152600360fa1b6060820152604181526120ac8161135b565b5190200616116120ec576120bf8161271d565b5091505060ff60058260070b07811660010111611c545790600560069260070b0760ff1660010190611f7e565b6006908190611f7e565b506001600160401b038116600319810111611c54576019906001600160401b031660031901612074565b50600a821015611f73565b6001915060070b131538611f6b565b60011215915038611f64565b600783900b1215925038611f5d565b50505050565b9091506020813d602011612187575b8161217760209383611376565b810103126101c757519038611483565b3d915061216a565b6040513d85823e3d90fd5b60405162461bcd60e51b81526020600482015260146024820152731c9bdbdb481b9bdd0818dc99585d1959081e595d60621b6044820152606490fd5b6040908151906121e582611340565b6000908183528160806020948286820152828782015282606082015201528260018060a01b0360065416916024865180948193630178fe3f60e01b835260048301525afa9182156122ae57809261227e575b505082519261224584611340565b8160f81c845261ffff92838360e81c169085015263ffffffff8260c81c1690840152818160b81c16606084015260a81c16608082015290565b9091508282813d83116122a7575b6122968183611376565b810103126103325750513880612237565b503d61228c565b8451903d90823e3d90fd5b6000908082526020600281526040600281852001936001600160401b03938486541690816122eb575b50505050505050565b6005548451634a83e9cd60e11b815260048101939093528590839060249082906001600160a01b03165afa918215612495578392612466575b5081156122e2576123b96123b46123c96123cf936123b96123b46123c36001986123a960ff60098f8f9083838351838101908d82528986820152603360f91b6060820152604181526123758161135b565b5190200616958251918201928b8452820152606760f81b60608201526041815261239e8161135b565b51902006169561271d565b509991989098612a3e565b612746565b9060070b90612913565b94612a3e565b906129c3565b936123d98561249f565b9483525220916002830192835492600283851614159283612457575b508261244e575b508161243d575b50612426575b5050805467ffffffffffffffff19169055388080808080806122e2565b67ffffffffffffffff191660021790553880612409565b60ff91505460d01c16151538612403565b159150386123fc565b825460801c16159250386123f5565b9091508481813d831161248e575b61247e8183611376565b810103126101c757519038612324565b503d612474565b84513d85823e3d90fd5b600090808252602090600182526001600160401b039182604085205460401c16801561256c57600554604051634a83e9cd60e11b81526004810183905292908190849060249082906001600160a01b03165afa928315612561578693612532575b50821561252a578560016040928661252799525220549360ff8560d01c169416149161268f565b90565b505050505090565b9080935081813d831161255a575b61254a8183611376565b810103126101c357519138612500565b503d612540565b6040513d88823e3d90fd5b5050505090565b801515806125dc575b6125835750565b620697804201908142116113015760407fc24affdb20f6529973515c5398461c1f6228edbfac531ab49e56a11433a86c9f9160018060a01b03169283600052600d602052808260002055815190600082526020820152a2565b5060095460405163c9a59e4760e01b81526004810183905290602090829060249082906001600160a01b03165afa90811561265157600091612620575b501561257c565b906020823d8211612649575b8161263960209383611376565b8101031261033257505138612619565b3d915061262c565b6040513d6000823e3d90fd5b60ff60019116019060ff821161130157565b8115612679570690565b634e487b7160e01b600052601260045260246000fd5b91909260ff600191160361271557600f9061270d575b60ff60646040516020810190858252866040820152600360f91b6060820152604181526126d18161135b565b519020069116116126e3575050600090565b612708916040519160208301526040820152600760f81b60608201526041815261135b565b600190565b5060196126a5565b505050600090565b6001600160401b039081811660070b92828260401c1660070b928260801c1660070b9160ff1c90565b60070b6003190190677fffffffffffffff198212677fffffffffffffff83131761130157565b60070b90677fffffffffffffff198212677fffffffffffffff83131761130157565b600160ff1b81146113015760000390565b90600160401b6000838203931281841281169184139015161761130157565b6127ca6127d39161271d565b5050919061276c565b60070b906000821261284a575b6127e99061276c565b60070b6000811261283c575b67800000000000000080831361282c575b811361281e575b80821315612819575090565b905090565b6128279061279f565b61280d565b916128369061279f565b91612806565b6128459061278e565b6127f5565b906128576127e99161278e565b9190506127e0565b60070b677fffffffffffffff1981146113015760000390565b6128819061271d565b50819050826000600782900b126128dc575b5060008160070b126128cc575b508060070b8260070b136000146128be57506001600160401b031690565b90506001600160401b031690565b6128d6915061285f565b386128a0565b6128e791935061285f565b9138612893565b60070b60040190677fffffffffffffff8213677fffffffffffffff1983121761130157565b9060070b9060070b0190677fffffffffffffff198212677fffffffffffffff83131761130157565b6129476125279161271d565b509160079190600081840b126129a4576129626009916128ee565b830b05915b600082820b126129855761297c6009926128ee565b900b05906129c3565b60099061299c6129976123c99461285f565b6128ee565b900b0561285f565b60096129b56129976129bd9361285f565b840b0561285f565b91612967565b90916001600160401b039067ffffffffffffffff60801b608082901b16908216808204600160801b149015171561130157600160ff1b9081019081106113015767ffffffffffffffff60401b8285169460401b1693808504600160401b14901517156113015761252793612a3691611397565b911690611397565b60099060070b02908160070b91820361130157565b8015612a705760ff8111611301576001901b9060ff821161130157565b5060019056fea26469706673582212201cbba65a2a41f927e731ff8b43f3fdd66902d05eadf08d573ce9d02f95740e9e64736f6c63430008140033",
+  "deployedBytecode": "0x60406080815260048036101561001457600080fd5b600091823560e01c8063136f6b5a14610f3e5780631ef1720a14610bfc5780632c44b2cf146109f6578381634636e9f11461084b57508063714dfc591461057a5783816387908b7f1461043457508063abcac4f414610416578063ed8f9cf9146101cb5763fee804911461008757600080fd5b346101c7576101403660031901126101c7576024908235823536610144116101c357600a546001600160a01b0395906100c390871633146112af565b6100cc82611404565b865b600881106100da578780f35b6100e3816113dc565b356100f7575b6100f2906112f2565b6100ce565b6007548716600160ff1b84018481116101b157600360fe1b85019081106101b157600183019182841161019f57908a9291610131856113dc565b35813b1561019b5786858a936084938e9783978f51998a9889976311aa10fb60e01b8952880152860152604485015260648401525af1801561019157610179575b50506100e9565b61018290611317565b61018d578738610172565b8780fd5b87513d84823e3d90fd5b8480fd5b634e487b7160e01b8b5260118552888bfd5b634e487b7160e01b8a5260118452878afd5b8580fd5b8280fd5b5082903461041257602090816003193601126101c75783359360018060a01b03926101fb84600a541633146112af565b858552848152602483862054948281600954168651938480926369f648a160e01b82528a898301525afa9182156104085787926103d9575b508082168752600d8352848720544211156103a65786978160075416803b156103a257888091606489518094819363c9b902e360e01b8352878c84015260066024840152600260448401525af1801561039857908991610384575b5050838260065416916024885180948193630607176160e31b83528a8301525afa93841561037a578894610342575b50506102c883612573565b6009541690813b1561033e5784516316ce431360e31b8152309481019485526020850191909152604084019290925260608301949094529284918491908290849082906080015b03925af190811561033557506103225750f35b61032b90611317565b6103325780f35b80fd5b513d84823e3d90fd5b8680fd5b819850809294503d8311610373575b61035b8183611376565b8101031261036e578695519188806102bd565b600080fd5b503d610351565b86513d8a823e3d90fd5b61038d90611317565b61018d57878a61028e565b87513d8b823e3d90fd5b8880fd5b5050606492519162461bcd60e51b8352820152600e60248201526d1b9bdd08199bdc9958db1bdcd95960921b6044820152fd5b9091508281813d8311610401575b6103f18183611376565b8101031261036e57519088610233565b503d6103e7565b85513d89823e3d90fd5b5080fd5b83823461041257816003193601126104125760209051620697808152f35b808484346105765761044536611299565b600a546001600160a01b039061045e90821633146112af565b8060095416908451936369f648a160e01b855283878601526020918286602481875afa958615610398578996610543575b50829060065416916024885180948193630607176160e31b83528c8301525afa91821561037a57889261050f575b50506104ca9084146113a4565b803b156101c35783516316ce431360e31b815230958101868152602081019490945260408401959095526060830191909152849184919082908490829060800161030f565b8198508092503d831161053c575b6105278183611376565b8101031261036e576104ca87965190896104bd565b503d61051d565b985094508188813d811161056f575b61055c8183611376565b8101031261036e5781899851959061048f565b503d610552565b5050fd5b50346101c75761058936611299565b600a5490936001600160a01b0392916105a590841633146112af565b841561081357826006541691845180938192630607176160e31b835284830152602094859160249485915afa90811561037a5790859189916107e2575b5016958184866009541688519283809263c9a59e4760e01b82528c898301525afa9081156103985789916107b5575b50801561077e57600a9004600101948560011161073a578186029580870483149015171561073a57889060075416803b156104125781809160848b8b519485938492637f4c824d60e11b84528b840152818a840152600660448401528c60648401525af1801561077457610760575b505062069780908082029182040361074e57868852600d84526106a7868920918254611397565b9055858752600d835284872054620d2f0042019081421161073a571015610705575050838552600d8152828520548351928352908201527fc24affdb20f6529973515c5398461c1f6228edbfac531ab49e56a11433a86c9f9190a280f35b60129060649386519362461bcd60e51b85528401528201527163616e6e6f7420707265706179206d6f726560701b6044820152fd5b82601185634e487b7160e01b600052526000fd5b50634e487b7160e01b87526011825286fd5b61076990611317565b61018d578738610680565b88513d84823e3d90fd5b865162461bcd60e51b8152808501869052601281850152713737ba10323ab733b2b7b71035b2b2b832b960711b6044820152606490fd5b90508481813d83116107db575b6107cc8183611376565b8101031261036e575138610611565b503d6107c2565b809250858092503d831161080c575b6107fb8183611376565b8101031261036e57849051386105e2565b503d6107f1565b606490602085519162461bcd60e51b835282015260126024820152711bdb99481c195c9a5bd908185d1b19585cdd60721b6044820152fd5b808484346105765761085c36611299565b600a549193916001600160a01b039061087890821633146112af565b806009541684519586916369f648a160e01b8352848684015282602460209485935afa96871561037a5788976109c4575b50818360065416916024885180948193630607176160e31b83528a8301525afa91821561037a578892610990575b50506108e49086146113a4565b808060075416951694803b1561033e578680916084875180948193637f4c824d60e11b83528b8a840152816024840152600660448401526064808401525af180156104085790879161097c575b505060095416803b156101c35783516323b872dd60e01b8152309381019384526001600160a01b0390951660208401526040830191909152849184919082908490829060600161030f565b61098590611317565b6101c3578588610931565b8198508092503d83116109bd575b6109a88183611376565b8101031261036e576108e487965190896108d7565b503d61099e565b975095508087813d81116109ef575b6109dd8183611376565b8101031261036e5787965195896108a9565b503d6109d3565b5082903461041257610a0736611299565b600a546001600160a01b039591939290610a2490871633146112af565b8560065416958351968792630607176160e31b84528484015282602460209485935afa968715610bf2578697610bc3575b50806009541684516331a9108f60e11b815286858201528381602481855afa90811561037a579083918991610b89575b501692308414610b555750610a9c879884146113a4565b803b1561033e5784516323b872dd60e01b81526001600160a01b038416858201908152306020820152604081018890529091889183919082908490829060600103925af1801561040857908791610b41575b5050610af982612573565b60095416803b156101c357859283608492865197889586946316ce431360e31b86523090860152836024860152604485015260648401525af190811561033557506103225750f35b610b4a90611317565b6101c3578588610aee565b8460649187519162461bcd60e51b8352820152600f60248201526e1b9bdd0819195858dd1a5d985d1959608a1b6044820152fd5b809250858092503d8311610bbc575b610ba28183611376565b8101031261018d5751828116810361018d5782908a610a85565b503d610b98565b9096508181813d8311610beb575b610bdb8183611376565b8101031261036e57519587610a55565b503d610bd1565b84513d88823e3d90fd5b5082903461041257806003193601126104125760249081356001600160401b0380821161019b573660238301121561019b578186013590811161019b57600595368583891b850101116101c357600a546001600160a01b0390610c6290821633146112af565b81359261ffff806080610c74876121d6565b01511615610f03578895895b838110610ccf57505050508697506007541690813b1561033e5786606492819560088851998a9788966302acc94b60e01b885287015285015260448401525af190811561033557506103225750f35b60085489516369f648a160e01b8152828e1b84018c01358882018190529187169991929160209182818f818f5afa908115610e88578f91610ed6575b508a03610e94578b51630178fe3f60e01b8152808a0185905282818f818f5afa908115610e88578f91610e5b575b50617fff600190808360e91c168201898111610e4657898116938a808260c01c169160d01c1614610e0e575b505050610d7191611397565b99803b15610e0a578d848e8b8f8490519586948593630301ea6560e51b85528401525af18015610dfe578a92918f91610ddd575b50507f87f4b7ea340c6b16973214300a3cbbb5afaf6c92389d1e81f95ffe0c07edcfb690610dd8948d51908152a26112f2565b610c80565b610deb919294959350611317565b610dfa57919088908d38610da5565b8c80fd5b8e8d51903d90823e3d90fd5b8d80fd5b8293921c168201809211610e3357610d719291610e2a91611397565b90913880610d65565b50634e487b7160e01b8f5260118a528d8ffd5b5050508d8f60118c634e487b7160e01b835252fd5b90508281813d8311610e81575b610e728183611376565b8101031261036e575138610d39565b503d610e68565b8f8e51903d90823e3d90fd5b508760178d6064938e519362461bcd60e51b85528401528201527f68617320746f206265206f776e6572206f6620676561720000000000000000006044820152fd5b90508281813d8311610efc575b610eed8183611376565b8101031261036e575138610d0b565b503d610ee3565b865162461bcd60e51b81526020818601526016818a0152751e5bdd5c8818da185c9858dd195c881a5cc81919585960521b6044820152606490fd5b50346101c75760603660031901126101c757813590602491823593604435936001600160401b039485811161018d573660238201121561018d578083013595861161018d573682878301011161018d57600a546001600160a01b039390610fa890851633146112af565b83600954168987519586926369f648a160e01b84528b8585015283876020998a935afa92831561128f578293611260575b50858782600654168b5192838092630607176160e31b82528d8a8301525afa8015611256578390611227575b611011915084146113a4565b806007541692833b156101c757608490838b519586948593637f4c824d60e11b85521688840152818a84015260066044840152601460648401525af1801561121d5761120a575b50878952600e84528589209081546001918282811c92168015611200575b878310146111ee5750601f81116111a8575b50898a601f8a11600114611119579389989693898080989495857f833228afd99eefed411de081e6bf23c4c4e2945e33997a07725ee65de5e23d519e9760609d9a9461110c575b50501b906000198660031b1c19161790555b865198878a98895288015201868601378383018501899052830152601f01601f19168101030190a280f35b86010135925085386110cf565b50828b52858b2090601f198a168c5b8181106111915750938a999794938a979360609a9793897f833228afd99eefed411de081e6bf23c4c4e2945e33997a07725ee65de5e23d519e9710611175575b505084811b0190556110e1565b8401850135600019600388901b60f8161c191690553880611168565b868301880135845592840192918801918801611128565b828b52858b20601f8a0160051c810191878b106111e4575b601f0160051c019082905b8281106111d9575050611088565b8c81550182906111cb565b90915081906111c0565b634e487b7160e01b8c5260229052848bfd5b91607f1691611076565b61121690999199611317565b9738611058565b87513d8c823e3d90fd5b508781813d831161124f575b61123d8183611376565b810103126101c7576110119051611005565b503d611233565b8a513d85823e3d90fd5b9092508681813d8311611288575b6112788183611376565b8101031261041257519138610fd9565b503d61126e565b89513d84823e3d90fd5b604090600319011261036e576004359060243590565b156112b657565b60405162461bcd60e51b81526020600482015260146024820152731bdb9b1e481c1b185e595c9cc8185b1b1bddd95960621b6044820152606490fd5b60001981146113015760010190565b634e487b7160e01b600052601160045260246000fd5b6001600160401b03811161132a57604052565b634e487b7160e01b600052604160045260246000fd5b60a081019081106001600160401b0382111761132a57604052565b608081019081106001600160401b0382111761132a57604052565b90601f801991011681019081106001600160401b0382111761132a57604052565b9190820180921161130157565b156113ab57565b60405162461bcd60e51b81526020600482015260096024820152683737ba1037bbb732b960b91b6044820152606490fd5b60088110156113ee5760051b60440190565b634e487b7160e01b600052603260045260246000fd5b60008181526001602052604081208054906001600160401b03821691821561219a5760d01c60ff1615611448575b5050506114416114469161293b565b6122b9565b565b600554604051634a83e9cd60e11b81526004810193909352602090839060249082906001600160a01b03165afa91821561218f57839261215b575b508115612155576114938461293b565b808452600260205260ff60408520541615611f2e575b5080548360c082901c60ff1660048103611d57575050600f5b60ff6064604051886020820152866040820152606f60f81b6060820152604181526114ec8161135b565b602081519101200616603c8110600014611d3d575060ff855b1660048110611bcf575060f0175b8461151d8761293b565b60ff8460e01c169060ff8560d81c16926115368a61271d565b50509060070b159081611bc3575b501561181b575050506060879260ff7f8850140926f0260fe1b422b7a0d93e7d5734e521eae9ac8969ed512cc383451593600160029117965b61ffff60c81b191683831660c81b1781831660d01b17885561159e8661293b565b96878b52600260205260408b2090815490848116858360081c1603611802575b50505081604051938a8552166020840152166040820152a283526002602052600160ff604085205416910191825491826115fa575b5050611432565b60ff611605846121d6565b5116926019611613886127be565b0480156117fa575b61165b6116528260405160208101908c8252886040820152601960fa1b60608201526041815261164a8161135b565b51902061266f565b8260011c611397565b9384156117f1575b856002146117d5575b906116af91600882116117cc575b816116a69160405160208101918d83526040820152606560f81b60608201526041815261164a8161135b565b9060011c611397565b9384156117c3575b6001146117ae575b6005821115611741575b50505060018060a01b03600754169154823b1561173d5790606484928360405195869485936302acc94b60e01b855260048501526006602485015260448401525af180156117325761171e575b8080806115f3565b6117288291611317565b6103325780611716565b6040513d84823e3d90fd5b8380fd5b6007546001600160a01b0316803b1561033e578692918360649260405196879586946302acc94b60e01b86526004860152602485015260448401525af180156117a357611790575b80806116c9565b61179c90939193611317565b9138611789565b6040513d86823e3d90fd5b92806117bd9160021c90611397565b926116bf565b600194506116b7565b6008915061167a565b93906117e8826116af9360021c90611397565b9490915061166c565b60019450611663565b50600161161b565b61ff009060081b169061ff0019161790553880806115be565b999499989391979896959290965b60ff8b60e81c1660ff8a1611611b8c575060405187602082015260ff60f81b8960f81b166040820152866041820152600360f81b6061820152604281528060808101106001600160401b03608083011117611b7857601481608060ff93016040526020815191012006166001808316141590818092611b63575b156118dd575050600160029117975b60ff808216146118c95760ff166001019790611829565b634e487b7160e01b8a52601160045260248afd5b600283811614158080611b30575b156118ff57505050600260039117976118b2565b600484811614158080611ab8575b1561192157505050506004809117976118b2565b6008938480871614159384611950575b505050506000146119465760059117976118b2565b50966001906118b2565b600314935090918315611aaa575b8315611a8e575b8315611a72575b8315611a56575b8315611a2d575b8315611a04575b83156119db575b831561199b575b50505038808080611931565b60ff8d16604d1493509091836119d3575b50826119cb575b50816119c3575b5038808061198f565b9050386119ba565b9150386119b3565b9250386119ac565b9250604e60ff8d1614806119fd575b806119f6575b92611988565b50826119f0565b50816119ea565b9250604e60ff8d161480611a26575b80611a1f575b92611981565b5081611a19565b5080611a13565b9250604e60ff8d161480611a4f575b80611a48575b9261197a565b5082611a42565b5080611a3c565b9250604f60ff8d161480611a6b575b92611973565b5081611a65565b9250604f60ff8d161480611a87575b9261196c565b5082611a81565b9250604f60ff8d161480611aa3575b92611965565b5080611a9d565b60ff8d16605014935061195e565b50600283148015611b23575b8015611b0e575b8015611af9575b8061190d5750604e60ff8d161480611af2575b801561190d57508161190d565b5083611ae5565b50604f60ff8d16148015611ad2575081611ad2565b50604f60ff8d16148015611acb575083611acb565b50605060ff8d1614611ac4565b50600182148015611b56575b806118eb5750604f60ff8c161480156118eb5750826118eb565b50605060ff8c1614611b3c565b508015806118a35750605060ff8b16146118a3565b634e487b7160e01b8a52604160045260248afd5b849998507f8850140926f0260fe1b422b7a0d93e7d5734e521eae9ac8969ed512cc38345159396975060ff9060609392969b61157d565b905060070b1538611544565b60038103611c6857506040805160208101888152918101869052600760fc1b606082015260079160ff91611c2091600391611c1781606181015b03601f198101835282611376565b5190201661265d565b16028060ff811603611c545760ff8116601503611c41575060d0175b611513565b60ff601c911603611c3c5760b017611513565b634e487b7160e01b86526011600452602486fd5b60028103611ce45750600360ff611cb18160068a604051611ca781611c098d602083019586909160419282526020820152600760fc1b60408201520190565b519020061661265d565b16028060ff811603611c545760ff8116600f03611cd15750605017611513565b60ff6012911603611c3c5760a017611513565b600103611c3c576040805160208101888152918101869052600760fc1b6060820152611d2391600391611d1a8160618101611c09565b51902016612a53565b60041b610ff0811660f0821603611c545760f01617611513565b605a1115611d4e5760ff6001611505565b60ff6002611505565b60ff606460405160208101908a8252886040820152600160f81b606082015260418152611d838161135b565b5190200616605711611f1d575b60ff606460405160208101908a8252886040820152600160f91b606082015260418152611dbc8161135b565b5190200616602811611dcf575b506114c2565b6040805160208101898152918101879052600360f81b6060820152604181528891601f199160ff91606491611e05606182611376565b519020061660191115611e5c57505080158015611e52575b15611e2d5750600a175b38611dc9565b80600114908115611e47575b5015611e2757600517611e27565b905060031438611e39565b5080600214611e1d565b6040805160208101938452908101889052600360f81b60608201526061918201815260ff92606492909190611e919082611376565b519020061660321115611ede5780611eac5750600817611e27565b60018103611ebe57506001175b611e27565b60028103611ecf5750600217611e27565b600303611eb957600417611e27565b80611eec5750600217611e27565b60018103611efd5750600417611e27565b60028103611f0e5750600817611e27565b600303611eb957600117611e27565b9050611f2881612a53565b90611d90565b6001600160401b0360035460401c1690611f478161271d565b505060001960079290920b828112159283612146575b508261213a575b508161212b575b508015612120575b1561203f5760069081905b8652600260205260ff604087209116908160ff1982541617905503156114a9576001600160401b036201437042041660035491816001600160401b0384161415600014611fef5750600160401b91506fffffffffffffffffffffffffffffffff196003541617176003555b386114a9565b60019150016001600160401b03811161202b5767ffffffffffffffff60401b9060401b169067ffffffffffffffff60401b191617600355611fe9565b634e487b7160e01b85526011600452602485fd5b60096001600160401b0361205283612878565b1602806001600160401b03811603611c54576001600160401b038116806120f6575b60191190506120ec57606460ff6127106040516020810190858252886040820152600360fa1b6060820152604181526120ac8161135b565b5190200616116120ec576120bf8161271d565b5091505060ff60058260070b07811660010111611c545790600560069260070b0760ff1660010190611f7e565b6006908190611f7e565b506001600160401b038116600319810111611c54576019906001600160401b031660031901612074565b50600a821015611f73565b6001915060070b131538611f6b565b60011215915038611f64565b600783900b1215925038611f5d565b50505050565b9091506020813d602011612187575b8161217760209383611376565b810103126101c757519038611483565b3d915061216a565b6040513d85823e3d90fd5b60405162461bcd60e51b81526020600482015260146024820152731c9bdbdb481b9bdd0818dc99585d1959081e595d60621b6044820152606490fd5b6040908151906121e582611340565b6000908183528160806020948286820152828782015282606082015201528260018060a01b0360065416916024865180948193630178fe3f60e01b835260048301525afa9182156122ae57809261227e575b505082519261224584611340565b8160f81c845261ffff92838360e81c169085015263ffffffff8260c81c1690840152818160b81c16606084015260a81c16608082015290565b9091508282813d83116122a7575b6122968183611376565b810103126103325750513880612237565b503d61228c565b8451903d90823e3d90fd5b6000908082526020600281526040600281852001936001600160401b03938486541690816122eb575b50505050505050565b6005548451634a83e9cd60e11b815260048101939093528590839060249082906001600160a01b03165afa918215612495578392612466575b5081156122e2576123b96123b46123c96123cf936123b96123b46123c36001986123a960ff60098f8f9083838351838101908d82528986820152603360f91b6060820152604181526123758161135b565b5190200616958251918201928b8452820152606760f81b60608201526041815261239e8161135b565b51902006169561271d565b509991989098612a3e565b612746565b9060070b90612913565b94612a3e565b906129c3565b936123d98561249f565b9483525220916002830192835492600283851614159283612457575b508261244e575b508161243d575b50612426575b5050805467ffffffffffffffff19169055388080808080806122e2565b67ffffffffffffffff191660021790553880612409565b60ff91505460d01c16151538612403565b159150386123fc565b825460801c16159250386123f5565b9091508481813d831161248e575b61247e8183611376565b810103126101c757519038612324565b503d612474565b84513d85823e3d90fd5b600090808252602090600182526001600160401b039182604085205460401c16801561256c57600554604051634a83e9cd60e11b81526004810183905292908190849060249082906001600160a01b03165afa928315612561578693612532575b50821561252a578560016040928661252799525220549360ff8560d01c169416149161268f565b90565b505050505090565b9080935081813d831161255a575b61254a8183611376565b810103126101c357519138612500565b503d612540565b6040513d88823e3d90fd5b5050505090565b801515806125dc575b6125835750565b620697804201908142116113015760407fc24affdb20f6529973515c5398461c1f6228edbfac531ab49e56a11433a86c9f9160018060a01b03169283600052600d602052808260002055815190600082526020820152a2565b5060095460405163c9a59e4760e01b81526004810183905290602090829060249082906001600160a01b03165afa90811561265157600091612620575b501561257c565b906020823d8211612649575b8161263960209383611376565b8101031261033257505138612619565b3d915061262c565b6040513d6000823e3d90fd5b60ff60019116019060ff821161130157565b8115612679570690565b634e487b7160e01b600052601260045260246000fd5b91909260ff600191160361271557600f9061270d575b60ff60646040516020810190858252866040820152600360f91b6060820152604181526126d18161135b565b519020069116116126e3575050600090565b612708916040519160208301526040820152600760f81b60608201526041815261135b565b600190565b5060196126a5565b505050600090565b6001600160401b039081811660070b92828260401c1660070b928260801c1660070b9160ff1c90565b60070b6003190190677fffffffffffffff198212677fffffffffffffff83131761130157565b60070b90677fffffffffffffff198212677fffffffffffffff83131761130157565b600160ff1b81146113015760000390565b90600160401b6000838203931281841281169184139015161761130157565b6127ca6127d39161271d565b5050919061276c565b60070b906000821261284a575b6127e99061276c565b60070b6000811261283c575b67800000000000000080831361282c575b811361281e575b80821315612819575090565b905090565b6128279061279f565b61280d565b916128369061279f565b91612806565b6128459061278e565b6127f5565b906128576127e99161278e565b9190506127e0565b60070b677fffffffffffffff1981146113015760000390565b6128819061271d565b50819050826000600782900b126128dc575b5060008160070b126128cc575b508060070b8260070b136000146128be57506001600160401b031690565b90506001600160401b031690565b6128d6915061285f565b386128a0565b6128e791935061285f565b9138612893565b60070b60040190677fffffffffffffff8213677fffffffffffffff1983121761130157565b9060070b9060070b0190677fffffffffffffff198212677fffffffffffffff83131761130157565b6129476125279161271d565b509160079190600081840b126129a4576129626009916128ee565b830b05915b600082820b126129855761297c6009926128ee565b900b05906129c3565b60099061299c6129976123c99461285f565b6128ee565b900b0561285f565b60096129b56129976129bd9361285f565b840b0561285f565b91612967565b90916001600160401b039067ffffffffffffffff60801b608082901b16908216808204600160801b149015171561130157600160ff1b9081019081106113015767ffffffffffffffff60401b8285169460401b1693808504600160401b14901517156113015761252793612a3691611397565b911690611397565b60099060070b02908160070b91820361130157565b8015612a705760ff8111611301576001901b9060ff821161130157565b5060019056fea26469706673582212201cbba65a2a41f927e731ff8b43f3fdd66902d05eadf08d573ce9d02f95740e9e64736f6c63430008140033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 2986,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_characters",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_uint256,t_struct(Character)2968_storage)"
+      },
+      {
+        "astId": 2991,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_rooms",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_uint256,t_struct(Room)2951_storage)"
+      },
+      {
+        "astId": 2996,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_areas",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_uint256,t_struct(Area)2981_storage)"
+      },
+      {
+        "astId": 3004,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_areaCounter",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_struct(AreaCounter)3001_storage"
+      },
+      {
+        "astId": 3006,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_adminContract",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_address"
+      },
+      {
+        "astId": 3009,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_blockHashRegister",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_contract(BlockHashRegister)13412"
+      },
+      {
+        "astId": 3012,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_charactersContract",
+        "offset": 0,
+        "slot": "6",
+        "type": "t_contract(Characters)464"
+      },
+      {
+        "astId": 3015,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_elementsContract",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_contract(Elements)13095"
+      },
+      {
+        "astId": 3018,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_gearsContract",
+        "offset": 0,
+        "slot": "8",
+        "type": "t_contract(Gears)13114"
+      },
+      {
+        "astId": 3021,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_roomsContract",
+        "offset": 0,
+        "slot": "9",
+        "type": "t_contract(Rooms)13181"
+      },
+      {
+        "astId": 3024,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_playerContract",
+        "offset": 0,
+        "slot": "10",
+        "type": "t_contract(Player)10953"
+      },
+      {
+        "astId": 3032,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_unlockedExits",
+        "offset": 0,
+        "slot": "11",
+        "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_mapping(t_uint256,t_bool)))"
+      },
+      {
+        "astId": 3044,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_quests",
+        "offset": 0,
+        "slot": "12",
+        "type": "t_mapping(t_uint256,t_mapping(t_uint64,t_struct(Quest)3037_storage))"
+      },
+      {
+        "astId": 3048,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_taxDueDate",
+        "offset": 0,
+        "slot": "13",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 3052,
+        "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+        "label": "_customRoomNames",
+        "offset": 0,
+        "slot": "14",
+        "type": "t_mapping(t_uint256,t_string_storage)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_contract(BlockHashRegister)13412": {
+        "encoding": "inplace",
+        "label": "contract BlockHashRegister",
+        "numberOfBytes": "20"
+      },
+      "t_contract(Characters)464": {
+        "encoding": "inplace",
+        "label": "contract Characters",
+        "numberOfBytes": "20"
+      },
+      "t_contract(Elements)13095": {
+        "encoding": "inplace",
+        "label": "contract Elements",
+        "numberOfBytes": "20"
+      },
+      "t_contract(Gears)13114": {
+        "encoding": "inplace",
+        "label": "contract Gears",
+        "numberOfBytes": "20"
+      },
+      "t_contract(Player)10953": {
+        "encoding": "inplace",
+        "label": "contract Player",
+        "numberOfBytes": "20"
+      },
+      "t_contract(Rooms)13181": {
+        "encoding": "inplace",
+        "label": "contract Rooms",
+        "numberOfBytes": "20"
+      },
+      "t_int64": {
+        "encoding": "inplace",
+        "label": "int64",
+        "numberOfBytes": "8"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_uint256,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_uint256,t_mapping(t_uint256,t_bool))": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => mapping(uint256 => bool))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint256,t_bool)"
+      },
+      "t_mapping(t_uint256,t_mapping(t_uint256,t_mapping(t_uint256,t_bool)))": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => mapping(uint256 => mapping(uint256 => bool)))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint256,t_mapping(t_uint256,t_bool))"
+      },
+      "t_mapping(t_uint256,t_mapping(t_uint64,t_struct(Quest)3037_storage))": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => mapping(uint64 => struct DungeonDataLayout.Quest))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint64,t_struct(Quest)3037_storage)"
+      },
+      "t_mapping(t_uint256,t_string_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => string)",
+        "numberOfBytes": "32",
+        "value": "t_string_storage"
+      },
+      "t_mapping(t_uint256,t_struct(Area)2981_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => struct DungeonDataLayout.Area)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Area)2981_storage"
+      },
+      "t_mapping(t_uint256,t_struct(Character)2968_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => struct DungeonDataLayout.Character)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Character)2968_storage"
+      },
+      "t_mapping(t_uint256,t_struct(Room)2951_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => struct DungeonDataLayout.Room)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Room)2951_storage"
+      },
+      "t_mapping(t_uint64,t_struct(Quest)3037_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint64",
+        "label": "mapping(uint64 => struct DungeonDataLayout.Quest)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Quest)3037_storage"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(Area)2981_storage": {
+        "encoding": "inplace",
+        "label": "struct DungeonDataLayout.Area",
+        "members": [
+          {
+            "astId": 2970,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "areaType",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2972,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "discovered",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2974,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "lastRoomIndex",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2976,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "currentIndex",
+            "offset": 3,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2978,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "lastRoom",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2980,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "eventBlockNumber",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "96"
+      },
+      "t_struct(AreaCounter)3001_storage": {
+        "encoding": "inplace",
+        "label": "struct DungeonDataLayout.AreaCounter",
+        "members": [
+          {
+            "astId": 2998,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "lastPeriod",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 3000,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "numAreas",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(Character)2968_storage": {
+        "encoding": "inplace",
+        "label": "struct DungeonDataLayout.Character",
+        "members": [
+          {
+            "astId": 2953,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "location",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2955,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "direction",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2957,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "floors",
+            "offset": 1,
+            "slot": "1",
+            "type": "t_int64"
+          },
+          {
+            "astId": 2959,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "slot_1",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2961,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "slot_2",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2963,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "slot_3",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2965,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "slot_4",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2967,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "slot_5",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "224"
+      },
+      "t_struct(Quest)3037_storage": {
+        "encoding": "inplace",
+        "label": "struct DungeonDataLayout.Quest",
+        "members": [
+          {
+            "astId": 3034,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "status",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 3036,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "data",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_string_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Room)2951_storage": {
+        "encoding": "inplace",
+        "label": "struct DungeonDataLayout.Room",
+        "members": [
+          {
+            "astId": 2930,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "blockNumber",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 2932,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "monsterBlockNumber",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 2934,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "numActiveCharacters",
+            "offset": 16,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 2936,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "direction",
+            "offset": 24,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2938,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "exits",
+            "offset": 25,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2940,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "kind",
+            "offset": 26,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2942,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "areaAtDiscovery",
+            "offset": 27,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2944,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "lastRoomIndex",
+            "offset": 28,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2946,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "index",
+            "offset": 29,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 2948,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "discoverer",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2950,
+            "contract": "src/dungeon/DungeonActionsFacet.sol:DungeonActionsFacet",
+            "label": "randomEvent",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "96"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "t_uint64": {
+        "encoding": "inplace",
+        "label": "uint64",
+        "numberOfBytes": "8"
+      },
+      "t_uint8": {
+        "encoding": "inplace",
+        "label": "uint8",
+        "numberOfBytes": "1"
+      }
+    }
+  }
+}

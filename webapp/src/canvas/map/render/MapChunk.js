@@ -1,6 +1,5 @@
-import 'pixi.js';
-import 'pixi-heaven';
-import 'pixi-tilemap';
+import PIXI from 'lib/pixi-compat';
+import { CompositeTilemap } from '@pixi/tilemap';
 import { get } from 'svelte/store';
 import { overrideFloor } from 'utils/utils';
 
@@ -57,15 +56,13 @@ class MapChunk extends CulledContainer {
     this.roomCoords = new Set();
 
     const x2 = CHUNK_ROOM_LENGTH * ROOM_SIZE * ROOM_TILE_SIZE;
-    const y2 = CHUNK_ROOM_LENGTH * ROOM_SIZE * ROOM_TILE_SIZE; // Add tile for walls on edge of chunk.
+    const y2 = CHUNK_ROOM_LENGTH * ROOM_SIZE * ROOM_TILE_SIZE;
 
-    // dimensions
     this.dims = new PIXI.Rectangle(this.x, this.y, x2, y2 + ROOM_TILE_SIZE);
 
     const length = 64 * ROOM_SIZE;
 
     if (DEBUG_BOXES_ENABLED) {
-      // DEBUG CODE
       this.border = new PIXI.Graphics();
       this.border.lineStyle(1, 0xff0000);
       this.border.moveTo(0, 0);
@@ -82,9 +79,6 @@ class MapChunk extends CulledContainer {
       this.initContent();
     }
 
-    /**
-     * ivan : right now, this works as extra check whether we have to update fog or room tiles
-     */
     this.showing = true;
     this.showingLock = false;
 
@@ -92,8 +86,9 @@ class MapChunk extends CulledContainer {
   }
 
   initContent() {
-    this.tilemapLower = new PIXI.tilemap.CompositeRectTileLayer(1, map.getBitmaps());
-    this.tilemapUpper = new PIXI.tilemap.CompositeRectTileLayer(2, map.getBitmaps());
+    // CompositeTilemap remplace CompositeRectTileLayer dans @pixi/tilemap v4+
+    this.tilemapLower = new CompositeTilemap();
+    this.tilemapUpper = new CompositeTilemap();
 
     this.tileLowerContainer = new PIXI.Container();
     this.tileLowerContainer.parentGroup = this.map.lowerGroup;
@@ -102,8 +97,6 @@ class MapChunk extends CulledContainer {
     this.tileUpperContainer.parentGroup = this.map.upperGroup;
     this.tileUpperContainer.addChild(this.tilemapUpper);
 
-    // TODO : @ivan might also switch layerableChildren to false if those containers dont have other
-    // parentGroup's inside.
     this.contentLower = new PIXI.Container();
     this.contentLower.parentGroup = this.map.lowerGroup;
     this.contentLower.position.set(-this.position.x, -this.position.y);
@@ -114,9 +107,10 @@ class MapChunk extends CulledContainer {
     this.contentUpper.position.set(-this.position.x, -this.position.y);
     this.contentUpper.sortableChildren = true;
 
-    // Use only one fog tilemap as it is used to render to textures, not stored per chunk.
-    this.tilemapFog = new PIXI.tilemap.CompositeRectTileLayer(10, [PIXI.utils.TextureCache.fog_gradient]);
-    this.tilemapFog.parentGroup = map.fogGroup;
+    // Fog tilemap
+    const fogTexture = PIXI.Assets.get('fog_gradient') || PIXI.Texture.WHITE;
+    this.tilemapFog = new CompositeTilemap();
+    this.tilemapFog.parentGroup = this.map.fogGroup;
     this.addChild(this.tilemapFog);
 
     this.debugContainer = new PIXI.Container();
@@ -208,7 +202,6 @@ class MapChunk extends CulledContainer {
     if (!this.showing) {
       return;
     }
-
     this.removeContent();
     this.showing = false;
   }
@@ -244,19 +237,14 @@ class MapChunk extends CulledContainer {
   }
 
   drawRooms() {
-    // TODO: Make sure that room shapes work properly with calculating max and min tile offsets outside of the
-    //  standard chunk range. These variables will be placeholer for now. -Josh
-
     this.tilemapLower.clear();
     this.tilemapUpper.clear();
 
-    // LOWER TILES
     this.rooms.forEach(room => {
       room.drawExterior(this, 'lower');
       room.drawInterior(this, 'lower');
     });
 
-    // UPPER TILES
     this.rooms.forEach(room => {
       room.drawExterior(this, 'upper');
       room.drawInterior(this, 'upper');
@@ -270,9 +258,7 @@ class MapChunk extends CulledContainer {
 
   renderFog() {
     if (this.tilemapFog) {
-      // Clear the tilemap last to not store unused tile data between fog draws.
       this.tilemapFog.clear();
-      // Draw each room's fog pass.
       this.rooms.forEach(room => {
         if (room.isLit()) {
           room.drawFog(this);
@@ -281,15 +267,11 @@ class MapChunk extends CulledContainer {
     }
   }
 
-  /**
-   * @param room {Room}
-   */
   addRoom(room) {
     if (!this.culled && !this.roomCoords.has(room.coordinates)) {
       this.rooms.push(room);
       this.roomCoords.add(room.coordinates);
 
-      // Debug room boxes.
       if (this.debugContainer) {
         if (room.box) {
           this.debugContainer.addChild(room.box);
@@ -305,7 +287,6 @@ class MapChunk extends CulledContainer {
       room.contentUpper.zIndex = zIndex;
       this.contentUpper.addChild(room.contentUpper);
 
-      // Let the chunk know that we need to redraw.
       this.setDirty(true);
     } else {
       console.log(`contains room ${room.coordinates}`);
@@ -354,10 +335,6 @@ class MapChunk extends CulledContainer {
     return false;
   }
 
-  /**
-   * @override
-   *
-   */
   _doCull() {
     const lastCulled = this.culled;
     this.culled = this.isOutsideViewport();
@@ -372,4 +349,4 @@ class MapChunk extends CulledContainer {
   }
 }
 
-export default MapChunk;
+export default MapChunk;  

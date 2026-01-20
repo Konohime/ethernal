@@ -88,7 +88,7 @@
     </span>
     <br />
     <span class="res slot">
-      $MATIC
+      $ETH
       <span class="highlight">{$claim.balance || '0'}</span>
     </span>
   </div>

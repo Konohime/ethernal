@@ -1,5 +1,12 @@
-import 'pixi.js';
-import { ease } from 'pixi-ease';
+/**
+ * UI.js - Migrated to PIXI 7
+ * 
+ * Changes:
+ * - Import from pixi-compat
+ * - gsap replaces pixi-ease for animations
+ */
+import PIXI from 'lib/pixi-compat';
+import gsap from 'gsap';
 
 import layerGroups from 'canvas/common/layersGroup';
 import ActionButton from 'canvas/common/ActionButton';
@@ -73,14 +80,17 @@ export default class UI {
 
     if (this.currentLabel && this.currentLabel.uniqueLocation !== id) {
       group.alpha = 0;
-      ease.add(group, { alpha: 1 }, { duration: 200 });
+      gsap.to(group, { alpha: 1, duration: 0.2 });
     }
     this.removeCurrentLabel();
 
     this._intv = setTimeout(() => {
-      const fadeout = ease.add(this.currentLabel, { alpha: 0 }, { duration: 200 });
-      fadeout.once('complete', () => {
-        this.removeCurrentLabel();
+      gsap.to(this.currentLabel, {
+        alpha: 0,
+        duration: 0.2,
+        onComplete: () => {
+          this.removeCurrentLabel();
+        }
       });
     }, 3000);
 
@@ -106,35 +116,12 @@ export default class UI {
    * @returns {null|PIXI.Container}
    */
   buttons({ id, parent, buttons, onCancel }) {
-    // text, onCancel, onConfirm, disabled, data, uniqueLocation, confirmClose = true
-
-    // DISABLED ROOM CLICKING TO TOGGLE
-    // let repeatClose = false;
-    // if (this.current && this.current.uniqueLocation && this.current.uniqueLocation === uniqueLocation) {
-    //   repeatClose = true;
-    // }
-
     // Ensure fresh buttons
     this.removeCurrent();
-
-    // DISABLED ROOM CLICKING TO TOGGLE
-    // if (repeatClose) {
-    //   return null;
-    // }
 
     const group = new PIXI.Container();
     group.parentGroup = UI_GROUP;
     group.uniqueLocation = id;
-
-    // @TODO: based on position in viewport show it below or above
-    // const screenPoint = this.viewport.toScreen(parent.x, parent.y);
-    // if (screenPoint.y > this.viewport.screenWorldHeight - 200) {
-    //   newAction.x = 25;
-    //   newAction.y = -60;
-    // } else {
-    //   newAction.x = 25;
-    //   newAction.y = 80;
-    // }
 
     this.current = group;
     this.onCancel = onCancel;
@@ -152,8 +139,8 @@ export default class UI {
           // Allow confirming text override
           if (confirmingText) {
             // Remove all buttons
-            for (let i = group.children.length - 1; i >= 0; i -= 1) {
-              group.removeChild(group.children[i]);
+            for (let j = group.children.length - 1; j >= 0; j -= 1) {
+              group.removeChild(group.children[j]);
             }
             const replacement = new ActionButton('wide', confirmingText);
             replacement.disable();

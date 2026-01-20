@@ -9,7 +9,7 @@
   const waiting = false;
   let writing = true;
 
-  const subtext = `Your $MATIC balance and items will be stored in your ${
+  const subtext = `Your $ETH balance and items will be stored in your ${
     useLocalKey ? '' : 'Portis'
   } wallet once you enter the dungeon.`;
 </script>

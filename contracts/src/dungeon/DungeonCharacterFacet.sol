@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "./DungeonFacetBase.sol";
 import "./PureDungeon.sol";
@@ -17,7 +18,7 @@ contract DungeonCharacterFacet is DungeonFacetBase {
         uint256 location = _characters[characterId].location;
         _actualiseRoom(location);
         require(_rooms[location].kind == PureDungeon.ROOM_TYPE_TEMPLE, "current room not temple");
-        uint16 newHp = PureDungeon._limitedChange(data.hp, data.maxHP, hp);
+        uint16 newHp = PureDungeon._limitedChange(data.hp, data.maxHP, int16(hp));
         uint256 hpCost = PureDungeon._hpCost(newHp - data.hp);
         _pay(characterId, location, PureDungeon.COINS, hpCost);
         data.hp = newHp;
@@ -63,7 +64,7 @@ contract DungeonCharacterFacet is DungeonFacetBase {
         _setCharacterData(newCharId, stats);
         _addInitialGears(newCharId);
         _characters[newCharId].floors = character.floors;
-        _charactersContract.transferFrom(address(this), address(subOwner), newCharId);
+        _charactersContract.transferFrom(address(this), address(uint160(subOwner)), newCharId);
         // start outside of dungeon
 
         emit Resurrect(characterId, newCharId);

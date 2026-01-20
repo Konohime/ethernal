@@ -21,10 +21,10 @@
     on the way. What good fortune!
   </p>
   {#if useLocalKey}
-    <p class="subtext">Set up a wallet to store your items and $MATIC.</p>
+    <p class="subtext">Set up a wallet to store your items and $ETH.</p>
     <!-- <p class="subtext"><small><i>* Tip: You can find them in your bag once you enter the dungeon *</i></small></p> -->
   {:else}
-    <p class="subtext">Store the items and $MATIC safely in a wallet.</p>
+    <p class="subtext">Store the items and $ETH safely in a wallet.</p>
     <!-- <p class="subtext">><small><i>* Tip: You can find them in your bag once you enter the dungeon *</i></small></p> -->
   {/if}
 

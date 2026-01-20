@@ -1,6 +1,12 @@
-module.exports = async ({deployments, network, getNamedAccounts}) => {
-  const dev_forceMine = !network.live;
+module.exports = async ({deployments, getNamedAccounts}) => {
   const {deploy} = deployments;
   const {deployer} = await getNamedAccounts();
-  await deploy('BlockHashRegister', {from: deployer, dev_forceMine: true, log: true});
+  
+  await deploy('BlockHashRegister', {
+    from: deployer,
+    log: true,
+    waitConfirmations: 1,
+  });
 };
+
+module.exports.tags = ['BlockHashRegister', 'core'];

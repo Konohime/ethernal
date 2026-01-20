@@ -1,6 +1,7 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-import "buidler-deploy/solc_0.6/proxy/Proxied.sol";
+import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./CharactersDataLayout.sol";
 
 contract Characters is Proxied, CharactersDataLayout {
@@ -101,7 +102,7 @@ contract Characters is Proxied, CharactersDataLayout {
         uint256 id
     ) external {
         require(from != address(0), "from is zero address");
-        require(to != address(0), "from is zero address");
+        require(to != address(0), "to is zero address");
         address owner = _owners[id];
         require(owner == from, "from is not owner");
         _subOwner[id][owner] = 0;

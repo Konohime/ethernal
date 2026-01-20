@@ -15,7 +15,12 @@ class Sockets {
     const privileged = process.env.PRIVILEGED_ADDRESSES;
     this.privilegedAddresses = new Set(privileged ? privileged.split(',').map(s => s.trim().toLowerCase()) : []);
     console.log('privileged addresses', Array.from(this.privilegedAddresses));
-    this.io = socketio(server);
+    this.io = socketio(server, {
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+      }
+    });
     this.io.on('connection', socket => {
       socket.emit('hello');
 

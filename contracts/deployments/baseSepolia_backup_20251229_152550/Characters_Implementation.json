@@ -1,0 +1,411 @@
+{
+  "address": "0x385390Ca76959d00FfD2d8d7360aA053423887B0",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "data",
+          "type": "uint256"
+        }
+      ],
+      "name": "CharacterUpdate",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "fullOwnerOf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "subOwner",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getData",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "getDataFor",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getSubOwner",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "subOwner",
+          "type": "uint256"
+        }
+      ],
+      "name": "mint",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "name": "mintTo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "ownerOf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "tokenOwner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "postUpgrade",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "data",
+          "type": "uint256"
+        }
+      ],
+      "name": "setData",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "subOwner",
+          "type": "uint256"
+        }
+      ],
+      "name": "setSubOwner",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "id",
+          "type": "bytes4"
+        }
+      ],
+      "name": "supportsInterface",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x948fa6b5a00ddf1d4563e2f6aa9f25e920b4b424600faafb83b24d88c2144538",
+  "receipt": {
+    "to": null,
+    "from": "0x78fAf6C26b364141fAd67c544A2DdE6Bc985baf4",
+    "contractAddress": "0x385390Ca76959d00FfD2d8d7360aA053423887B0",
+    "transactionIndex": 15,
+    "gasUsed": "479819",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x15e95754702cac386aba92e65f90181ded27092815c2b3adc5279d0c9753081a",
+    "transactionHash": "0x948fa6b5a00ddf1d4563e2f6aa9f25e920b4b424600faafb83b24d88c2144538",
+    "logs": [],
+    "blockNumber": 34591082,
+    "cumulativeGasUsed": "2243518",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "3705cadeb86e4cfd473ba34c32cdc277",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"data\",\"type\":\"uint256\"}],\"name\":\"CharacterUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"fullOwnerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"subOwner\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"getData\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"getDataFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"getSubOwner\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"subOwner\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"mintTo\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"ownerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"postUpgrade\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"data\",\"type\":\"uint256\"}],\"name\":\"setData\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"subOwner\",\"type\":\"uint256\"}],\"name\":\"setSubOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"id\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/characters/Characters.sol\":\"Characters\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nabstract contract Proxied {\\n    /// @notice to be used by initialisation / postUpgrade function so that only the proxy's admin can execute them\\n    /// It also allows these functions to be called inside a contructor\\n    /// even if the contract is meant to be used without proxy\\n    modifier proxied() {\\n        address proxyAdminAddress = _proxyAdmin();\\n        // With hardhat-deploy proxies\\n        // the proxyAdminAddress is zero only for the implementation contract\\n        // if the implementation contract want to be used as a standalone/immutable contract\\n        // it simply has to execute the `proxied` function\\n        // This ensure the proxyAdminAddress is never zero post deployment\\n        // And allow you to keep the same code for both proxied contract and immutable contract\\n        if (proxyAdminAddress == address(0)) {\\n            // ensure can not be called twice when used outside of proxy : no admin\\n            // solhint-disable-next-line security/no-inline-assembly\\n            assembly {\\n                sstore(\\n                    0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103,\\n                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\\n                )\\n            }\\n        } else {\\n            require(msg.sender == proxyAdminAddress);\\n        }\\n        _;\\n    }\\n\\n    modifier onlyProxyAdmin() {\\n        require(msg.sender == _proxyAdmin(), \\\"NOT_AUTHORIZED\\\");\\n        _;\\n    }\\n\\n    function _proxyAdmin() internal view returns (address ownerAddress) {\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            ownerAddress := sload(0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xaaceeafeeaf0d200ca3942d8bf14c1c4f787a77f79cc87c08bb668e65acdee29\",\"license\":\"MIT\"},\"src/characters/Characters.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"hardhat-deploy/solc_0.8/proxy/Proxied.sol\\\";\\nimport \\\"./CharactersDataLayout.sol\\\";\\n\\ncontract Characters is Proxied, CharactersDataLayout {\\n    event CharacterUpdate(uint256 indexed id, address indexed owner, uint256 data);\\n    event Transfer(address indexed from, address indexed to, uint256 indexed id);\\n\\n    function postUpgrade() external proxied {\\n        if (nextId == 0) {\\n            nextId = 1;\\n        }\\n    }\\n\\n    function getSubOwner(uint256 id) external view returns (uint256) {\\n        return _subOwner[id][_owners[id]];\\n    }\\n\\n    function setSubOwner(uint256 id, uint256 subOwner) external {\\n        require(msg.sender == _owners[id], \\\"only owner is able to set sub owner\\\");\\n        _setSubOwnerFor(id, msg.sender, subOwner);\\n    }\\n\\n    function _setSubOwnerFor(\\n        uint256 id,\\n        address owner,\\n        uint256 subOwner\\n    ) internal {\\n        // TODO emit SubOwnerTransferEvent\\n        _subOwner[id][owner] = subOwner;\\n    }\\n\\n    function mintTo(address to) external returns (uint256) {\\n        return _mint(to);\\n    }\\n\\n    // subowner is uint(address) of player currently\\n    // when subowner == 0 character is considered not in the dungeon\\n    function mint(uint256 subOwner) external returns (uint256) {\\n        uint256 id = _mint(msg.sender);\\n        _setSubOwnerFor(id, msg.sender, subOwner);\\n        return id;\\n    }\\n\\n    function _mint(address to) internal returns (uint256) {\\n        uint256 id = nextId++;\\n        _owners[id] = to;\\n        _numPerOwners[to]++;\\n        emit Transfer(address(0), to, id);\\n        return id;\\n    }\\n\\n    function getData(uint256 id) external view returns (uint256) {\\n        return _data[id][msg.sender];\\n    }\\n\\n    function getDataFor(uint256 id, address owner) external view returns (uint256) {\\n        return _data[id][owner];\\n    }\\n\\n    // TODO only dungeon should be able to set data\\n    // currently this can be called by the player when characters is outside of dungeon\\n    function setData(uint256 id, uint256 data) external {\\n        require(msg.sender == _ownerOf(id), \\\"only owner is allowed to set data\\\");\\n        _setDataFor(id, msg.sender, data);\\n    }\\n\\n    function _setDataFor(\\n        uint256 id,\\n        address owner,\\n        uint256 data\\n    ) internal {\\n        _data[id][owner] = data;\\n        emit CharacterUpdate(id, owner, data);\\n    }\\n\\n    function _ownerOf(uint256 id) internal view returns (address) {\\n        return _owners[id];\\n    }\\n\\n    function fullOwnerOf(uint256 id) external view returns (address owner, uint256 subOwner) {\\n        owner = _ownerOf(id);\\n        subOwner = _subOwner[id][owner];\\n    }\\n\\n    // EIP-721 Standard\\n    function ownerOf(uint256 id) external view returns (address tokenOwner) {\\n        tokenOwner = _ownerOf(id);\\n        require(tokenOwner != address(0), \\\"token does not exist\\\");\\n    }\\n\\n    function balanceOf(address who) external view returns (uint256) {\\n        require(who != address(0), \\\"zero address\\\");\\n        return _numPerOwners[who];\\n    }\\n\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 id\\n    ) external {\\n        require(from != address(0), \\\"from is zero address\\\");\\n        require(to != address(0), \\\"to is zero address\\\");\\n        address owner = _owners[id];\\n        require(owner == from, \\\"from is not owner\\\");\\n        _subOwner[id][owner] = 0;\\n        _owners[id] = to;\\n        _numPerOwners[from]--;\\n        _numPerOwners[to]++;\\n    }\\n\\n    function supportsInterface(bytes4 id) external pure returns (bool) {\\n        // TODO metadata || id == 0x5b5e139f;\\n        return id == 0x01ffc9a7 || id == 0x80ac58cd;\\n    }\\n}\\n\",\"keccak256\":\"0xcc9355031d7447f7b27da41ff240cfdf96cc59c5d4e273d3f7940ce95b22ef30\",\"license\":\"MIT\"},\"src/characters/CharactersDataLayout.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract CharactersDataLayout {\\n    uint256 nextId;\\n    mapping(uint256 => address) _owners;\\n    mapping(address => uint256) _numPerOwners;\\n    mapping(uint256 => mapping(address => uint256)) _subOwner;\\n    mapping(uint256 => mapping(address => uint256)) _data;\\n}\\n\",\"keccak256\":\"0x8b2acf9ac90aabf99ea230bfdefd3a9fbe70851f94cc5be2c331543560d7f811\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60808060405234610016576107b5908161001c8239f35b600080fdfe6080604081815260048036101561001557600080fd5b600092833560e01c9081630178fe3f146106675750806301ffc9a71461061257806323b872dd1461049d5780632ac638e4146104575780632c53bc64146103f15780633038bb08146103b15780634848b1a5146102f55780636352211e1461027e57806370a082311461020b578063755edd17146101de5780637fbddc471461013e578063a0712d68146100f55763de572b76146100b257600080fd5b346100f157816003193601126100f15760209282916100cf6106b3565b813583529085528282206001600160a01b039091168252845220549051908152f35b8280fd5b5090346100f15760203660031901126100f1576020925061013861011833610704565b600081815260036020908152604080832033845290915290209335909355565b51908152f35b508290346101da5761014f366106c9565b8184526001602052848420549092906001600160a01b0316330361018b5750600090815260036020908152604080832033845290915290205580f35b608490602086519162461bcd60e51b8352820152602360248201527f6f6e6c79206f776e65722069732061626c6520746f2073657420737562206f776044820152623732b960e91b6064820152fd5b5080fd5b5050346101da5760203660031901126101da576020906102046101ff610698565b610704565b9051908152f35b508290346101da5760203660031901126101da576001600160a01b0361022f610698565b1690811561024c5760208480858581526002845220549051908152f35b606490602085519162461bcd60e51b8352820152600c60248201526b7a65726f206164647265737360a01b6044820152fd5b5082346102f25760203660031901126102f257813581526001602052829020546001600160a01b03169081156102b8575060209151908152f35b606490602084519162461bcd60e51b835282015260146024820152731d1bdad95b88191bd95cc81b9bdd08195e1a5cdd60621b6044820152fd5b80fd5b50346100f157610304366106c9565b81855260016020528385205490939192906001600160a01b03163303610365578285526020528084203385526020528281852055519182527f0324611978ffe2df69227853d6503c1eee913c0a8e7bff62b65e6d2966add44260203393a380f35b6020608492519162461bcd60e51b8352820152602160248201527f6f6e6c79206f776e657220697320616c6c6f77656420746f20736574206461746044820152606160f81b6064820152fd5b50346100f15760203660031901126100f1573582526003602090815281832060018252828420546001600160a01b03168452815291819020549051908152f35b83346102f257806003193601126102f2577fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d610380546001600160a01b03919082168061044a5750555b8054156104435780f35b6001815580f35b9150503303156104395780fd5b508290346101da5760203660031901126101da5735815260016020528160018060a01b038183205416916003602052818120838252602052205482519182526020820152f35b509190346101da5760603660031901126101da576104b9610698565b6104c16106b3565b6001600160a01b0391604435919083169081156105d85783169182156105a0578086526020936001855285872054168281036105695781875260038552858720908752845284862086905585526001835283852080546001600160a01b031916831790558452600282528284208054801561055657600294959650600019019055845252812061055181546106df565b905580f35b634e487b7160e01b865260118752602486fd5b855162461bcd60e51b81528089018690526011602482015270333937b69034b9903737ba1037bbb732b960791b6044820152606490fd5b845162461bcd60e51b81526020818901526012602482015271746f206973207a65726f206164647265737360701b6044820152606490fd5b845162461bcd60e51b8152602081890152601460248201527366726f6d206973207a65726f206164647265737360601b6044820152606490fd5b50346100f15760203660031901126100f157359063ffffffff60e01b82168092036100f157602092506301ffc9a760e01b8214918215610656575b50519015158152f35b6380ac58cd60e01b1491503861064d565b92919050346106945760203660031901126106945792836020943582528452818120338252845220548152f35b8380fd5b600435906001600160a01b03821682036106ae57565b600080fd5b602435906001600160a01b03821682036106ae57565b60409060031901126106ae576004359060243590565b60001981146106ee5760010190565b634e487b7160e01b600052601160045260246000fd5b60008054918291610714836106df565b815582815260016020908152604080832080546001600160a01b0319166001600160a01b039095169485179055838352600290915281208054610756906106df565b90557fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef8180a49056fea26469706673582212200bb90d46a8060ee630d2b584a98b7903c4b15e7c2c60cf3c15400d43ac36dbaa64736f6c63430008140033",
+  "deployedBytecode": "0x6080604081815260048036101561001557600080fd5b600092833560e01c9081630178fe3f146106675750806301ffc9a71461061257806323b872dd1461049d5780632ac638e4146104575780632c53bc64146103f15780633038bb08146103b15780634848b1a5146102f55780636352211e1461027e57806370a082311461020b578063755edd17146101de5780637fbddc471461013e578063a0712d68146100f55763de572b76146100b257600080fd5b346100f157816003193601126100f15760209282916100cf6106b3565b813583529085528282206001600160a01b039091168252845220549051908152f35b8280fd5b5090346100f15760203660031901126100f1576020925061013861011833610704565b600081815260036020908152604080832033845290915290209335909355565b51908152f35b508290346101da5761014f366106c9565b8184526001602052848420549092906001600160a01b0316330361018b5750600090815260036020908152604080832033845290915290205580f35b608490602086519162461bcd60e51b8352820152602360248201527f6f6e6c79206f776e65722069732061626c6520746f2073657420737562206f776044820152623732b960e91b6064820152fd5b5080fd5b5050346101da5760203660031901126101da576020906102046101ff610698565b610704565b9051908152f35b508290346101da5760203660031901126101da576001600160a01b0361022f610698565b1690811561024c5760208480858581526002845220549051908152f35b606490602085519162461bcd60e51b8352820152600c60248201526b7a65726f206164647265737360a01b6044820152fd5b5082346102f25760203660031901126102f257813581526001602052829020546001600160a01b03169081156102b8575060209151908152f35b606490602084519162461bcd60e51b835282015260146024820152731d1bdad95b88191bd95cc81b9bdd08195e1a5cdd60621b6044820152fd5b80fd5b50346100f157610304366106c9565b81855260016020528385205490939192906001600160a01b03163303610365578285526020528084203385526020528281852055519182527f0324611978ffe2df69227853d6503c1eee913c0a8e7bff62b65e6d2966add44260203393a380f35b6020608492519162461bcd60e51b8352820152602160248201527f6f6e6c79206f776e657220697320616c6c6f77656420746f20736574206461746044820152606160f81b6064820152fd5b50346100f15760203660031901126100f1573582526003602090815281832060018252828420546001600160a01b03168452815291819020549051908152f35b83346102f257806003193601126102f2577fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d610380546001600160a01b03919082168061044a5750555b8054156104435780f35b6001815580f35b9150503303156104395780fd5b508290346101da5760203660031901126101da5735815260016020528160018060a01b038183205416916003602052818120838252602052205482519182526020820152f35b509190346101da5760603660031901126101da576104b9610698565b6104c16106b3565b6001600160a01b0391604435919083169081156105d85783169182156105a0578086526020936001855285872054168281036105695781875260038552858720908752845284862086905585526001835283852080546001600160a01b031916831790558452600282528284208054801561055657600294959650600019019055845252812061055181546106df565b905580f35b634e487b7160e01b865260118752602486fd5b855162461bcd60e51b81528089018690526011602482015270333937b69034b9903737ba1037bbb732b960791b6044820152606490fd5b845162461bcd60e51b81526020818901526012602482015271746f206973207a65726f206164647265737360701b6044820152606490fd5b845162461bcd60e51b8152602081890152601460248201527366726f6d206973207a65726f206164647265737360601b6044820152606490fd5b50346100f15760203660031901126100f157359063ffffffff60e01b82168092036100f157602092506301ffc9a760e01b8214918215610656575b50519015158152f35b6380ac58cd60e01b1491503861064d565b92919050346106945760203660031901126106945792836020943582528452818120338252845220548152f35b8380fd5b600435906001600160a01b03821682036106ae57565b600080fd5b602435906001600160a01b03821682036106ae57565b60409060031901126106ae576004359060243590565b60001981146106ee5760010190565b634e487b7160e01b600052601160045260246000fd5b60008054918291610714836106df565b815582815260016020908152604080832080546001600160a01b0319166001600160a01b039095169485179055838352600290915281208054610756906106df565b90557fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef8180a49056fea26469706673582212200bb90d46a8060ee630d2b584a98b7903c4b15e7c2c60cf3c15400d43ac36dbaa64736f6c63430008140033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 468,
+        "contract": "src/characters/Characters.sol:Characters",
+        "label": "nextId",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 472,
+        "contract": "src/characters/Characters.sol:Characters",
+        "label": "_owners",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_uint256,t_address)"
+      },
+      {
+        "astId": 476,
+        "contract": "src/characters/Characters.sol:Characters",
+        "label": "_numPerOwners",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 482,
+        "contract": "src/characters/Characters.sol:Characters",
+        "label": "_subOwner",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))"
+      },
+      {
+        "astId": 488,
+        "contract": "src/characters/Characters.sol:Characters",
+        "label": "_data",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_uint256,t_address)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => address)",
+        "numberOfBytes": "32",
+        "value": "t_address"
+      },
+      "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => mapping(address => uint256))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_address,t_uint256)"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

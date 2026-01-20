@@ -21,7 +21,7 @@
       <UseKeyScreen next="{() => claim.claim()}" />
     {:else if $claim.status === 'Claimed' || $claim.status === 'None'}
       <TypingTextScreen
-        buttonText="Pay {FOOD_PRICE} $MATIC for food"
+        buttonText="Pay {FOOD_PRICE} $ETH for food"
         disableSkip="true"
         waitText="The elemental counts your money while you check the food...."
         text="An elemental appears: “You need food to survive in the dungeon. Remember, in the Ethernal every action

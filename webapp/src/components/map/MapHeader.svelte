@@ -1,6 +1,5 @@
 <script>
   import { menuOverlay } from 'stores/screen';
-  import { BigNumber } from 'ethers';
 
   import { playerEnergy, characterBalances, characterStatus, needFood } from 'lib/cache';
   import config from 'data/config';
@@ -17,7 +16,7 @@
   import IconCoin from 'assets/icons/coin_2x.png';
 
   $: price = config($wallet.chainId).price;
-  $: energy = $playerEnergy && BigNumber.from($playerEnergy).mul(100).div(BigNumber.from(price)).toNumber();
+  $: energy = $playerEnergy && Number((BigInt($playerEnergy) * 100n) / BigInt(price));
   $: energyLevel = Math.min(100, energy);
   $: coins = $characterBalances.coins;
   $: keys = $characterBalances.keys;

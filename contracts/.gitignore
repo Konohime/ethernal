@@ -1,13 +1,43 @@
-node_modules
-yarn-error.log
-.mnemonic*
-.priv*
-.bitski*
-test_deployments
-.claimKeys*
-.backend_privateKey
+# Dependencies
+node_modules/
+
+# Build
 artifacts/
 cache/
-deployments/localhost_*
-scripts/sendFood.js
-deployments/buidlerevm_*
+typechain-types/
+
+# Coverage
+coverage/
+coverage.json
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Secrets - NE JAMAIS COMMIT
+.mnemonic
+mnemonic.local
+*.pem
+*.key
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Hardhat
+deployments/localhost/
+deployments/hardhat/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+*.tgz

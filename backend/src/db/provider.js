@@ -5,9 +5,13 @@ const retry = require('p-retry');
 const Promise = require('bluebird');
 const memoize = require('memoizee');
 const taim = require('taim');
-const VM = require('ethereumjs-vm').default;
-const { Transaction } = require('ethereumjs-tx');
-const { privateToAddress } = require('ethereumjs-util');
+
+// Nouvelles imports @ethereumjs
+const { createVM, runTx } = require('@ethereumjs/vm');
+const { Common, Mainnet, Hardfork } = require('@ethereumjs/common');
+const { createLegacyTx } = require('@ethereumjs/tx');
+const { Address, privateToAddress, hexToBytes } = require('@ethereumjs/util');
+
 const { simpleEncode, simpleDecode } = require('ethereumjs-abi');
 const contractsInfo = process.env.DEV ? require('../dev_contractsInfo.json') : require('../contractsInfo.json');
 const Postgres = require('./postgres');
@@ -62,34 +66,42 @@ const setupAuthorization = async ({ DungeonAdmin }) => {
 };
 
 const setupPureContract = async deploymentBytecode => {
-  const accountPk = Buffer.from('e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109', 'hex');
-  const accountAddress = privateToAddress(accountPk);
-  const vm = new VM();
-  const tx = new Transaction({
-    value: 0,
-    gasLimit: 10000000, // We assume that 10M is enough,
-    gasPrice: 0,
-    data: deploymentBytecode,
-    nonce: 0,
-  });
-  tx.sign(accountPk);
-  const deploymentResult = await vm.runTx({ tx });
+  const accountPk = hexToBytes('0xe331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109');
+  const accountAddress = new Address(privateToAddress(accountPk));
+  
+  // Utiliser Berlin (avant EIP-1559) pour éviter les problèmes de baseFee
+  const common = new Common({ chain: Mainnet, hardfork: Hardfork.Berlin });
+  const vm = await createVM({ common });
+  
+  const txData = {
+    value: 0n,
+    gasLimit: 10000000n,
+    gasPrice: 1n, // Mettre au moins 1
+    data: hexToBytes(deploymentBytecode.startsWith('0x') ? deploymentBytecode : '0x' + deploymentBytecode),
+    nonce: 0n,
+  };
+  
+  const tx = createLegacyTx(txData, { common });
+  const signedTx = tx.sign(accountPk);
+  
+  const deploymentResult = await runTx(vm, { tx: signedTx, skipBalance: true, skipNonce: true });
   if (deploymentResult.execResult.exceptionError) {
     throw deploymentResult.execResult.exceptionError;
   }
   const contractAddress = deploymentResult.createdAddress;
   console.log('vm for pure calls started');
+  
   return async (funcSig, args) => {
-    const callResult = await vm.runCall({
+    const callResult = await vm.evm.runCall({
       to: contractAddress,
       caller: accountAddress,
-      origin: accountAddress, // The tx.origin is also the caller here
+      origin: accountAddress,
       data: simpleEncode(funcSig, ...args),
     });
     if (callResult.execResult.exceptionError) {
       throw callResult.execResult.exceptionError;
     }
-    return simpleDecode(funcSig, callResult.execResult.returnValue);
+    return simpleDecode(funcSig, Buffer.from(callResult.execResult.returnValue));
   };
 };
 

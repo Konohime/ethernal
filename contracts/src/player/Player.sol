@@ -1,6 +1,7 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-import "buidler-deploy/solc_0.6/proxy/Proxied.sol";
+import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./PlayerDataLayout.sol";
 import "../utils/MetaTransactionReceiver.sol";
 import "./Pool.sol";
@@ -36,7 +37,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     }
 
     function getEnergy(address playerAddress) external view returns (uint256 energy, uint256 freeEnergy) {
-        Player storage player = _players[playerAddress];
+        PlayerStruct storage player = _players[playerAddress];
         energy = player.energy;
         freeEnergy = player.freeEnergy;
     }
@@ -47,7 +48,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         view
         returns (uint256 energy, uint256 freeEnergy)
     {
-        Player storage player = _players[playerAddress];
+        PlayerStruct storage player = _players[playerAddress];
         energy = player.energy;
         freeEnergy = player.freeEnergy;
     }
@@ -93,7 +94,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         if (newDelegate != address(0)) {
             _addDelegate(sender, newDelegate);
         }
-        _holder.enter.value(value)(sender, characterId, name, class, location);
+        _holder.enter{value: value}(sender, characterId, name, class, location);
         _lastCharacterIds[sender] = characterId;
     }
 
@@ -110,13 +111,13 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint256 characterId = _getFirstParam(data);
         require(_charactersContract.ownerOf(characterId) == address(_holder), "_holder does not own character");
         uint256 playerAddress = _charactersContract.getSubOwner(characterId);
-        if (uint256(sender) != playerAddress) {
-            require(uint256(_delegates[sender]) == playerAddress, "sender is not delegate of character's player");
+        if (uint256(uint160(sender)) != playerAddress) {
+            require(uint256(uint160(_delegates[sender])) == playerAddress, "sender is not delegate of character's player");
         }
 
         (success, returnData) = _executeWithSpecificGas(destination, gasLimit, data);
 
-        Player storage player = _players[address(playerAddress)];
+        PlayerStruct storage player = _players[address(uint160(playerAddress))];
         uint256 energy = player.energy;
         uint256 txCharge = ((initialGas - gasleft()) + 10000) * tx.gasprice;
         uint256 freeEnergyFee = (txCharge * 10) / 100; // 10% extra is used for free energy
@@ -139,7 +140,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
                 }
 
                 if (balanceToGive > 0) {
-                    msg.sender.transfer(balanceToGive);
+                    payable(msg.sender).transfer(balanceToGive);
                 }
             }
         }
@@ -215,7 +216,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint256 gasLimit,
         bytes memory data
     ) internal returns (bool success, bytes memory returnData) {
-        (success, returnData) = to.call.gas(gasLimit)(data);
+        (success, returnData) = to.call{gas: gasLimit}(data);
         assert(gasleft() > gasLimit / 63);
         // not enough gas provided, assert to throw all gas // TODO use EIP-1930
     }

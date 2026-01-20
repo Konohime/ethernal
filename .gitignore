@@ -1,11 +1,28 @@
-.DS_Store
-._*
-.vscode/
-.idea/
-build/
-*.vim
+# Dependencies
 node_modules/
-.env*
-webapp/yarn.lock
-.mnemonic*
-yarn.lock
+
+# Environment variables (TRÈS IMPORTANT)
+.env
+.env.local
+.env.*.local
+
+# Hardhat
+cache/
+artifacts/
+typechain/
+typechain-types/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database local
+*.db
+*.sqlite

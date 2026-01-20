@@ -1,7 +1,10 @@
-import 'pixi.js';
+/**
+ * NameTag - Migrated to PIXI 7
+ */
+import PIXI from 'lib/pixi-compat';
 
 export default class NameTag extends PIXI.Container {
-  constructor(name, opts) {
+  constructor(name, opts = {}) {
     super();
 
     const tCache = PIXI.utils.TextureCache;

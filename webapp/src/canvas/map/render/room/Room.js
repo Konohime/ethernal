@@ -527,6 +527,7 @@ class Room extends Dirtable {
    */
   drawCorridorRoof(tilemap, renderPass) {
     const { allExits, expansions } = this.data;
+    if (!allExits) return;
     const roomNorth = this.getNeighbor(Direction.NORTH);
     const roomSouth = this.getNeighbor(Direction.SOUTH);
     const roomEast = this.getNeighbor(Direction.EAST);
@@ -605,6 +606,7 @@ class Room extends Dirtable {
    */
   drawCorridorWalls(tilemap, renderPass) {
     const { allExits } = this.data;
+    if (!allExits) return; // Skip rooms without exit data
     if (allExits.east && allExits.west) {
       const top = this.ly + 3 - this.offsetY;
       const bottom = this.ly + 8 - this.offsetY;
@@ -626,6 +628,7 @@ class Room extends Dirtable {
    */
   drawRoof(tilemap, renderPass) {
     const { allExits, expansions } = this.data;
+    if (!allExits) return;
     const roomNorth = this.getNeighbor(Direction.NORTH);
     const roomSouth = this.getNeighbor(Direction.SOUTH);
     const roomEast = this.getNeighbor(Direction.EAST);
@@ -810,6 +813,7 @@ class Room extends Dirtable {
    */
   drawWalls(tilemap, renderPass) {
     const { allExits } = this.data;
+    if (!allExits) return;
     if (renderPass === 'lower') {
       if (allExits.north) {
         const doors = [];
@@ -1144,7 +1148,7 @@ class Room extends Dirtable {
   }
 
   hasExit(direction) {
-    return this.data.allExits[direction];
+    return this.data.allExits && this.data.allExits[direction];
   }
 
   hasLockedDoor(direction) {

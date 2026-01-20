@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "./DungeonFacetBase.sol";
 import "./PureDungeon.sol";
@@ -48,9 +49,9 @@ contract DungeonAdminFacet is DungeonFacetBase {
         for (uint8 i = 0; i < balanceChange.length; i++) {
             int16 change = balanceChange[i];
             if (change > 0) {
-                _elementsContract.mint(characterId, i + 1, uint256(change));
+                _elementsContract.mint(characterId, i + 1, uint256(uint16(change)));
             } else if (change < 0) {
-                _elementsContract.subBurnFrom(characterId, i + 1, uint256(-change));
+                _elementsContract.subBurnFrom(characterId, i + 1, uint256(uint16(-change)));
             }
         }
         CharacterData memory characterData = _getCharacterData(characterId);
@@ -105,7 +106,7 @@ contract DungeonAdminFacet is DungeonFacetBase {
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
         for (uint256 i = 0; i < amountsPayed.length; i++) {
-            _elementsContract.transferFrom(address(owner), address(0), i+1, amountsPayed[i]);
+            _elementsContract.transferFrom(address(uint160(owner)), address(0), i+1, amountsPayed[i]);
         }
         _roomsContract.setData(location, data);
     }
@@ -158,15 +159,15 @@ contract DungeonAdminFacet is DungeonFacetBase {
         uint256 location = character.location;
         _actualiseRoom(location);
         CharacterData memory characterData = _getCharacterData(characterId);
-        int64 newHp = int64(characterData.hp) + int64(hpChange);
-        if (newHp > int64(characterData.maxHP)) {
+        int64 newHp = int64(uint64(characterData.hp)) + int64(hpChange);
+        if (newHp > int64(uint64(characterData.maxHP))) {
             characterData.hp = characterData.maxHP;
         }
         if (newHp <= 0) {
             emit Death(characterId, monsterId);
             characterData.hp = 0;
         } else {
-            characterData.hp = uint16(newHp);
+            characterData.hp = uint16(int16(newHp));
         }
         _setCharacterData(characterId, characterData);
         uint8 reverseDirection = (character.direction + 2) % 4;

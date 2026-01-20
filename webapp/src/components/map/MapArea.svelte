@@ -4,11 +4,10 @@
   import { characterFeatures } from 'lib/cache';
   import nprogress from 'nprogress';
   import router from 'page';
-  import 'pixi.js';
+  
+  // Import PIXI from compatibility layer
+  import PIXI, { Stage } from 'lib/pixi-compat';
   import { Viewport } from 'pixi-viewport';
-
-  window.PIXI = PIXI;
-  require('pixi-layers');
 
   import log from 'utils/log';
   import { menuOverlay, notificationOverlay } from 'stores/screen';
@@ -42,6 +41,7 @@
   let mapNavEnabled = false;
   let expandMiniMap = false;
   let roomCoordinates;
+  let assetsLoaded = false;
 
   $: area = getAreaByType($currentRoom.areaType);
 
@@ -49,7 +49,7 @@
   let startingCoordinates;
   router('/room/:coords', ({ params }) => {
     const { coords } = params;
-    if (!map || loader.progress !== 100) {
+    if (!map || !assetsLoaded) {
       startingCoordinates = coords;
     } else {
       map.refocus(coords);
@@ -57,29 +57,101 @@
   });
   router.start();
 
-  /** PIXI loader handlers */
-  const loader = PIXI.Loader.shared;
+  /** Asset loading with PIXI 7 Assets API */
+  const loadAssets = async () => {
+    nprogress.start();
+    
+    const assets = [
+      { alias: 'icon_def', src: '/images/ui/icon_def.png' },
+      { alias: 'icon_select_atk', src: '/images/ui/attackSelectIcon.png' },
+      { alias: 'icon_select_def', src: '/images/ui/defenseSelectIcon.png' },
+      
+      // UI icons for modifier stats
+      { alias: 'modifier_icon_armor_s', src: '/images/ui/modifier/icon_armor_s.png' },
+      { alias: 'modifier_icon_atk_s', src: '/images/ui/modifier/icon_atk_s.png' },
+      { alias: 'modifier_icon_def_s', src: '/images/ui/modifier/icon_def_s.png' },
+      { alias: 'modifier_icon_dmg_s', src: '/images/ui/modifier/icon_dmg_s.png' },
+      { alias: 'modifier_icon_hp_s', src: '/images/ui/modifier/icon_hp_s.png' },
+      { alias: 'icon_armor_s', src: '/images/ui/icon_armor_s.png' },
+      
+      // Portraits
+      { alias: 'portrait_adv', src: '/images/ui/portraits/port_adv_6x.png' },
+      { alias: 'portrait_bar', src: '/images/ui/portraits/port_bar_6x.png' },
+      { alias: 'portrait_war', src: '/images/ui/portraits/port_war_6x.png' },
+      { alias: 'portrait_wiz', src: '/images/ui/portraits/port_wiz_6x.png' },
+      
+      // More icons
+      { alias: 'icon_atk_s', src: '/images/ui/icon_atk_s.png' },
+      { alias: 'icon_def_s', src: '/images/ui/icon_def_s.png' },
+      { alias: 'icon_dmg_s', src: '/images/ui/icon_dmg_s.png' },
+      { alias: 'icon_hp_s', src: '/images/ui/icon_hp_s.png' },
+      
+      // UI icons for combat cards
+      { alias: 'icon_action_armor', src: '/images/ui/icon_action_armor.png' },
+      { alias: 'icon_action_atk', src: '/images/ui/icon_action_atk.png' },
+      { alias: 'icon_action_def', src: '/images/ui/icon_action_def.png' },
+      { alias: 'icon_action_dmg', src: '/images/ui/icon_action_dmg.png' },
+      { alias: 'icon_action_hp', src: '/images/ui/icon_action_hp.png' },
+      
+      // Spritesheets (JSON with textures)
+      { alias: 'fx_curses', src: `/images/fx_curses.json?${COMMIT}` },
+      { alias: 'character_classes', src: `/images/map/character_classes.json?${COMMIT}` },
+      
+      // Map assets
+      { alias: 'arrows', src: '/images/map/arrows.png' },
+      { alias: 'path', src: '/images/map/path.png' },
+      { alias: 'tilemaps', src: `/images/map/tilemaps.json?${COMMIT}` },
+      { alias: 'sheet', src: `/images/pixi-art.json?${COMMIT}` },
+      
+      // Radial menu icons
+      { alias: 'icon_box_02', src: '/images/ui/icons/interaction/box02_36x36.png' },
+      { alias: 'help_icon_16', src: '/images/ui/icons/interaction/help_16x16.png' },
+      { alias: 'chat_icon_16', src: '/images/ui/icons/interaction/chat_16x16.png' },
+      { alias: 'mail_icon_16', src: '/images/ui/icons/interaction/mail_16x16.png' },
+      { alias: 'trade_icon_16', src: '/images/ui/icons/interaction/trade_16x16.png' },
+      { alias: 'party_icon_16', src: '/images/ui/icons/interaction/party_16x16.png' },
+      { alias: 'guild_icon_16', src: '/images/ui/icons/interaction/guild02_16x16.png' },
+    ];
+    
+    // Add all assets to the bundle
+    for (const asset of assets) {
+      PIXI.Assets.add(asset);
+    }
+    
+    // Load all assets with progress tracking
+    try {
+      await PIXI.Assets.load(
+        assets.map(a => a.alias),
+        (progress) => {
+          log.debug(`${Math.round(progress * 100)}% loaded`);
+          nprogress.set(progress);
+        }
+      );
+      
+      assetsLoaded = true;
+      nprogress.done();
+      log.debug('All assets loaded');
+      
+      // Initialize the map
+      init();
+    } catch (err) {
+      log.error('Asset loading error:', err);
+      nprogress.done();
+      Sentry.captureException(err);
+    }
+  };
+
   const resize = () => {
+    if (!container || !mapViewport || !app) return;
     _w = container.clientWidth;
     _h = container.clientHeight;
     mapViewport.resize(_w, _h);
     app.renderer.resize(_w, _h);
   };
-  const handleLoadProgress = ({ progress }) => {
-    log.debug(`${progress}% loaded`);
-    nprogress.set(progress / 100);
-  };
-  const handleLoadAsset = (_, resource) => {
-    log.debug(`Asset loaded ${resource.name}`);
-  };
-  const handleLoadError = () => {
-    log.error('Load error');
-    nprogress.error();
-  };
 
   /** Page init */
   const init = async () => {
-    if (map != null || loader.progress !== 100) {
+    if (map != null || !assetsLoaded) {
       return;
     }
 
@@ -87,7 +159,7 @@
 
     if (map == null) {
       map = new MapRenderer(mapViewport, app, ui);
-      global.map = map;
+      globalThis.map = map;
       map.init();
       app.ticker.add(() => {
         map.onUpdate();
@@ -104,145 +176,82 @@
 
   /** Page mount */
   onMount(() => {
-    // Load them google fonts before starting...!
+    // Load Google fonts
     window.WebFontConfig = {
       google: {
         families: ['Space Mono', 'VT323'],
       },
       active() {
-        init();
+        loadAssets();
       },
     };
 
-    /** --- PIXI MAP --- */
-    /* eslint-disable */
-    // include the web-font loader script
-    (function () {
-      const wf = document.createElement('script');
-      wf.src = `${
-        document.location.protocol === 'https:' ? 'https' : 'http'
-      }://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js`;
-      wf.type = 'text/javascript';
-      wf.async = 'true';
-      const s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(wf, s);
-    })();
-    /* eslint-enabled */
+    // Load web-font loader script
+    const wf = document.createElement('script');
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = true;
+    document.head.appendChild(wf);
 
     _w = container.clientWidth;
     _h = container.clientHeight;
 
-    let _w2 = _w / 2;
-    let _h2 = _h / 2;
-    if (Math.floor(_w2) !== _w2) {
-      _w -= 1;
-    }
-    if (Math.floor(_h2) !== _h2) {
-      _h -= 1;
+    // Ensure even dimensions
+    if (_w % 2 !== 0) _w -= 1;
+    if (_h % 2 !== 0) _h -= 1;
+
+    // Configure tilemap settings (PIXI 7)
+    if (PIXI.tilemap && PIXI.tilemap.settings) {
+      PIXI.tilemap.settings.maxTextures = 4;
     }
 
-    console.log('tilemap');
-    console.log(PIXI.tilemap);
-    PIXI.tilemap.Constant.maxTextures = 4;
-    console.log('constant');
-    console.log(PIXI.tilemap.Constant);
-
-    /* set up pixi app */
     try {
+      // Create PIXI Application (PIXI 7 style)
       app = new PIXI.Application({
         width: _w,
         height: _h,
         resolution: window.devicePixelRatio,
         autoDensity: true,
         backgroundColor: 0x000000,
+        antialias: false,
       });
 
-      PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+      // Set default scale mode
+      PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
       app.ticker.maxFPS = MAX_FPS;
-      app.stage = new PIXI.display.Stage();
+      
+      // Use Stage from @pixi/layers
+      app.stage = new Stage();
       app.stage.sortableChildren = true;
 
+      // Create Viewport (pixi-viewport 5.x is compatible with PIXI 7)
       mapViewport = new Viewport({
         screenWidth: _w,
         screenHeight: _h,
         worldWidth: _w,
         worldHeight: _h,
-        interaction: app.renderer.plugins.interaction, // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+        events: app.renderer.events, // PIXI 7 uses events instead of interaction
       });
+      
       app.stage.addChild(mapViewport);
       mapViewport
         .drag()
         .wheel()
-        // .pinch()
         .decelerate()
         .clampZoom({ minWidth: _w / 3, minHeight: _h / 3, maxWidth: _w * 3, maxHeight: _h * 3 });
 
-      loader.add('icon_def', '/images/ui/icon_def.png');
-      loader.add('icon_select_atk', '/images/ui/attackSelectIcon.png');
-      loader.add('icon_select_def', '/images/ui/defenseSelectIcon.png');
+      container.appendChild(app.canvas); // PIXI 7 uses app.canvas instead of app.view
 
-      // UI icons for modifier stats.
-      loader.add('modifier_icon_armor_s', '/images/ui/modifier/icon_armor_s.png');
-      loader.add('modifier_icon_atk_s', '/images/ui/modifier/icon_atk_s.png');
-      loader.add('modifier_icon_def_s', '/images/ui/modifier/icon_def_s.png');
-      loader.add('modifier_icon_dmg_s', '/images/ui/modifier/icon_dmg_s.png');
-      loader.add('modifier_icon_hp_s', '/images/ui/modifier/icon_hp_s.png');
-      loader.add('icon_armor_s', '/images/ui/icon_armor_s.png');
-
-      loader.add('portrait_adv', '/images/ui/portraits/port_adv_6x.png');
-      loader.add('portrait_bar', '/images/ui/portraits/port_bar_6x.png');
-      loader.add('portrait_war', '/images/ui/portraits/port_war_6x.png');
-      loader.add('portrait_wiz', '/images/ui/portraits/port_wiz_6x.png');
-
-      loader.add('icon_atk_s', '/images/ui/icon_atk_s.png');
-      loader.add('icon_def_s', '/images/ui/icon_def_s.png');
-      loader.add('icon_dmg_s', '/images/ui/icon_dmg_s.png');
-      loader.add('icon_hp_s', '/images/ui/icon_hp_s.png');
-
-      // UI icons for combat cards.
-      loader.add('icon_action_armor', '/images/ui/icon_action_armor.png');
-      loader.add('icon_action_atk', '/images/ui/icon_action_atk.png');
-      loader.add('icon_action_def', '/images/ui/icon_action_def.png');
-      loader.add('icon_action_dmg', '/images/ui/icon_action_dmg.png');
-      loader.add('icon_action_hp', '/images/ui/icon_action_hp.png');
-
-      loader.add('fx_curses', `/images/fx_curses.json?${COMMIT}`);
-      loader.add('character_classes', `/images/map/character_classes.json?${COMMIT}`);
-
-      // New Map TileSets.
-      loader.add('arrows', '/images/map/arrows.png');
-      loader.add('path', '/images/map/path.png');
-      // all map folder, except arrows and path
-      loader.add('tilemaps', `/images/map/tilemaps.json?${COMMIT}`);
-      loader.add('sheet', `/images/pixi-art.json?${COMMIT}`);
-
-      // Icon box for the map radial menu.
-      loader.add('icon_box_02', '/images/ui/icons/interaction/box02_36x36.png');
-      // Icons for the map radial menu.
-      loader.add('help_icon_16', '/images/ui/icons/interaction/help_16x16.png');
-      loader.add('chat_icon_16', '/images/ui/icons/interaction/chat_16x16.png');
-      loader.add('mail_icon_16', '/images/ui/icons/interaction/mail_16x16.png');
-      loader.add('trade_icon_16', '/images/ui/icons/interaction/trade_16x16.png');
-      loader.add('party_icon_16', '/images/ui/icons/interaction/party_16x16.png');
-      loader.add('guild_icon_16', '/images/ui/icons/interaction/guild02_16x16.png');
-
-      loader.onStart.add(nprogress.start);
-      loader.onProgress.add(handleLoadProgress);
-      loader.onLoad.add(handleLoadAsset);
-      loader.onComplete.add(nprogress.done);
-      loader.onError.add(handleLoadError);
-
-      // Make sure all textures copy this setting when loaded in & instantiated.
-      PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-      loader.load(init);
-      container.appendChild(app.view);
-
-      /* make responsive */
+      // Make responsive
       window.addEventListener('resize', resize);
     } catch (err) {
       if (/WebGL unsupported in this browser/.test(err.message)) {
-        notificationOverlay.open('generic', { class: 'error', text: 'Ethernal requires a hardware accelerated WebGL-enabled device to play.', closeable: false });
+        notificationOverlay.open('generic', {
+          class: 'error',
+          text: 'Ethernal requires a hardware accelerated WebGL-enabled device to play.',
+          closeable: false
+        });
       }
       Sentry.captureException(err);
     }
@@ -250,6 +259,9 @@
 
   onDestroy(() => {
     window.removeEventListener('resize', resize);
+    if (app) {
+      app.destroy(true, { children: true, texture: true, baseTexture: true });
+    }
   });
 
   const toggleMiniMap = () => {
@@ -429,9 +441,6 @@
       flex-direction: column;
       text-align: right;
       display: flex;
-      // justify-content: space-between;
-      // margin: 0 24px;
-      // padding: 10px 0 8px;
       color: $color-lightGrey;
       text-transform: uppercase;
 

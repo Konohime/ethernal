@@ -1,4 +1,5 @@
-pragma solidity 0.6.5;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import "./DungeonFacetBase.sol";
 import "./PureDungeon.sol";
@@ -17,13 +18,13 @@ contract DungeonMovementFacet is DungeonFacetBase {
         string calldata name,
         uint8 class,
         uint256 location
-    ) external onlyPlayer {
+    ) external payable onlyPlayer {
         if (_charactersContract.ownerOf(characterId) != address(this)) {
             _charactersContract.transferFrom(sender, address(this), characterId);
         } else {
             require(_charactersContract.getSubOwner(characterId) == 0, "already in dungeon");
         }
-        _charactersContract.setSubOwner(characterId, uint256(sender));
+        _charactersContract.setSubOwner(characterId, uint256(uint160(sender)));
         uint256 data = _charactersContract.getData(characterId);
         if (data == 0) {
             _setCharacterData(
@@ -52,7 +53,7 @@ contract DungeonMovementFacet is DungeonFacetBase {
 
     function exit(uint256 characterId) external onlyPlayer {
         require(_characters[characterId].location == PureDungeon.LOCATION_ZERO, "need to reach the entrance");
-        address subOwner = address(_charactersContract.getSubOwner(characterId));
+        address subOwner = address(uint160(_charactersContract.getSubOwner(characterId)));
         _charactersContract.transferFrom(address(this), subOwner, characterId);
     }
 

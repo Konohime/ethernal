@@ -41,12 +41,11 @@ class Character extends PIXI.Container {
     this.light.position.set(0, 6);
     this.addChild(this.light);
 
-    const spritesheet_legacy = PIXI.Loader.shared.resources.sheet.spritesheet;
+    const spritesheet_legacy = PIXI.Assets.get('sheet');
     const animations_legacy = spritesheet_legacy.animations;
     let { char_front_walk, char_side_walk, char_back_walk, char_torch } = animations_legacy;
-
     // TODO: Figure out what the plan is to implement sprites separated for components. -Josh
-    const charAnims = PIXI.Loader.shared.resources.character_classes.spritesheet.animations;
+    const charAnims = PIXI.Assets.get('character_classes').animations;
 
     // DEBUG CODE
     // char_front_walk = charAnims.char_wiz_front;

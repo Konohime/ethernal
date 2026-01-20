@@ -17,7 +17,7 @@ import OtherPanel from './ui/actor/OtherPanel';
 import AttackType from '../AttackType';
 
 window.PIXI = PIXI;
-require('pixi-layers');
+require('@pixi/layers');
 
 /**
  * TODO: (Passive Task) Write checker method for app width and resizing of elements as well as text options.

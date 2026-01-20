@@ -3,7 +3,7 @@
   import 'pixi.js';
 
   window.PIXI = PIXI;
-  require('pixi-layers');
+  require('@pixi/layers');
 
   import { dungeon } from 'stores/dungeon';
   import { mapOverlay, menuOverlay } from 'stores/screen';

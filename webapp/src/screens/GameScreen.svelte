@@ -20,7 +20,7 @@
       <DefaultScreen text="Please accept payment" />
     {:else}
       <DefaultScreen>
-        <p>The Elemental counts the $MATIC while you check the food...</p>
+        <p>The Elemental counts the $ETH while you check the food...</p>
       </DefaultScreen>
     {/if}
   {:else if $preDungeonCheck.status === 'Done' && $preDungeonCheck.isCharacterInDungeon && !$preDungeonCheck.isDelegateReady}

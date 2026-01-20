@@ -1,16 +1,18 @@
-module.exports = async ({ethers, deployments, network, getNamedAccounts}) => {
-  const dev_forceMine = !network.live;
+module.exports = async ({deployments, network, getNamedAccounts}) => {
   const {diamond, read, execute, log, getArtifact} = deployments;
-  const {deployer, dungeonOwner, backendAddress} = await getNamedAccounts();
+  const {deployer, backendAddress} = await getNamedAccounts();
 
-  const playerContract = await ethers.getContract('Player');
-  const dungeonAdminContract = await ethers.getContract('DungeonAdmin');
-  const blockHasRegisterContract = await ethers.getContract('BlockHashRegister');
+  const playerDeployment = await deployments.get('Player');
+  const dungeonAdminDeployment = await deployments.get('DungeonAdmin');
+  const blockHashRegisterDeployment = await deployments.get('BlockHashRegister');
 
+  // Deploy Diamond
   const dungeon = await diamond.deploy('Dungeon', {
-    from: network.live ? deployer : dungeonOwner,
-    dev_forceMine,
-    linkedData: {readOnlyDungeon: (await getArtifact('ReadOnlyDungeon')).bytecode},
+    from: deployer,
+    owner: deployer,
+    linkedData: {
+      readOnlyDungeon: (await getArtifact('ReadOnlyDungeon')).bytecode,
+    },
     facets: [
       'DungeonActionsFacet',
       'DungeonAdminFacet',
@@ -18,22 +20,30 @@ module.exports = async ({ethers, deployments, network, getNamedAccounts}) => {
       'DungeonInfoFacet',
       'DungeonMovementFacet',
     ],
-    execute: {
-      methodName: 'postUpgrade',
-      args: [blockHasRegisterContract.address, playerContract.address, dungeonOwner, dungeonAdminContract.address],
-    },
     log: true,
+    waitConfirmations: 1,
   });
 
-  const result = await read('DungeonAdmin', 'getDungeonAndBackendAddress');
-  if (result.dungeon !== dungeon.address || result.backendAddress !== backendAddress) {
-    log(' setting backend address...');
-    await execute(
-      'DungeonAdmin',
-      {from: deployer, dev_forceMine},
-      'setDungeonAndBackend',
-      dungeon.address,
-      backendAddress,
-    );
+  log('Diamond deployed at:', dungeon.address);
+  log('Skipping postUpgrade - will be handled in start script');
+
+  // Set backend address
+  try {
+    const result = await read('DungeonAdmin', 'getDungeonAndBackendAddress');
+    if (result.dungeon !== dungeon.address || result.backendAddress !== backendAddress) {
+      log('Setting backend address...');
+      await execute(
+        'DungeonAdmin',
+        {from: deployer},
+        'setDungeonAndBackend',
+        dungeon.address,
+        backendAddress
+      );
+    }
+  } catch (e) {
+    log('Backend address will be set later');
   }
 };
+
+module.exports.tags = ['Dungeon', 'core'];
+module.exports.dependencies = ['Player', 'DungeonAdmin', 'BlockHashRegister', 'PureDungeon'];

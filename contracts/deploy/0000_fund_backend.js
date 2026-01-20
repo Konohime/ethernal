@@ -1,13 +1,23 @@
-module.exports = async ({network, deployments, getNamedAccounts}) => {
-  const {sendTxAndWait} = deployments;
-  let dev_forceMine = false;
+module.exports = async ({network, getNamedAccounts, ethers}) => {
+  // Skip on live networks
   if (network.live) {
     return;
-  } else {
-    dev_forceMine = true;
   }
 
   const {deployer, backendAddress} = await getNamedAccounts();
-  await sendTxAndWait({from: deployer, to: backendAddress, value: '20000000000000000000', gas: 21000, dev_forceMine});
+  
+  // Get signer
+  const signer = await ethers.getSigner(deployer);
+  
+  // Fund backend with 20 ETH for local testing
+  const tx = await signer.sendTransaction({
+    to: backendAddress,
+    value: ethers.parseEther('20'),
+  });
+  
+  await tx.wait();
+  console.log(`Funded backend ${backendAddress} with 20 ETH`);
 };
-module.exports.skip = async () => true;
+
+module.exports.tags = ['fund', 'local'];
+module.exports.skip = async ({network}) => network.live; // Skip on live networks

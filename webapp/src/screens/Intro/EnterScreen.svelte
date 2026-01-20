@@ -12,7 +12,7 @@
 <DefaultScreen
   header="logo"
   text="{Number($claim.rawBalance) === 0 ? 'Your key is empty' : 'You have a skull key'}"
-  subtext="{Number($claim.rawBalance) === 0 ? 'Please get a different key' : `And a balance of ${$claim.balance} $MATIC.`}"
+  subtext="{Number($claim.rawBalance) === 0 ? 'Please get a different key' : `And a balance of ${$claim.balance} $ETH.`}"
   btnText="Create a character"
   btnPressed="{() => next()}"
   btnDisabled="{Number($claim.rawBalance) === 0}"
