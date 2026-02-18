@@ -420,6 +420,9 @@ class MapRenderer {
       this.updateAllFog();
       this.previousReachable = Object.keys(reachable);
     });
+
+    // Add the root container to the viewport for rendering
+    this.viewport.addChild(this.root);
   }
 
   onUpdate() {
