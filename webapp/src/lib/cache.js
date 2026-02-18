@@ -1286,6 +1286,7 @@ export const keeperIncome = new ReadOnly(_keeperIncome);
 export const keeperAbilities = new ReadOnly(_keeperAbilities);
 export const currentTrade = new ReadOnly(_currentTrade);
 export const mapLog = new ReadOnly(_mapLog);
+export const viewport = writable({ minX: -20, maxX: 20, minY: -20, maxY: 20, count: 0 });
 
 const logToText = turnAction => {
   const attack = inflictionText(turnAction.inflictions.attacker);

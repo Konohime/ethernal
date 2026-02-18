@@ -1102,28 +1102,28 @@ class Room extends Dirtable {
    * @return {boolean} Returns true if the room is a temple room.
    */
   isTemple() {
-    return this.data.kind === '3';
+    return this.data.kind === 3;
   }
 
   /**
    * @return {boolean} Returns true if the room is a teleport room.
    */
   isTeleporter() {
-    return this.data.kind === '2';
+    return this.data.kind === 2;
   }
 
   /**
    * @return {boolean} Returns true if the room is a lore room.
    */
   isLore() {
-    return this.data.kind === '4';
+    return this.data.kind === 4;
   }
 
   /**
    * @return {boolean} Returns true if the room is a carrier room.
    */
   isCarrier() {
-    return this.data.kind === '5';
+    return this.data.kind === 5;
   }
 
   /**

@@ -111,6 +111,41 @@
       { alias: 'trade_icon_16', src: '/images/ui/icons/interaction/trade_16x16.png' },
       { alias: 'party_icon_16', src: '/images/ui/icons/interaction/party_16x16.png' },
       { alias: 'guild_icon_16', src: '/images/ui/icons/interaction/guild02_16x16.png' },
+
+      // ===========================================
+      // MAP ROOM ASSETS (ADDED FOR ROOM RENDERING)
+      // ===========================================
+      
+      // Teleporter textures
+      { alias: 'teleporter', src: '/images/map/teleporter/teleporter.png' },
+      { alias: 'teleporter_off', src: '/images/map/teleporter/teleporter_off.png' },
+      { alias: 'teleporter2', src: '/images/map/teleporter/teleporter2.png' },
+      { alias: 'teleporter_corners', src: '/images/map/teleporter/teleporter_corners.png' },
+      
+      // Light textures (for room lighting effects)
+      { alias: 'light_1', src: '/images/map/light/light_1.png' },
+      { alias: 'light_2', src: '/images/map/light/light_2.png' },
+      { alias: 'light_3', src: '/images/map/light/light_3.png' },
+      { alias: 'light_4', src: '/images/map/light/light_4.png' },
+      { alias: 'light_5', src: '/images/map/light/light_5.png' },
+      { alias: 'light_6', src: '/images/map/light/light_6.png' },
+      { alias: 'light_7', src: '/images/map/light/light_7.png' },
+      
+      // Temple textures (in root map folder)
+      { alias: 'temple_center', src: '/images/map/temple_center.png' },
+      
+      // Lift/Carrier textures (animated) - in lift_full subfolder
+      { alias: 'lift_full1', src: '/images/map/lift/lift_full/lift_full1.png' },
+      { alias: 'lift_full2', src: '/images/map/lift/lift_full/lift_full2.png' },
+      { alias: 'lift_full3', src: '/images/map/lift/lift_full/lift_full3.png' },
+      { alias: 'lift_full4', src: '/images/map/lift/lift_full/lift_full4.png' },
+      { alias: 'lift_full5', src: '/images/map/lift/lift_full/lift_full5.png' },
+      { alias: 'lift_full6', src: '/images/map/lift/lift_full/lift_full6.png' },
+      { alias: 'lift_full7', src: '/images/map/lift/lift_full/lift_full7.png' },
+      { alias: 'lift_full8', src: '/images/map/lift/lift_full/lift_full8.png' },
+      
+      // Fog gradient for unexplored areas
+      { alias: 'fog_gradient', src: '/images/map/fog_gradient.png' },
     ];
     
     // Add all assets to the bundle

@@ -4,13 +4,23 @@ class Light extends PIXI.Container {
   constructor(tint = 0xffffff, alpha = 0.5, alphaPerLayer = 0.25) {
     super();
 
-    this.light1 = new PIXI.Sprite(PIXI.utils.TextureCache.light_1);
-    this.light2 = new PIXI.Sprite(PIXI.utils.TextureCache.light_2);
-    this.light3 = new PIXI.Sprite(PIXI.utils.TextureCache.light_3);
-    this.light4 = new PIXI.Sprite(PIXI.utils.TextureCache.light_4);
-    this.light5 = new PIXI.Sprite(PIXI.utils.TextureCache.light_5);
-    this.light6 = new PIXI.Sprite(PIXI.utils.TextureCache.light_6);
-    this.light7 = new PIXI.Sprite(PIXI.utils.TextureCache.light_7);
+    // Helper function to safely get texture or use empty texture
+    const getTexture = (name) => {
+      const texture = PIXI.utils.TextureCache[name];
+      if (!texture) {
+        console.warn(`Light: texture "${name}" not found in cache, using empty texture`);
+        return PIXI.Texture.EMPTY;
+      }
+      return texture;
+    };
+
+    this.light1 = new PIXI.Sprite(getTexture('light_1'));
+    this.light2 = new PIXI.Sprite(getTexture('light_2'));
+    this.light3 = new PIXI.Sprite(getTexture('light_3'));
+    this.light4 = new PIXI.Sprite(getTexture('light_4'));
+    this.light5 = new PIXI.Sprite(getTexture('light_5'));
+    this.light6 = new PIXI.Sprite(getTexture('light_6'));
+    this.light7 = new PIXI.Sprite(getTexture('light_7'));
 
     this.alpha = alpha;
 

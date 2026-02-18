@@ -31,62 +31,13 @@ class DungeonMap extends DungeonComponent {
 
   registerEventHandlers() {
     const { Dungeon } = this.contracts;
-    // PATCH: Ajout des handlers pour RoomDiscovered et RoomActualised
-    events.on(Dungeon, 'RoomDiscovered', this.handleRoomDiscovered.bind(this));
-    events.on(Dungeon, 'RoomActualised', this.handleRoomActualised.bind(this));
+    events.on(Dungeon, 'RoomDiscovered', () => {});
     events.on(Dungeon, 'CharacterMoved', this.handleCharacterMoved.bind(this), this.prefetchCharacterMoved.bind(this));
     try {
       events.onConfirmed(Dungeon, 'CharacterMoved', this.handleConfirmedCharacterMoved.bind(this));
       console.log('registered confirmed event listeners');
     } catch (e) {
       console.log('confirmed events not supported');
-    }
-  }
-
-  // PATCH: Handler pour RoomDiscovered
-  async handleRoomDiscovered(location, blockNumber, direction, event) {
-    const coordinates = locationToCoordinates(location);
-    console.log('RoomDiscovered event:', coordinates, 'block:', blockNumber.toString(), 'direction:', direction);
-    
-    const existing = await this._room(coordinates);
-    if (!existing || !existing.status) {
-      const room = {
-        ...(existing || {}),
-        coordinates,
-        location: location.toString(),
-        status: 'discovered',
-        blockNumber: Number(blockNumber),
-        direction,
-        characters: existing?.characters || [],
-      };
-      await this.storeRooms([room]);
-      console.log('Stored discovered room:', coordinates);
-    }
-  }
-
-  // PATCH: Handler pour RoomActualised
-  async handleRoomActualised(location, blockHash, exits, kind, event) {
-    const coordinates = locationToCoordinates(location);
-    console.log('RoomActualised event:', coordinates, 'kind:', kind, 'exits:', exits);
-    
-    let room = await this._room(coordinates) || { coordinates, characters: [] };
-    
-    room = {
-      ...room,
-      location: location.toString(),
-      status: 'actualised',
-      kind: Number(kind),
-      exits: decodeExits(exits),
-      exitsBits: exits,
-      hash: blockHash,
-      blockNumber: event.blockNumber,
-    };
-    
-    await this.storeRooms([room]);
-    console.log('Stored actualised room:', coordinates, 'kind:', room.kind);
-    
-    if (!events.replaying) {
-      this.sockets.emit('room-actualised', { roomUpdates: [cleanRoom(room)] });
     }
   }
 
@@ -472,12 +423,12 @@ class DungeonMap extends DungeonComponent {
 
   // TODO optimization - precalculated?
   async randomEntryLocation() {
-  const rooms = await this.roomsAround('0,0', 15);
-  const valid = Object.values(rooms)
-    .filter(room => Number(room.kind) === 2)
-    // .filter(({ coordinates }) => Object.keys(bfs(rooms, coordinates, 0)).length >= 5) // Disabled for dev - need 5+ connected rooms
-    .map(({ location }) => location);
-  return { location: randomItem(valid), valid };
+    const rooms = await this.roomsAround('0,0', 15);
+    const valid = Object.values(rooms)
+      .filter(room => Number(room.kind) === 2)
+      .filter(({ coordinates }) => Object.keys(bfs(rooms, coordinates, 0)).length >= 5)
+      .map(({ location }) => location);
+    return { location: randomItem(valid), valid };
   }
 
   async _room(coordinates) {
