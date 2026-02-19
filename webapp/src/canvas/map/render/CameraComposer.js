@@ -30,24 +30,24 @@ export class CameraComposer extends PIXI.Container {
     this.transform.updateTransform(this.parent.transform);
     this.worldAlpha = this.alpha * this.parent.worldAlpha;
 
-    // Apply the camera (listen) worldTransform to stage.
-    // Core of the camera system: stage gets the camera matrix
-    // so all scene content moves with the camera.
     if (this.stage && this.listen) {
       const listenWT = this.listen.worldTransform;
-      const stageWT = this.stage.worldTransform;
 
       if (this.inverse) {
+        // Inverse: apply inverted camera matrix
         TMP_Matrix.copyFrom(listenWT);
         TMP_Matrix.invert();
-        stageWT.copyFrom(TMP_Matrix);
+        this.stage.position.set(TMP_Matrix.tx, TMP_Matrix.ty);
+        this.stage.scale.set(TMP_Matrix.a, TMP_Matrix.d);
       } else {
-        stageWT.copyFrom(listenWT);
+        // Apply camera position/scale to stage via position (so PIXI propagates correctly)
+        this.stage.position.set(listenWT.tx, listenWT.ty);
+        this.stage.scale.set(listenWT.a, listenWT.d);
       }
 
-      this.stage.worldAlpha = this.worldAlpha;
-      for (let i = 0, j = this.stage.children.length; i < j; ++i) {
-        const child = this.stage.children[i];
+      // Let PIXI propagate the transform normally through the tree
+      for (let i = 0, j = this.children.length; i < j; ++i) {
+        const child = this.children[i];
         if (child.visible) {
           child.updateTransform();
         }

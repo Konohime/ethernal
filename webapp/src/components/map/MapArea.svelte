@@ -245,8 +245,8 @@
       app = new PIXI.Application({
         width: _w,
         height: _h,
-        resolution: window.devicePixelRatio,
-        autoDensity: true,
+        resolution: 1,
+        autoDensity: false,
         backgroundColor: 0x000000,
         antialias: false,
       });
@@ -260,13 +260,13 @@
       app.stage = new Stage();
       app.stage.sortableChildren = true;
 
-      // Create Viewport (pixi-viewport 5.x is compatible with PIXI 7)
+      // Create Viewport in CSS pixels (no resolution scaling - handled by PIXI autoDensity)
       mapViewport = new Viewport({
         screenWidth: _w,
         screenHeight: _h,
         worldWidth: _w,
         worldHeight: _h,
-        events: app.renderer.events, // PIXI 7 uses events instead of interaction
+        events: app.renderer.events,
       });
       
       app.stage.addChild(mapViewport);
@@ -276,7 +276,7 @@
         .decelerate()
         .clampZoom({ minWidth: _w / 3, minHeight: _h / 3, maxWidth: _w * 3, maxHeight: _h * 3 });
 
-      container.appendChild(app.canvas); // PIXI 7 uses app.canvas instead of app.view
+      container.appendChild(app.view || app.canvas); // PIXI 7 compatibility // PIXI 7 uses app.canvas instead of app.view
 
       // Make responsive
       window.addEventListener('resize', resize);
