@@ -35,10 +35,13 @@ class MapUpdates {
         const chunkIsNew = !this.map.chunks.get(chunkId);
         if (chunkIsNew) {
           this.map.createChunk(chunkId);
+          // Handle room update BEFORE doCull: doCull may hide the chunk and destroy
+          // contentLower/Upper containers, which causes addRoom to silently reject the room.
+          this.map.handleRoomUpdate(update);
           this.map.doCull(true);
         }
-        // Handle room update if active OR if chunk was just created (first load)
-        if (this.map.isRoomActive(newest.coordinates) || chunkIsNew) {
+        // For existing chunks, handle room update only if active
+        if (!chunkIsNew && this.map.isRoomActive(newest.coordinates)) {
           this.map.handleRoomUpdate(update);
 
           // Update room actions for player only if they are in that room
