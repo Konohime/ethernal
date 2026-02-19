@@ -4,8 +4,7 @@ export default class Monster extends PIXI.Container {
   constructor(monster) {
     super();
 
-    const { spritesheet } = PIXI.Loader.shared.resources.sheet;
-    const { animations } = spritesheet;
+    const { animations } = PIXI.Assets.get('sheet');
 
     const monAnimatedSprite = new PIXI.AnimatedSprite(animations.mon_overworld);
     monAnimatedSprite.anchor.set(0.5);

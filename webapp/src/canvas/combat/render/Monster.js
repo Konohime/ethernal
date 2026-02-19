@@ -32,8 +32,8 @@ class Monster extends PIXI.Container {
     this.monsterSprite.y = 120;
     this.addChild(this.monsterSprite);
 
-    this.animations = PIXI.Loader.shared.resources.sheet.spritesheet.animations;
-    this.curseAnimations = PIXI.Loader.shared.resources.fx_curses.spritesheet.animations;
+    this.animations = PIXI.Assets.get('sheet').animations;
+    this.curseAnimations = PIXI.Assets.get('fx_curses').animations;
 
     this.animationGroup = new AnimationGroup(this.monsterSprite);
     const resetProfile = {

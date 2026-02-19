@@ -87,6 +87,14 @@ class AssetsLoader {
           PIXI.Assets.add({ alias: name, src: url });
           const resource = await PIXI.Assets.load(name);
           this._loaded[name] = resource;
+
+          if (resource && resource.textures) {
+            Object.entries(resource.textures).forEach(([key, texture]) => {
+              PIXI.utils.TextureCache[key] = texture;
+            });
+          }
+
+          PIXI.utils.TextureCache[name] = resource;
           
           loaded++;
           this._progress = (loaded / total) * 100;

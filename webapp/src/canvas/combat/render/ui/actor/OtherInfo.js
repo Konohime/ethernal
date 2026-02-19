@@ -25,7 +25,8 @@ export class OtherInfo extends PIXI.Container {
     this.new = true;
 
     this.actor = actor;
-    this.animations = PIXI.Loader.shared.resources.sheet.spritesheet.animations;
+    this.animations = PIXI.Assets.get('sheet').animations;
+
 
     let scale = 0.5;
     let profileTexture = PIXI.utils.TextureCache[`ui_combat_profile.png`];

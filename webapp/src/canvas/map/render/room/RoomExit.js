@@ -17,7 +17,8 @@ class RoomExit extends PIXI.Container {
     this.room = room;
     this.coordinates = coordinates;
     this.direction = direction;
-    this.animations = PIXI.Loader.shared.resources.sheet.spritesheet.animations;
+    const sheetResource = Object.values(PIXI.Assets.cache._cache || {}).find(r => r?.animations);
+    this.animations = PIXI.Assets.get('sheet').animations;
     this.pivot.set(0.5, 0.5);
 
     if (direction === Direction.NORTH || direction === Direction.SOUTH) {

@@ -12,8 +12,8 @@ class CharacterInfo extends ActorInfo {
   constructor(actor) {
     super(actor);
 
-    this.animations = PIXI.Loader.shared.resources.sheet.spritesheet.animations;
-    this.curseAnimations = PIXI.Loader.shared.resources.fx_curses.spritesheet.animations;
+    this.animations = PIXI.Assets.get('sheet').animations;
+    this.curseAnimations = PIXI.Assets.get('fx_curses').animations;
 
     let scale = 1;
     let profileTexture = PIXI.utils.TextureCache[`ui_combat_profile.png`];

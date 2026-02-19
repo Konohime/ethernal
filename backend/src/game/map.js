@@ -46,47 +46,19 @@ class DungeonMap extends DungeonComponent {
   // PATCH: Handler pour RoomDiscovered
   async handleRoomDiscovered(location, blockNumber, direction, event) {
     const coordinates = locationToCoordinates(location);
-    console.log('RoomDiscovered event:', coordinates, 'block:', blockNumber.toString(), 'direction:', direction);
-    
-    const existing = await this._room(coordinates);
-    if (!existing || !existing.status) {
-      const room = {
-        ...(existing || {}),
-        coordinates,
-        location: location.toString(),
-        status: 'discovered',
-        blockNumber: Number(blockNumber),
-        direction,
-        characters: existing?.characters || [],
-      };
-      await this.storeRooms([room]);
-      console.log('Stored discovered room:', coordinates);
-    }
+    console.log('RoomDiscovered event:', coordinates);
   }
 
   // PATCH: Handler pour RoomActualised
   async handleRoomActualised(location, blockHash, exits, kind, event) {
     const coordinates = locationToCoordinates(location);
-    console.log('RoomActualised event:', coordinates, 'kind:', kind, 'exits:', exits);
-    
-    let room = await this._room(coordinates) || { coordinates, characters: [] };
-    
-    room = {
-      ...room,
-      location: location.toString(),
-      status: 'actualised',
-      kind: Number(kind),
-      exits: decodeExits(exits),
-      exitsBits: exits,
-      hash: blockHash,
-      blockNumber: event.blockNumber,
-    };
-    
-    await this.storeRooms([room]);
-    console.log('Stored actualised room:', coordinates, 'kind:', room.kind);
-    
+    console.log('RoomActualised event:', coordinates, 'kind:', kind);
+
+    const room = await this.reloadRoom(coordinates);
+
     if (!events.replaying) {
       this.sockets.emit('room-actualised', { roomUpdates: [cleanRoom(room)] });
+    
     }
   }
 
