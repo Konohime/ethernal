@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { subscribe } from 'svelte/internal';
 import 'pixi.js';
+require('@pixi/layers');
 import { ease } from 'pixi-ease';
 
 import { actionsText, teleportText } from 'data/text';
@@ -114,7 +115,7 @@ class MapRenderer {
     this.fullscreenFog.camera = this.cameraComposer;
     this.showDelay = 0;
 
-    patchTreeSearch(app.renderer.plugins.interaction);
+    patchTreeSearch(app.renderer?.plugins?.interaction);
 
     app.ticker.add(() => {
       window.globalCounter = 0;
