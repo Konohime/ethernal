@@ -252,18 +252,28 @@ export const drawTile = (tilemap, textureId, tx, ty, dim, flipX, flipY, rotate) 
     }
   }
 
-  // Draw the tile.
-  tilemap.addRect(
-    textureId,
-    dim.x,
-    dim.y,
+  // Draw the tile. (@pixi/tilemap v4+ API: tile(texture, x, y, options))
+  // textureId can be a PIXI.Texture or a bitmap index (legacy integer).
+  const texture = typeof textureId === 'number'
+    ? (tilemap.__bitmaps && tilemap.__bitmaps[textureId])
+    : textureId;
+
+  if (!texture) {
+    console.warn('drawTile: texture not found for id', textureId);
+    return;
+  }
+
+  tilemap.tile(
+    texture,
     tx * ROOM_TILE_SIZE,
     ty * ROOM_TILE_SIZE,
-    dim.width,
-    dim.height,
-    null,
-    null,
-    flag,
+    {
+      u: dim.x,
+      v: dim.y,
+      tileWidth: dim.width,
+      tileHeight: dim.height,
+      rotate: flag,
+    },
   );
 };
 

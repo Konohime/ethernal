@@ -240,6 +240,11 @@ class MapChunk extends CulledContainer {
     this.tilemapLower.clear();
     this.tilemapUpper.clear();
 
+    // Assign bitmaps array so drawTile can resolve integer texture ids to PIXI.Texture
+    const bitmaps = this.map.getBitmaps();
+    this.tilemapLower.__bitmaps = bitmaps;
+    this.tilemapUpper.__bitmaps = bitmaps;
+
     this.rooms.forEach(room => {
       room.drawExterior(this, 'lower');
       room.drawInterior(this, 'lower');
@@ -259,6 +264,8 @@ class MapChunk extends CulledContainer {
   renderFog() {
     if (this.tilemapFog) {
       this.tilemapFog.clear();
+      // Assign bitmaps so drawFogTile can resolve index 0 (fog_gradient texture)
+      this.tilemapFog.__bitmaps = this.map.getBitmaps();
       this.rooms.forEach(room => {
         if (room.isLit()) {
           room.drawFog(this);

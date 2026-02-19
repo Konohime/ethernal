@@ -88,13 +88,26 @@ class AssetsLoader {
           const resource = await PIXI.Assets.load(name);
           this._loaded[name] = resource;
 
+          // Populate the REAL PIXI.utils.TextureCache (plain object)
+          // This is what MapRenderer.js reads via PIXI.utils.TextureCache
           if (resource && resource.textures) {
             Object.entries(resource.textures).forEach(([key, texture]) => {
               PIXI.utils.TextureCache[key] = texture;
+              // Also register without file extension: "room_normal2.png" → "room_normal2"
+              const keyNoExt = key.replace(/\.[^/.]+$/, "");
+              if (keyNoExt !== key) {
+                PIXI.utils.TextureCache[keyNoExt] = texture;
+              }
             });
           }
 
+          // Also store the resource itself under its name
           PIXI.utils.TextureCache[name] = resource;
+          // And without extension
+          const nameNoExt = name.replace(/\.[^/.]+$/, "");
+          if (nameNoExt !== name) {
+            PIXI.utils.TextureCache[nameNoExt] = resource;
+          }
           
           loaded++;
           this._progress = (loaded / total) * 100;
@@ -133,17 +146,13 @@ PIXICompat.Loader = {
   shared: sharedLoader,
 };
 
-// Helper pour TextureCache - créer un nouvel objet utils
+// ✅ FIX: Use the REAL PIXI.utils.TextureCache (a plain object populated by AssetsLoader above)
+// The old Proxy approach was broken because PIXI.Assets.cache uses URLs as keys, not short names.
 PIXICompat.utils = {
   ...PIXI.utils,
   get TextureCache() {
-    return new Proxy({}, {
-      get(target, prop) {
-        const cached = PIXI.Assets.cache.get(prop);
-        if (cached) return cached;
-        return PIXI.Assets.get(prop);
-      }
-    });
+    // Return the actual PIXI.utils.TextureCache which is populated by AssetsLoader.load()
+    return PIXI.utils.TextureCache;
   }
 };
 

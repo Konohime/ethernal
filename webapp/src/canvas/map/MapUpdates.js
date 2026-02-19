@@ -32,17 +32,19 @@ class MapUpdates {
       const { newest = {} } = update;
       if (parseCoordinates(newest.coordinates).z === this.map.floor) {
         const chunkId = coordinatesChunkId(newest.coordinates);
-        if (!this.map.chunks.get(chunkId)) {
+        const chunkIsNew = !this.map.chunks.get(chunkId);
+        if (chunkIsNew) {
           this.map.createChunk(chunkId);
           this.map.doCull(true);
         }
-        if (this.map.isRoomActive(newest.coordinates)) {
+        // Handle room update if active OR if chunk was just created (first load)
+        if (this.map.isRoomActive(newest.coordinates) || chunkIsNew) {
           this.map.handleRoomUpdate(update);
 
           // Update room actions for player only if they are in that room
           if (
-            newest.coordinates === cache.characterCoordinates &&
-            newest.onlineCharacters.includes(cache.characterId)
+            newest.coordinates === this.cache.characterCoordinates &&
+            newest.onlineCharacters.includes(this.cache.characterId)
           ) {
             this.map.displayRoomActions(newest.coordinates);
           }
