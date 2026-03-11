@@ -100,33 +100,37 @@ const store = derived(
         store.checkBackIn = async value => {
           const gasEstimate = toBeHex(BigInt(4000000));
           _set({ status: 'SigningBackIn', delegateAccount });
-          
-          try {
-            // Étape 1: Refill d'abord
-            console.log('Step 1: Refilling energy...');
-            const refillTx = await wallet.tx(
-              { gas: gasEstimate, gasPrice, value },
-              'Player',
-              'refill',
-            );
-            await refillTx.wait();
-            console.log('Refill done!');
 
-            // Étape 2: Ajouter le delegate (sans value cette fois)
-            console.log('Step 2: Adding delegate...');
-            const tx = await wallet.tx(
-              { gas: gasEstimate, gasPrice },
-              'Player',
-              'addDelegate',
-              delegateAccount.address,
-            );
+          try {
+            // Read current on-chain energy so we can top up exactly enough for addDelegate.
+            // The deployed contract has MIN_BALANCE = 1000000000000000 (0.001 ETH),
+            // which may differ from config.minBalance when that value was later reduced.
+            const CONTRACT_MIN_BALANCE = BigInt('1000000000000000'); // 0.001 ETH as deployed
+            const [onChainEnergy] = await wallet.call('Player', 'getEnergy', $wallet.address);
+            const currentEnergy = BigInt(onChainEnergy.toString());
+            const needed = currentEnergy < CONTRACT_MIN_BALANCE
+              ? CONTRACT_MIN_BALANCE - currentEnergy
+              : BigInt(0);
+
+            // Use max(needed, UI-provided value) so we never send less than expected
+            const valueToSend = needed > BigInt(value) ? toBeHex(needed) : value;
+            const txOpts = { gas: gasEstimate, gasPrice };
+            if (BigInt(valueToSend) > BigInt(0)) txOpts.value = valueToSend;
+
+            // Single atomic tx: addDelegate is payable and calls _refill internally
+            console.log('Adding delegate...', {
+              currentEnergy: currentEnergy.toString(),
+              needed: needed.toString(),
+              valueToSend,
+            });
+            const tx = await wallet.tx(txOpts, 'Player', 'addDelegate', delegateAccount.address);
             await tx.wait();
             console.log('Delegate added!');
           } catch (e) {
             _set({ status: 'Error', error: { code: 'checkBackIn', message: e.toString(), e, wallet } });
             return;
           }
-          
+
           const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
           _set({
             status: 'Done',
