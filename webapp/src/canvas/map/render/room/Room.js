@@ -1,4 +1,4 @@
-import 'pixi.js';
+import PIXI from 'lib/pixi-compat';
 import seedrandom from 'seedrandom';
 import quests from 'data/quests';
 import RoomType from '../../RoomType';
@@ -192,7 +192,7 @@ class Room extends Dirtable {
         const gy = this.chunk.cy * CHUNK_ROOM_LENGTH * ROOM_SIZE + this.lyInner;
 
         // console.log({ coordinates, gx, gy });
-        const ttex = PIXI.utils.TextureCache.teleporter;
+        const ttex = PIXI.Texture.from("teleporter");
         this.teleport = new PIXI.Sprite(ttex);
         this.teleport.scale.set(1.5, 1.5);
         let telX = ROOM_TILE_SIZE * (gx + this.widthInner / 2);
@@ -222,7 +222,7 @@ class Room extends Dirtable {
 
         this.updateTeleporter();
       } else if (this.isTemple()) {
-        const ttex = PIXI.utils.TextureCache.temple_center;
+        const ttex = PIXI.Texture.from("temple_center");
         const gx = this.chunk.cx * CHUNK_ROOM_LENGTH * ROOM_SIZE + this.lxInner;
         const gy = this.chunk.cy * CHUNK_ROOM_LENGTH * ROOM_SIZE + this.lyInner;
         let telX = ROOM_TILE_SIZE * (gx + this.widthInner / 2);
@@ -235,11 +235,12 @@ class Room extends Dirtable {
         this.templeCenter.position.set(Math.floor(telX), Math.floor(telY));
         this.contentLower.addChild(this.templeCenter);
       } else if (this.isCarrier()) {
-        const t = PIXI.utils.TextureCache;
-        // eslint-disable-next-line camelcase
-        const { lift_full1, lift_full2, lift_full3, lift_full4, lift_full5, lift_full6, lift_full7, lift_full8 } = t;
-        // eslint-disable-next-line camelcase
-        const ttex = [lift_full1, lift_full2, lift_full3, lift_full4, lift_full5, lift_full6, lift_full7, lift_full8];
+        const ttex = [
+          PIXI.Texture.from('lift_full1'), PIXI.Texture.from('lift_full2'),
+          PIXI.Texture.from('lift_full3'), PIXI.Texture.from('lift_full4'),
+          PIXI.Texture.from('lift_full5'), PIXI.Texture.from('lift_full6'),
+          PIXI.Texture.from('lift_full7'), PIXI.Texture.from('lift_full8'),
+        ];
         const sprite = new PIXI.AnimatedSprite(ttex);
         sprite.animationSpeed = 0.15;
         sprite.parentGroup = this.chunk.map.upperGroup;
@@ -364,7 +365,7 @@ class Room extends Dirtable {
     if (!this.isTeleporter()) return;
     if ((manualSwitch === undefined && this.isMyCharacterInRoom()) || manualSwitch) {
       if (!this.teleportOn) {
-        this.teleport.texture = PIXI.utils.TextureCache.teleporter;
+        this.teleport.texture = PIXI.Texture.from("teleporter");
         // eslint-disable-next-line prefer-destructuring
         this.teleportBL.texture = this.map.teleporterCorners[0];
         // eslint-disable-next-line prefer-destructuring
@@ -376,7 +377,7 @@ class Room extends Dirtable {
         this.teleportOn = true;
       }
     } else {
-      this.teleport.texture = PIXI.utils.TextureCache.teleporter_off;
+      this.teleport.texture = PIXI.Texture.from("teleporter_off");
       // eslint-disable-next-line prefer-destructuring
       this.teleportBL.texture = this.map.teleporterCorners[4];
       // eslint-disable-next-line prefer-destructuring

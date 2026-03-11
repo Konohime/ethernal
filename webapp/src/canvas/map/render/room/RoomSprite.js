@@ -1,4 +1,4 @@
-import 'pixi.js';
+import PIXI from 'lib/pixi-compat';
 
 const DEFAULT_OPTIONS = {
   flip: {

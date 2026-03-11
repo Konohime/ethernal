@@ -133,7 +133,7 @@ class Dungeon {
     console.log(`character ${character} metatransaction error:`, error.reason);
     const info = await this.character.info(
       character,
-      await this.reloadPlayerInfo(character, await this.reloadCharacterStats(character)),
+      await this.character.reloadPlayerInfo(character, await this.character.reloadCharacterStats(character)),
     );
     await this.map.reorgRoom(info.coordinates, [info]);
     this.debug.metatxFails.push({ character, error, date: new Date().toISOString() });

@@ -255,10 +255,9 @@ class MapChunk extends CulledContainer {
       room.drawInterior(this, 'upper');
     });
 
-    this.tilemapLower.width = this.dims.width;
-    this.tilemapLower.height = this.dims.height;
-    this.tilemapUpper.width = this.dims.width;
-    this.tilemapUpper.height = this.dims.height;
+    // NOTE: Do NOT set .width/.height on CompositeTilemap — in PIXI 7, assigning
+    // width/height on a Container forces a scale factor (desiredSize / contentBounds),
+    // which causes tiles to render at the wrong size.
   }
 
   renderFog() {

@@ -1,8 +1,7 @@
 import { get } from 'svelte/store';
 import { subscribe } from 'svelte/internal';
-import 'pixi.js';
-require('@pixi/layers');
-import { ease } from 'pixi-ease';
+import PIXI from 'lib/pixi-compat';
+import gsap from 'gsap';
 
 import { actionsText, teleportText } from 'data/text';
 import {
@@ -98,8 +97,8 @@ class MapRenderer {
     };
 
     this.container = new PIXI.Container();
-    this.container.interactive = true;
-    this.container.containsPoint = () => true;
+    this.container.eventMode = 'static';
+    this.container.hitArea = { contains: () => true };
     // this.container.interactiveChildren = false;
 
     this.container.sortableChildren = false;
@@ -115,7 +114,8 @@ class MapRenderer {
     this.fullscreenFog.camera = this.cameraComposer;
     this.showDelay = 0;
 
-    patchTreeSearch(app.renderer?.plugins?.interaction);
+    // patchTreeSearch is no longer needed in PIXI 7
+    // patchTreeSearch(app.renderer?.plugins?.interaction);
 
     app.ticker.add(() => {
       window.globalCounter = 0;
@@ -142,7 +142,7 @@ class MapRenderer {
     this.stopped = true;
 
     this.app.ticker.stop();
-    this.app.renderer.view.style.visibility = 'hidden';
+    (this.app.canvas || this.app.renderer.view).style.visibility = 'hidden';
   }
 
   startMap() {
@@ -151,7 +151,7 @@ class MapRenderer {
     }
     this.stopped = false;
     this.app.ticker.start();
-    this.app.renderer.view.style.visibility = 'inherit';
+    (this.app.canvas || this.app.renderer.view).style.visibility = 'inherit';
   }
 
   init() {
@@ -233,7 +233,7 @@ class MapRenderer {
 
     this.containerTop.sortableChildren = true;
     this.containerTop.sortDirty = true;
-    this.containerTop.interactive = true;
+    this.containerTop.eventMode = 'static';
     this.containerTop.interactiveChildren = true;
 
     this.containerTop.addChild(myCharLayer);
@@ -246,7 +246,16 @@ class MapRenderer {
     this.containerTop.addChild(pathLayer);
     this.containerTop.addChild(radialMenuLayer);
 
-    const tCache = PIXI.utils.TextureCache;
+    // PIXI 7: utils.TextureCache still works for spritesheet frames.
+    // Add a fallback wrapper in case some keys are only in PIXI.Cache.
+    const _textureCache = PIXI.utils.TextureCache;
+    const tCache = new Proxy(_textureCache, {
+      get(target, key) {
+        if (key in target) return target[key];
+        // Fallback: try PIXI 7 Cache / Texture.from
+        try { return PIXI.Texture.from(key); } catch(e) { return undefined; }
+      }
+    });
 
     this.bitmaps = [];
     this.bitmapMap = {};
@@ -296,16 +305,23 @@ class MapRenderer {
     this.roomSpriteSheets[RoomType.TEMPLE].index = this.bitmapMap[RoomType.TEMPLE];
     this.roomSpriteSheets[RoomType.LIFT].index = this.bitmapMap[RoomType.LIFT];
 
-    this.arrowTop = new PIXI.Texture(tCache.arrows.baseTexture, new PIXI.Rectangle(0, 0, 65, 64), null, null, 0);
-    this.arrowBottom = new PIXI.Texture(tCache.arrows.baseTexture, new PIXI.Rectangle(0, 0, 65, 64), null, null, 8);
-    this.arrowLeft = new PIXI.Texture(tCache.arrows.baseTexture, new PIXI.Rectangle(65, 0, 65, 64), null, null, 0);
-    this.arrowRight = new PIXI.Texture(tCache.arrows.baseTexture, new PIXI.Rectangle(65, 0, 65, 64), null, null, 12);
+    // PIXI 7: Texture constructor signature changed for rotation parameter.
+    const createRotatedTexture = (baseTexture, frame, rotate) => {
+      const tex = new PIXI.Texture(baseTexture, frame);
+      if (rotate) tex.rotate = rotate;
+      return tex;
+    };
+
+    this.arrowTop = createRotatedTexture(tCache.arrows.baseTexture, new PIXI.Rectangle(0, 0, 65, 64), 0);
+    this.arrowBottom = createRotatedTexture(tCache.arrows.baseTexture, new PIXI.Rectangle(0, 0, 65, 64), 8);
+    this.arrowLeft = createRotatedTexture(tCache.arrows.baseTexture, new PIXI.Rectangle(65, 0, 65, 64), 0);
+    this.arrowRight = createRotatedTexture(tCache.arrows.baseTexture, new PIXI.Rectangle(65, 0, 65, 64), 12);
 
     const pathDim = new PIXI.Rectangle(0, 0, 18, 18);
-    this.pathTop = new PIXI.Texture(tCache.path.baseTexture, pathDim, null, null, 6);
-    this.pathBottom = new PIXI.Texture(tCache.path.baseTexture, pathDim, null, null, 2);
-    this.pathLeft = new PIXI.Texture(tCache.path.baseTexture, pathDim, null, null, 0);
-    this.pathRight = new PIXI.Texture(tCache.path.baseTexture, pathDim, null, null, 4);
+    this.pathTop = createRotatedTexture(tCache.path.baseTexture, pathDim, 6);
+    this.pathBottom = createRotatedTexture(tCache.path.baseTexture, pathDim, 2);
+    this.pathLeft = createRotatedTexture(tCache.path.baseTexture, pathDim, 0);
+    this.pathRight = createRotatedTexture(tCache.path.baseTexture, pathDim, 4);
 
     this.teleporterCorners = [];
 
@@ -391,9 +407,9 @@ class MapRenderer {
       buttonIcon.scale.set(1.1625, 1.1625);
       buttonBack.anchor.set(0.5, 0.5);
       buttonIcon.anchor.set(0.5, 0.5);
-      buttonIcon.interactive = true;
-      buttonBack.interactive = true;
-      button.interactive = true;
+      buttonIcon.eventMode = 'static';
+      buttonBack.eventMode = 'static';
+      button.eventMode = 'static';
       button.interactiveChildren = true;
       button.addChild(buttonBack, buttonIcon);
       return button;
@@ -408,7 +424,7 @@ class MapRenderer {
     this.charMenu.parentGroup = this.radialMenuGroup;
 
     this.arrowContainer = new PIXI.Container();
-    this.arrowContainer.interactive = true;
+    this.arrowContainer.eventMode = 'static';
     this.arrowContainer.interactiveChildren = true;
 
     this.container.addChild(this.arrowContainer);
@@ -733,7 +749,8 @@ class MapRenderer {
       parentGroup: this.charGroup,
     });
 
-    character.interactive = character.buttonMode = true;
+    character.eventMode = 'static';
+    character.cursor = 'pointer';
     character.on('pointerdown', event => {
       event.stopPropagation();
       this.camera.setPosition(character.position.x, character.position.y, 1000);
@@ -994,11 +1011,10 @@ class MapRenderer {
   removeCharacter(charId) {
     const character = this.characters[charId];
     if (character) {
-      const charFadeout = ease.add(character, { alpha: 0 }, { duration: 1000 });
-      charFadeout.once('complete', () => {
+      gsap.to(character, { alpha: 0, duration: 1, onComplete: () => {
         this.removeObject(character);
         delete this.characters[charId];
-      });
+      }});
     } else {
       // eslint-disable-next-line no-console
       console.error(`no character on map with id: ${charId}. skip removing ...`);
@@ -1304,7 +1320,7 @@ class MapRenderer {
       if (item.appear) {
         item.appear(item.x, item.y);
       } else {
-        ease.add(item, { alpha: 1 }, { duration: 1000 });
+        gsap.to(item, { alpha: 1, duration: 1 });
       }
     }
     const [rx, ry] = coords.split(',').map(Number);
@@ -1703,12 +1719,11 @@ class MapRenderer {
     // Create the sprite to add to the map.
     const arrow = new PIXI.Sprite(texture);
     arrow.parentGroup = this.arrowGroup;
-    arrow.buttonMode = true;
+    arrow.cursor = 'pointer';
     arrow.anchor.set(0.5, 0.5);
     arrow.scale.set(0.25, 0.25);
     arrow.position.set(px, py);
-    arrow.interactive = true;
-    arrow.buttonMode = true;
+    arrow.eventMode = 'static';
 
     const path = new PIXI.Sprite(pathTexture);
     path.anchor.set(0.5, 0.5);

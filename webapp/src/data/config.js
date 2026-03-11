@@ -18,7 +18,7 @@ const settings = Object.freeze({
     '80001': '1500000000000000',
     '77': '1000000000000000',
     '100': '100000000000000000',
-    '84532': '1000000000000000', // 0.001 ETH - Base Sepolia (assez pour addDelegate)
+    '84532': '10000000000000', // 0.00001 ETH - Base Sepolia (needFood threshold = minBalance*5 = 0.00005 ETH)
     '8453': '1000000000000000',  // 0.001 ETH - Base Mainnet
   },
   gasPrice: {

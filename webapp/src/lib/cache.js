@@ -621,7 +621,7 @@ class Cache {
     const info = await retry(
       () =>
         this.fetch(`characters/${this.characterId}`).then(async info => {
-          if (info.characterId === this.characterId) {
+          if (String(info.characterId) === String(this.characterId)) {
             return info;
           } else {
             throw new Error('backend not ready');
@@ -658,7 +658,7 @@ class Cache {
     console.log('fetching rooms', initialCoordinates);
     const rooms = await this.subscribeRooms(initialCoordinates);
     console.log('rooms fetched', rooms);
-    this.applyRoomUpdates(rooms);
+    if (rooms) this.applyRoomUpdates(rooms);
 
     const characterRoom = this.rooms[coordinates];
     if (!this.currentCombat && characterRoom && characterRoom.combat) {

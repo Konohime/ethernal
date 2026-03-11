@@ -1,4 +1,4 @@
-import 'pixi.js';
+import PIXI from 'lib/pixi-compat';
 import Direction from '../../utils/Direction';
 
 /** The size (in pixels), a tile is for room SpriteSheets. */

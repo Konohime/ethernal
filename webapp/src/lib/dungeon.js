@@ -158,18 +158,18 @@ class Dungeon {
   }
 
   async move(direction) {
-    this.notifyOnError(this.playerWallet.tx('move', this.character, direction));
+    this.notifyOnError(this.playerWallet.tx('move', this.character, direction)).catch(err => console.error('move failed:', err));
     return this.cache.onceMoved();
   }
 
   async movePath(path) {
-    this.notifyOnError(this.playerWallet.tx('movePath', this.character, path));
+    this.notifyOnError(this.playerWallet.tx('movePath', this.character, path)).catch(err => console.error('movePath failed:', err));
     return this.cache.onceMoved();
   }
 
   async teleport(location) {
     console.log(`teleporting to ${location}`);
-    this.notifyOnError(this.playerWallet.tx('teleport', this.character, coordinatesToLocation(location)));
+    this.notifyOnError(this.playerWallet.tx('teleport', this.character, coordinatesToLocation(location))).catch(err => console.error('teleport failed:', err));
     return this.cache.onceMoved();
   }
 

@@ -148,9 +148,13 @@
       { alias: 'fog_gradient', src: '/images/map/fog_gradient.png' },
     ];
     
-    // Add all assets to the bundle
+    // Add all assets to the bundle (skip already-registered ones)
     for (const asset of assets) {
-      PIXI.Assets.add(asset);
+      try {
+        PIXI.Assets.add(asset);
+      } catch (e) {
+        // Asset already registered, skip
+      }
     }
     
     // Load all assets with progress tracking
@@ -251,7 +255,7 @@
         antialias: false,
       });
 
-      // Set default scale mode
+      // Set default scale mode BEFORE loading assets (critical for pixel-art)
       PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
       app.ticker.maxFPS = MAX_FPS;
@@ -259,6 +263,8 @@
       // Use Stage from @pixi/layers
       app.stage = new Stage();
       app.stage.sortableChildren = true;
+      app.stage.eventMode = 'static';
+      app.stage.hitArea = app.screen;
 
       // Create Viewport in CSS pixels (no resolution scaling - handled by PIXI autoDensity)
       mapViewport = new Viewport({
