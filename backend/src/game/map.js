@@ -47,6 +47,16 @@ class DungeonMap extends DungeonComponent {
   async handleRoomDiscovered(location, blockNumber, direction, event) {
     const coordinates = locationToCoordinates(location);
     console.log('RoomDiscovered event:', coordinates);
+
+    // Clear stale memoize cache so fetchRoomInfo gets fresh on-chain data
+    const { Dungeon } = this.contracts;
+    Dungeon.cached.getRoomInfo.delete(location);
+
+    const room = await this.reloadRoom(coordinates);
+
+    if (room && !events.replaying) {
+      this.sockets.emit('room-actualised', { roomUpdates: [cleanRoom(room)] });
+    }
   }
 
   // PATCH: Handler pour RoomActualised
@@ -351,9 +361,17 @@ class DungeonMap extends DungeonComponent {
   }
 
   async reloadRoomEnsured(coordinates, originalRoom) {
+    const { Dungeon } = this.contracts;
+    const location = coordinatesToLocation(coordinates);
     const { monsterBlockNumber, characters = [], hasMonster } = originalRoom || await this._room(coordinates);
     const room = await retry(async () => {
+      // Clear stale memoize cache on each attempt so we always get fresh on-chain data
+      Dungeon.cached.getRoomInfo.delete(location);
       const r = await this.fetchRoomInfo(coordinates);
+      if (!r) {
+        console.log('failed to fetch updated room (not on-chain yet), trying again...');
+        throw new Error('room info not available yet');
+      }
       if (
         characters.length === 0 &&
         Number(monsterBlockNumber) === Number(r.monsterBlockNumber) &&

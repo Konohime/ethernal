@@ -158,19 +158,31 @@ class Dungeon {
   }
 
   async move(direction) {
-    this.notifyOnError(this.playerWallet.tx('move', this.character, direction)).catch(err => console.error('move failed:', err));
-    return this.cache.onceMoved();
+    const txPromise = this.notifyOnError(this.playerWallet.tx('move', this.character, direction));
+    const movedPromise = this.cache.onceMoved();
+    return new Promise((resolve, reject) => {
+      movedPromise.then(resolve).catch(reject);
+      txPromise.catch(reject);
+    });
   }
 
   async movePath(path) {
-    this.notifyOnError(this.playerWallet.tx('movePath', this.character, path)).catch(err => console.error('movePath failed:', err));
-    return this.cache.onceMoved();
+    const txPromise = this.notifyOnError(this.playerWallet.tx('movePath', this.character, path));
+    const movedPromise = this.cache.onceMoved();
+    return new Promise((resolve, reject) => {
+      movedPromise.then(resolve).catch(reject);
+      txPromise.catch(reject);
+    });
   }
 
   async teleport(location) {
     console.log(`teleporting to ${location}`);
-    this.notifyOnError(this.playerWallet.tx('teleport', this.character, coordinatesToLocation(location))).catch(err => console.error('teleport failed:', err));
-    return this.cache.onceMoved();
+    const txPromise = this.notifyOnError(this.playerWallet.tx('teleport', this.character, coordinatesToLocation(location)));
+    const movedPromise = this.cache.onceMoved();
+    return new Promise((resolve, reject) => {
+      movedPromise.then(resolve).catch(reject);
+      txPromise.catch(reject);
+    });
   }
 
   async scavengeGear(character, id) {
