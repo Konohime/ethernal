@@ -194,25 +194,24 @@
         {#if claimError}
           <p style="color: #ff6b6b; font-size: 12px; padding-bottom: 8px;">{claimError}</p>
         {/if}
-        {#if $needFood && $ubf && $ubf.amount > 0 && (!$ubf.claimed || ($ubf.claimed && !$untilNext))}
+        <BoxButton
+          isDisabled="{level >= 100 || dead || refillBN === 0n}"
+          onClick="{refill}"
+          type="full"
+          loadingText="Refilling..."
+        >
+          Refill
+          {#if $needFood}now{/if}
+          ({refillAmount} $ETH)
+        </BoxButton>
+        {#if $ubf && $ubf.amount > 0 && (!$ubf.claimed || ($ubf.claimed && !$untilNext))}
           <BoxButton
             isDisabled="{level >= 100 || dead || refillBN === 0n}"
             onClick="{claim}"
             type="full"
             loadingText="Claiming free food..."
           >
-            Claim free food & refill ({$ubf.amount} $ETH)
-          </BoxButton>
-        {:else}
-          <BoxButton
-            isDisabled="{level >= 100 || dead || refillBN === 0n}"
-            onClick="{refill}"
-            type="full"
-            loadingText="Refilling..."
-          >
-            Refill
-            {#if $needFood}now{/if}
-            ({refillAmount} $ETH)
+            Claim free food ({$ubf.amount} $ETH)
           </BoxButton>
         {/if}
       </div>
