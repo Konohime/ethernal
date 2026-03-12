@@ -77,37 +77,51 @@ class PlayerWallet {
       try {
         receipt = await oldWait();
       } catch (err) {
-        // ethers v6 CALL_EXCEPTION includes the receipt
-        if (err.receipt) {
-          receipt = err.receipt;
-        } else {
+        // ethers v6 attaches receipt via Object.assign in makeError
+        receipt = err.receipt || err.info?.receipt;
+        if (!receipt) {
+          // Fallback: fetch receipt from provider using the TX hash
+          try {
+            receipt = await this.provider.getTransactionReceipt(tx.hash);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error('failed to get receipt for reverted tx', e);
+          }
+        }
+        if (!receipt) {
           throw err;
         }
       }
-      receipt.methodName = methodName;
-      receipt.args = args;
-      if (receipt.logs && receipt.logs.length > 0) {
-        const callEvent = receipt.logs.find((log) => log.fragment?.name === 'Call');
+      // Use plain object to avoid issues with ethers v6 read-only receipt properties
+      const result = {
+        ...receipt,
+        logs: receipt.logs || [],
+        status: receipt.status,
+        hash: receipt.hash,
+        methodName,
+        args,
+      };
+      if (result.logs.length > 0) {
+        const callEvent = result.logs.find((l) => l.fragment?.name === 'Call');
         if (callEvent && !callEvent.args.success) {
           const bytes = getBytes(callEvent.args[1]);
           if (hexlify(bytes.slice(0, 4)) === '0x08c379a0') {
             const reason = defaultAbiCoder.decode(['string'], bytes.slice(4));
-            throw { reason: reason[0], receipt };
+            throw { reason: reason[0], receipt: result };
           }
-          throw { receipt, errorData: callEvent.args[1] };
+          throw { receipt: result, errorData: callEvent.args[1] };
         } else if (callEvent) {
-          // eslint-disable-next-line prefer-destructuring
-          receipt.returnData = callEvent.args[1];
+          result.returnData = callEvent.args[1];
         }
-      } else if (receipt.status === 0) {
+      } else if (result.status === 0) {
         // Outer TX reverted (e.g. not enough energy) — no logs emitted
-        throw { reason: 'transaction reverted', receipt };
-      } else {
+        throw { reason: 'transaction reverted', receipt: result };
+      } else if (result.logs.length === 0 && result.status !== 0) {
         // should not reach here
-        throw { receipt };
+        throw { receipt: result };
       }
-      log.debug('metatransaction receipt received', { tx, receipt });
-      return receipt;
+      log.debug('metatransaction receipt received', { tx, receipt: result });
+      return result;
     };
 
     log.debug('sending metatransaction', {
