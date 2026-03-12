@@ -68,8 +68,17 @@
     }
   };
 
+  let claimError = null;
+
   const claim = async () => {
-    await $dungeon.claimUbf();
+    try {
+      claimError = null;
+      await $dungeon.claimUbf();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('claim failed', err);
+      claimError = err.reason || 'Claim failed. Try refilling with ETH instead.';
+    }
   };
 
   let copied;
@@ -182,6 +191,9 @@
           Fill
           {#if refillToMax}to 100%{:else}rest of balance.{/if}
         </h6>
+        {#if claimError}
+          <p style="color: #ff6b6b; font-size: 12px; padding-bottom: 8px;">{claimError}</p>
+        {/if}
         {#if $needFood && $ubf && (!$ubf.claimed || ($ubf.claimed && !$untilNext))}
           <BoxButton
             isDisabled="{level >= 100 || dead || refillBN === 0n}"

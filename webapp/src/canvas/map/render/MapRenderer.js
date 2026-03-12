@@ -15,7 +15,7 @@ import {
   currentQuest,
 } from 'lib/cache';
 import { aroundCoordinates, overrideFloor, formatCoordinates, parseCoordinates } from 'utils/utils';
-import { mapModal, menuOverlay } from 'stores/screen';
+import { mapModal, menuOverlay, notificationOverlay } from 'stores/screen';
 
 import NameTag from 'canvas/common/NameTag';
 import log from 'utils/log';
@@ -1867,8 +1867,13 @@ class MapRenderer {
       await global.dungeon.cache.move(to);
     } catch (err) {
       moving = false;
+      this.myCharacter.moving = false;
       this.placeArrows();
-      throw err;
+      const reason = err.reason || (err.message && err.message.slice(0, 80)) || 'Move failed';
+      notificationOverlay.open('generic', { text: `<em>Error:</em> ${reason}`, timeout: 8000 });
+      // eslint-disable-next-line no-console
+      console.error('move failed', err);
+      return; // Don't re-throw; error is displayed via notification
     }
     moving = false;
   }

@@ -61,6 +61,7 @@ class Dungeon {
     this.delegateWallet = new ethers.Wallet(delegatePrivateKey, this.provider);
     this.contract = this.contract.connect(this.delegateWallet);
     this.transferer = this.transferer.connect(this.delegateWallet);
+    this.ubf = this.ubf.connect(this.delegateWallet);
 
     this.playerWallet = new PlayerWallet({
       playerContract: this.playerContract,

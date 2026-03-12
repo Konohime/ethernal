@@ -71,7 +71,19 @@ class PlayerWallet {
     );
     const oldWait = tx.wait.bind(tx);
     tx.wait = async () => {
-      const receipt = await oldWait();
+      // ethers v6 throws CALL_EXCEPTION when receipt.status === 0
+      // We need to catch that to extract the receipt and check the Call event for inner revert reasons
+      let receipt;
+      try {
+        receipt = await oldWait();
+      } catch (err) {
+        // ethers v6 CALL_EXCEPTION includes the receipt
+        if (err.receipt) {
+          receipt = err.receipt;
+        } else {
+          throw err;
+        }
+      }
       receipt.methodName = methodName;
       receipt.args = args;
       if (receipt.logs && receipt.logs.length > 0) {
@@ -87,6 +99,9 @@ class PlayerWallet {
           // eslint-disable-next-line prefer-destructuring
           receipt.returnData = callEvent.args[1];
         }
+      } else if (receipt.status === 0) {
+        // Outer TX reverted (e.g. not enough energy) — no logs emitted
+        throw { reason: 'transaction reverted', receipt };
       } else {
         // should not reach here
         throw { receipt };
