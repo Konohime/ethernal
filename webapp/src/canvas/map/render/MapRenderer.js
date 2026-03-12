@@ -1863,7 +1863,13 @@ class MapRenderer {
     this.myCharacter.moving = true;
     this.ui.remove();
     this.updateFog = false;
-    await global.dungeon.cache.move(to);
+    try {
+      await global.dungeon.cache.move(to);
+    } catch (err) {
+      moving = false;
+      this.placeArrows();
+      throw err;
+    }
     moving = false;
   }
 

@@ -30,7 +30,11 @@ class PlayerWallet {
   async reserveGas({ limit = 400000, gasPrice = null }) {
     if (gasPrice === null) {
       const chainId = await this.provider.send('eth_chainId', []);
-      gasPrice = BigInt(config(chainId).gasPrice);
+      const configPrice = BigInt(config(chainId).gasPrice);
+      const feeData = await this.provider.getFeeData();
+      // Use whichever is higher: network current price or configured minimum
+      const networkPrice = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
+      gasPrice = networkPrice > configPrice ? networkPrice : configPrice;
     }
     const gasEstimate = BigInt(limit);
     const gasLimit = gasEstimate + 100000n; // BigInt addition
