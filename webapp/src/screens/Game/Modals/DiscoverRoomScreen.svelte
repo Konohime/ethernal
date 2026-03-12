@@ -15,38 +15,42 @@
   let fragments;
   let loading = true;
 
-  $: hasEnoughFragments = fragments && $characterBalances.fragments >= fragments;
+  $: hasEnoughFragments = fragments !== null && fragments !== undefined && $characterBalances.fragments >= fragments;
 
   // Determine how much player can afford before calling move
-  $: Promise.resolve()
-    .then(() => {
-      loading = true;
-      error = null;
-    })
-    .then(() => $dungeon.discoveryCost(coordinates))
-    .then(val => {
-      fragments = val && !val.error ? val : null;
-    })
-    .catch(() => {
-      fragments = null;
-    })
-    .finally(() => {
-      loading = false;
-    });
+  $: if ($dungeon && coordinates) {
+    loading = true;
+    error = null;
+    $dungeon.discoveryCost(coordinates)
+      .then(val => {
+        // val === 0 means free (LOCATION_ZERO), val > 0 means cost in fragments
+        fragments = (val !== null && val !== undefined && !val.error) ? Number(val) : null;
+      })
+      .catch(e => {
+        // eslint-disable-next-line no-console
+        console.error('discoveryCost failed:', e);
+        fragments = null;
+      })
+      .finally(() => {
+        loading = false;
+      });
+  }
 
   $: isDisabled = loading || !hasEnoughFragments;
 
   const onClick = async () => {
     error = null;
     try {
-      $map._move(coordinates);
+      await $map._move(coordinates);
       mapModal.close();
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error(err);
+      console.error('room discovery failed:', err);
       error = 'Please try again.';
-      if (err.reason === 'does not own enough') {
-        error = 'Not enough coins. Try again later.';
+      if (err && err.reason === 'does not own enough') {
+        error = 'Not enough fragments. Try again later.';
+      } else if (err && err.reason) {
+        error = err.reason;
       }
     }
   };
@@ -87,22 +91,26 @@
 <ModalLayout class="discover-room-screen">
   {#if loading}
     <p>...</p>
-  {:else if fragments}
-    <p>{fragments} {pluralize('fragment', fragments)} to generate room {formatCoordinates(coordinates)}</p>
-    {#if $characterBalances.fragments}
-      <Resources fragments="{$characterBalances.fragments}" hideEmpty>
-        <span class="res">You are carrying</span>
-      </Resources>
+  {:else if fragments !== null && fragments !== undefined}
+    {#if fragments === 0}
+      <p>Free to generate room {formatCoordinates(coordinates)}</p>
     {:else}
-      <span class="res">You don't have any fragments in your bag.</span>
+      <p>{fragments} {pluralize('fragment', fragments)} to generate room {formatCoordinates(coordinates)}</p>
+      {#if $characterBalances.fragments}
+        <Resources fragments="{$characterBalances.fragments}" hideEmpty>
+          <span class="res">You are carrying</span>
+        </Resources>
+      {:else}
+        <span class="res">You don't have any fragments in your bag.</span>
+      {/if}
     {/if}
   {:else}
-    <p>...</p>
+    <p>Unable to load room cost. Please try again.</p>
   {/if}
 
   <div class="button">
-    <BoxButton type="wide full" {isDisabled} {onClick} loadingText="...">
-      {#if loading}...{:else if !hasEnoughFragments}Not enough fragments{:else}Generate room{/if}
+    <BoxButton type="wide full" {isDisabled} {onClick} loadingText="Generating...">
+      {#if loading}...{:else if !hasEnoughFragments && fragments > 0}Not enough fragments{:else}Generate room{/if}
     </BoxButton>
     {#if error}
       <p class="error">{error}</p>
