@@ -110,12 +110,21 @@ class Dungeon {
       tx = await metatx;
       await tx.wait();
     } catch (err) {
-      this.cache.socket.emit('metatx-error', err);
+      // Emit a serializable error object (ethers v6 receipts contain BigInt which JSON.stringify can't handle)
+      try {
+        this.cache.socket.emit('metatx-error', {
+          reason: err.reason || err.message || 'unknown error',
+          hash: err.receipt?.hash || tx?.hash,
+        });
+      } catch (emitErr) {
+        // eslint-disable-next-line no-console
+        console.warn('failed to emit metatx-error', emitErr);
+      }
       // eslint-disable-next-line no-console
       console.log('tx failed', err);
       Sentry.captureException(err, {
         tags: { metatx: err.reason },
-        extra: { tx, receipt: err.receipt },
+        extra: { hash: err.receipt?.hash || tx?.hash },
       });
       throw err;
     }
