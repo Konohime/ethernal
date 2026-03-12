@@ -194,7 +194,7 @@
         {#if claimError}
           <p style="color: #ff6b6b; font-size: 12px; padding-bottom: 8px;">{claimError}</p>
         {/if}
-        {#if $needFood && $ubf && (!$ubf.claimed || ($ubf.claimed && !$untilNext))}
+        {#if $needFood && $ubf && $ubf.amount > 0 && (!$ubf.claimed || ($ubf.claimed && !$untilNext))}
           <BoxButton
             isDisabled="{level >= 100 || dead || refillBN === 0n}"
             onClick="{claim}"
