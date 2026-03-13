@@ -36,17 +36,19 @@ class PlayerWallet {
       const networkPrice = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
       gasPrice = networkPrice > configPrice ? networkPrice : configPrice;
     }
-    const gasEstimate = BigInt(limit);
-    const gasLimit = gasEstimate + 100000n; // BigInt addition
+    // Inner call gas: the gas allocated to the destination contract call inside callAsCharacter
+    const innerGasLimit = BigInt(limit);
+    // TX gas: inner call + overhead for callAsCharacter itself (auth, fees, storage, pool charge, event)
+    const txGasLimit = innerGasLimit + 200000n;
 
-    const fee = gasPrice * gasLimit; // BigInt multiplication
+    const fee = gasPrice * txGasLimit;
 
     const balance = await this.getBalance();
-    if (fee > balance) { // BigInt comparison
+    if (fee > balance) {
       throw new Error(`not enough balance, needed: ${fee}`);
     }
 
-    return { gasLimit, gasPrice };
+    return { innerGasLimit, txGasLimit, gasPrice };
   }
 
   async tx(options, methodName, ...args) {
@@ -65,9 +67,9 @@ class PlayerWallet {
 
     const tx = await this.playerContract.callAsCharacter(
       this.destinationContract.target, // ethers v6: .target instead of .address
-      overrides.gasLimit,
+      overrides.innerGasLimit,         // gas allocated to the inner contract call
       data,
-      overrides,
+      { gasLimit: overrides.txGasLimit, gasPrice: overrides.gasPrice }, // TX overrides
     );
     const oldWait = tx.wait.bind(tx);
     tx.wait = async () => {
