@@ -35,7 +35,7 @@
     "test:gas": "REPORT_GAS=true hardhat test",
     "coverage": "hardhat coverage",
     "deploy:local": "hardhat deploy --network localhost --export ../webapp/contracts/development.json",
-    "deploy:base-sepolia": "hardhat deploy --network baseSepolia --export ../webapp/contracts/staging.json",
+    "deploy:base-sepolia": "hardhat deploy --network base-sepolia --export ../webapp/contracts/staging.json",
     "deploy:base": "hardhat deploy --network base --export ../webapp/contracts/production.json",
     "node": "hardhat node",
     "dev": "hardhat node --export ../webapp/contracts/development.json",
