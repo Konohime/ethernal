@@ -14,6 +14,8 @@
   import { dungeon, map as mapStore } from 'stores/dungeon';
   import { currentRoom, characterStatus, currentFloor } from 'lib/cache';
   import { getAreaByType } from 'data/elements';
+  import config from 'data/config';
+  import wallet from 'stores/wallet';
 
   import MapRenderer from 'canvas/map/render/MapRenderer';
   import { MAX_FPS } from 'canvas/common/Utils';
@@ -29,6 +31,8 @@
   import IconClose from 'assets/close.png';
 
   export let hidden;
+
+  $: blockExplorerUrl = config($wallet.chainId).blockExplorerUrl || 'https://etherscan.io/block';
 
   let app;
   let container;
@@ -562,7 +566,7 @@
           </h3>
           <h4>
             Room Block
-            <a href="{BLOCK_EXPLORER_URL}/{$currentRoom.blockNumber}" rel="noopener nofollow" target="_blank">
+            <a href="{blockExplorerUrl}/{$currentRoom.blockNumber}" rel="noopener nofollow" target="_blank">
               #{Number($currentRoom.blockNumber)}
             </a>
           </h4>

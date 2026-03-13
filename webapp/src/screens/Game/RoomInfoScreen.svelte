@@ -15,6 +15,8 @@
   } from 'lib/cache';
   import { roomsText } from 'data/text';
   import { getAreaByType } from 'data/elements';
+  import config from 'data/config';
+  import wallet from 'stores/wallet';
   import { fetchCache } from 'lib/cache';
   import roomGenerator from 'lib/roomGenerator';
   import { formatCoordinates, getCoordinatesFloor } from 'utils/utils';
@@ -30,6 +32,8 @@
 
   export let back;
   export let coordinates;
+
+  $: blockExplorerUrl = config($wallet.chainId).blockExplorerUrl || 'https://etherscan.io/block';
 
   const DEACTIVATE_COST = 100; // 100 coins in vault to deactivate a room
   const ROOM_COST = 2; // 10 coins, later will be dynamic
@@ -496,7 +500,7 @@
           </p>
           <p>
             <span>Room block:</span>
-            <a href="{BLOCK_EXPLORER_URL}/{room.blockNumber}" rel="noopener nofollow" target="_blank">
+            <a href="{blockExplorerUrl}/{room.blockNumber}" rel="noopener nofollow" target="_blank">
               #{room.blockNumber}
             </a>
           </p>

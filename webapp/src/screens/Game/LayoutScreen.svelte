@@ -52,6 +52,14 @@
 
   import IconSkull from 'assets/skull-key-white.png';
 
+  // Strip internal meta-props before spreading into svelte:component
+  const screenProps = (obj) => {
+    if (!obj) return {};
+    // eslint-disable-next-line no-unused-vars
+    const { this: _comp, important: _imp, screen: _scr, ...props } = obj;
+    return props;
+  };
+
   let monsterOverlayEnabled = true;
   export const toggleMonsterOverlay = () => {
     monsterOverlayEnabled = !monsterOverlayEnabled;
@@ -187,7 +195,7 @@
     <div class="layout--area">
       {#if gameOverlayScreen}
         <div class="layout--area--map--overlay as-game-overlay">
-          <svelte:component this="{gameOverlayScreen.this}" {...gameOverlayScreen} />
+          <svelte:component this="{gameOverlayScreen.this}" {...screenProps(gameOverlayScreen)} />
         </div>
       {/if}
 
@@ -198,7 +206,7 @@
             class="layout--area--menu--overlay {menuOverlayScreen.important ? 'as-important' : ''}"
             transition:fade="{{ duration: 200 }}"
           >
-            <svelte:component this="{menuOverlayScreen.this}" {...menuOverlayScreen} />
+            <svelte:component this="{menuOverlayScreen.this}" {...screenProps(menuOverlayScreen)} />
           </div>
         {/if}
 
@@ -210,7 +218,7 @@
         <!-- Desktop online players menu -->
         {#if menuPlayersScreen}
           <div class="layout--area--menu--item">
-            <svelte:component this="{menuPlayersScreen.this}" {...menuPlayersScreen} class="online-players--desktop" />
+            <svelte:component this="{menuPlayersScreen.this}" {...screenProps(menuPlayersScreen)} class="online-players--desktop" />
           </div>
         {/if}
       </div>
@@ -223,14 +231,14 @@
         <!-- Display map overlay screen, e.g. loot. On mobile, this is fullscreen. -->
         {#if mapOverlayScreen}
           <div class="layout--area--map--overlay">
-            <svelte:component this="{mapOverlayScreen.this}" {...mapOverlayScreen} />
+            <svelte:component this="{mapOverlayScreen.this}" {...screenProps(mapOverlayScreen)} />
           </div>
         {/if}
 
         <!-- Display map modals, e.g. healing. -->
         {#if mapModalScreen && !monsterOverlay}
           <div class="layout--area--map--modal">
-            <svelte:component this="{mapModalScreen.this}" {...mapModalScreen} />
+            <svelte:component this="{mapModalScreen.this}" {...screenProps(mapModalScreen)} />
           </div>
         {/if}
 

@@ -28,6 +28,16 @@ const settings = Object.freeze({
     '84532': '1000000',
     '8453': '1000000',
   },
+  blockExplorerUrl: {
+    default: 'https://etherscan.io/block',
+    '4': 'https://rinkeby.etherscan.io/block',
+    '42': 'https://kovan.etherscan.io/block',
+    '80001': 'https://mumbai.polygonscan.com/block',
+    '77': 'https://blockscout.com/poa/sokol/block',
+    '100': 'https://blockscout.com/xdai/mainnet/block',
+    '84532': 'https://sepolia.basescan.org/block',
+    '8453': 'https://basescan.org/block',
+  },
 });
 const cache = {};
 const config = chainId => {
