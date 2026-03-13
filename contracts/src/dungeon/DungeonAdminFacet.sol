@@ -174,7 +174,9 @@ contract DungeonAdminFacet is DungeonFacetBase {
         uint256 escapeTo = _moveTo(characterId, location, reverseDirection);
         emit CharacterMoved(characterId, character.location, escapeTo, 0, reverseDirection);
         _actualiseRoom(escapeTo);
-        _rooms[character.location].numActiveCharacters--;
+        if (_rooms[character.location].numActiveCharacters > 0) {
+            _rooms[character.location].numActiveCharacters--;
+        }
         _rooms[escapeTo].numActiveCharacters++;
         character.location = escapeTo;
         character.direction = reverseDirection;

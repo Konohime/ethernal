@@ -39,20 +39,27 @@ contract DungeonMovementFacet is DungeonFacetBase {
             );
             _addInitialGears(characterId);
         }
+        uint256 entryLocation;
         if (
             location != 0 &&
             _rooms[location].kind == PureDungeon.ROOM_TYPE_TELEPORT &&
             PureDungeon._getRing(PureDungeon.LOCATION_ZERO, location) < 10
         ) {
-            _characters[characterId].location = location;
+            entryLocation = location;
         } else {
-            _characters[characterId].location = PureDungeon.LOCATION_ZERO;
+            entryLocation = PureDungeon.LOCATION_ZERO;
         }
+        _characters[characterId].location = entryLocation;
+        _rooms[entryLocation].numActiveCharacters++;
         emit Enter(characterId, sender, name);
     }
 
     function exit(uint256 characterId) external onlyPlayer {
-        require(_characters[characterId].location == PureDungeon.LOCATION_ZERO, "need to reach the entrance");
+        uint256 location = _characters[characterId].location;
+        require(location == PureDungeon.LOCATION_ZERO, "need to reach the entrance");
+        if (_rooms[location].numActiveCharacters > 0) {
+            _rooms[location].numActiveCharacters--;
+        }
         address subOwner = address(uint160(_charactersContract.getSubOwner(characterId)));
         _charactersContract.transferFrom(address(this), subOwner, characterId);
     }
