@@ -373,7 +373,9 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
             area.eventBlockNumber = blockNumber;
             emit RandomEvent(areaLoc, blockNumber);
         }
-        currentRoom.numActiveCharacters--;
+        if (currentRoom.numActiveCharacters > 0) {
+            currentRoom.numActiveCharacters--;
+        }
         nextRoom.numActiveCharacters++;
         character.location = location;
         character.direction = direction;
