@@ -38,6 +38,7 @@ contract DungeonMovementFacet is DungeonFacetBase {
                 })
             );
             _addInitialGears(characterId);
+            _elementsContract.mint(characterId, PureDungeon.FRAGMENTS, 10);
         }
         uint256 entryLocation;
         if (

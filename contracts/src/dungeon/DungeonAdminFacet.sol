@@ -207,6 +207,10 @@ contract DungeonAdminFacet is DungeonFacetBase {
         }
     }
 
+    function mintElements(uint256 characterId, uint256 elementId, uint256 amount) external onlyOwner {
+        _elementsContract.mint(characterId, elementId, amount);
+    }
+
     function start(
         Characters characters,
         Elements elements,
