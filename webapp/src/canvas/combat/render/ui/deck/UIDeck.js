@@ -135,6 +135,7 @@ class UIDeck extends PIXI.Container {
   }
 
   show(callback) {
+    this._hideRequested = false;
     this.deck.updateFromCache();
     this.visible = true;
     this.applied = false;
@@ -168,9 +169,12 @@ class UIDeck extends PIXI.Container {
   }
 
   hide(callback) {
+    this._hideRequested = true;
     const hideDeck = ease.add(this, { alpha: 0 }, { duration: 200 });
     hideDeck.on('complete', () => {
-      this.visible = false;
+      if (this._hideRequested) {
+        this.visible = false;
+      }
       if (callback) {
         callback.call();
       }

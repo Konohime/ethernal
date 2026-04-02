@@ -659,8 +659,6 @@ class CombatRenderer {
 
     this.monsterAttackDeck.hide();
     this.monsterDefenseDeck.hide();
-    this.charAttackDeck.hide();
-    this.charDefenseDeck.hide();
 
     this.charAttackDeck.reset();
     this.charDefenseDeck.reset();
