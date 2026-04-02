@@ -31,8 +31,9 @@ class RoomExit extends PIXI.Container {
     }
 
     this.visible = false;
-    const sprites = locked
-      ? this.animations[`${this.set}_door`]
+    const lockedAnim = locked ? this.animations[`${this.set}_door`] : null;
+    const sprites = lockedAnim && lockedAnim.length
+      ? lockedAnim
       : [PIXI.utils.TextureCache[`room_exit_${this.set}.png`]];
 
     this.floor = new PIXI.Sprite(PIXI.utils.TextureCache[`room_exit_${this.set}.png`]);
