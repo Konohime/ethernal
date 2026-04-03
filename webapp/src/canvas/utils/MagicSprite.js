@@ -13,8 +13,8 @@ export default class MagicSprite extends Sprite {
     this.transform.updateLocalTransform();
 
     if (this.camera) {
-      this.worldTransform.copyFrom(this.localTransform);
-      this.worldTransform.prepend(this.camera.invertedMatrix);
+      // Render at screen-space (0,0) so the fog overlay covers the full screen
+      this.worldTransform.set(1, 0, 0, 1, 0, 0);
       this._transformID = -1;
     }
   }

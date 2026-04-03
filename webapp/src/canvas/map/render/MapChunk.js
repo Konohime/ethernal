@@ -15,6 +15,7 @@ import {
   coordinatesInChunk,
   chunkPixelPosition,
   coordinatesDoorId,
+  drawFogVoid,
 } from './MapUtils';
 import Direction from '../../utils/Direction';
 
@@ -263,6 +264,7 @@ class MapChunk extends CulledContainer {
   renderFog() {
     if (this.tilemapFog) {
       this.tilemapFog.clear();
+      this.tilemapFog.fogMap = undefined;
       // Assign bitmaps so drawFogTile can resolve index 0 (fog_gradient texture)
       this.tilemapFog.__bitmaps = this.map.getBitmaps();
       this.rooms.forEach(room => {
@@ -270,6 +272,9 @@ class MapChunk extends CulledContainer {
           room.drawFog(this);
         }
       });
+      // Fill unexplored/unlit areas with black VOID tiles
+      const chunkTileSize = CHUNK_ROOM_LENGTH * ROOM_SIZE;
+      drawFogVoid(this.tilemapFog, 0, 0, chunkTileSize - 1, chunkTileSize - 1);
     }
   }
 

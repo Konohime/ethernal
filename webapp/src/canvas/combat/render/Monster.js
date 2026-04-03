@@ -26,7 +26,7 @@ class Monster extends PIXI.Container {
     nameLabel.anchor.set(0.5, 0);
     this.addChild(nameLabel);
 
-    this.monsterSprite = new PIXI.Sprite(PIXI.utils.TextureCache[monster.getTextureFile()]);
+    this.monsterSprite = new PIXI.Sprite(PIXI.utils.TextureCache[monster.getTextureFile()] || PIXI.Texture.EMPTY);
     this.monsterSprite.anchor.set(0.5);
     this.monsterSprite.scale.set(2.5);
     this.monsterSprite.y = 120;

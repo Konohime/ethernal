@@ -41,7 +41,9 @@ contract DungeonAdminFacet is DungeonFacetBase {
     ) external onlyAdmin {
         _blockHashRegister.save();
         Character storage character = _characters[characterId];
-        _actualiseRoom(character.location);
+        if (_rooms[character.location].blockNumber > 0) {
+            _actualiseRoom(character.location);
+        }
         if (gearData > 0) {
             require(_gearsContract.subBalanceOf(characterId) < MAX_GEARS, "Too many gears");
             _gearsContract.mint(characterId, gearData);
@@ -126,8 +128,10 @@ contract DungeonAdminFacet is DungeonFacetBase {
 
     function monsterDefeated(uint256 location) external onlyAdmin {
         _blockHashRegister.save();
-        _actualiseRoom(location);
         Room storage room = _rooms[location];
+        if (room.blockNumber > 0) {
+            _actualiseRoom(location);
+        }
         if (room.monsterBlockNumber != 0) {
             room.monsterBlockNumber = 0;
         }

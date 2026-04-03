@@ -574,7 +574,7 @@ class MapRenderer {
       this.addRoom(newest);
     }
 
-    if (!old && newest.onlineCharacters.length) {
+    if (!old && newest.onlineCharacters?.length) {
       newest.onlineCharacters.forEach(character => {
         if (character === cache.characterId) {
           this.addCharacter(cache.characterId, newest.coordinates, cache.characterStatus, 'my');
@@ -590,9 +590,7 @@ class MapRenderer {
     if (old && old.hasMonster && !newest.hasMonster) {
       this.removeMonster(newest.coordinates);
     } else if ((!old || !old.hasMonster) && newest.hasMonster) {
-      const {
-        combat: { monster },
-      } = newest;
+      const monster = newest.combat?.monster;
       this.addMonster(newest.coordinates, monster, animate);
     }
 
@@ -1041,12 +1039,13 @@ class MapRenderer {
       console.error(`monster already present at ${coords}`);
       return;
     }
-    this.monsters[coords] = this.addObjectAtCoords(new Monster(monster), coords, {
+    const obj = this.addObjectAtCoords(new Monster(monster), coords, {
       animate,
       x: 4.5,
       y: 4.5,
       parentGroup: this.mobGroup,
     });
+    this.monsters[coords] = obj;
     this.dirty = true;
   }
 

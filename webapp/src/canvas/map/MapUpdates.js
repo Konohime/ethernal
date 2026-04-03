@@ -47,7 +47,7 @@ class MapUpdates {
           // Update room actions for player only if they are in that room
           if (
             newest.coordinates === this.cache.characterCoordinates &&
-            newest.onlineCharacters.includes(this.cache.characterId)
+            newest.onlineCharacters?.includes(this.cache.characterId)
           ) {
             this.map.displayRoomActions(newest.coordinates);
           }

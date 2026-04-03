@@ -453,7 +453,7 @@ class DungeonMap extends DungeonComponent {
   }
 
   onlineCharacters(room = { characters: [] }) {
-    return room.characters.filter(char => this.sockets.characters[char]);
+    return (room.characters || []).filter(char => this.sockets.characters[char]);
   }
 
   async onlineCharactersInfo() {

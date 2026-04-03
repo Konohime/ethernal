@@ -1,9 +1,9 @@
 {
-  "name": "baseSepolia",
+  "name": "base-sepolia",
   "chainId": "84532",
   "contracts": {
     "BlockHashRegister": {
-      "address": "0x3E4B9A01BD2429f66ecBf271f6B312812a6d4603",
+      "address": "0x4F56f3B9783DE18F9433C752E6b897806F9Ab81C",
       "abi": [
         {
           "anonymous": false,
@@ -86,7 +86,7 @@
       ]
     },
     "Characters": {
-      "address": "0xDae9aea73bBd49695cc14ab651C931282f6B0C87",
+      "address": "0xEa489e89db69efcce6D1FAda6f140cC512C691Ee",
       "abi": [
         {
           "anonymous": false,
@@ -512,7 +512,7 @@
       ]
     },
     "Characters_Implementation": {
-      "address": "0x385390Ca76959d00FfD2d8d7360aA053423887B0",
+      "address": "0x11F5749Bd4aFBEbaaad80920AD2b062e5784826a",
       "abi": [
         {
           "anonymous": false,
@@ -814,7 +814,7 @@
       ]
     },
     "Characters_Proxy": {
-      "address": "0xDae9aea73bBd49695cc14ab651C931282f6B0C87",
+      "address": "0xEa489e89db69efcce6D1FAda6f140cC512C691Ee",
       "abi": [
         {
           "inputs": [
@@ -962,7 +962,7 @@
       ]
     },
     "Dungeon": {
-      "address": "0xC04fEaD57c2990929Ab3ac205474dEaC093820C3",
+      "address": "0xB99b54A05C4F98c5Fc6c73580935310dCF981508",
       "abi": [
         {
           "inputs": [
@@ -1683,6 +1683,29 @@
             }
           ],
           "name": "generateRoomIncome",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "characterId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "elementId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "mintElements",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -2534,7 +2557,7 @@
       }
     },
     "DungeonActionsFacet": {
-      "address": "0x94cCFC3fadf335B6EC25Dce648b25E6759086049",
+      "address": "0x8c079dAea16Da1c19C707Fa92352296Bd92BE982",
       "abi": [
         {
           "anonymous": false,
@@ -3073,7 +3096,7 @@
       }
     },
     "DungeonAdmin": {
-      "address": "0x454B68A1236C8A89359cCA4e782322aB86BAC4E2",
+      "address": "0x4DD559385dD53ed5eFEc7B6aFd98A3C2DA06269c",
       "abi": [
         {
           "inputs": [
@@ -3418,7 +3441,7 @@
       ]
     },
     "DungeonAdminFacet": {
-      "address": "0x9e872a7c1787D2079b60363c6e3499657386B570",
+      "address": "0x0D5cA4B9a4dd4aB8f729c7E18508e6AD8E452967",
       "abi": [
         {
           "anonymous": false,
@@ -3927,6 +3950,29 @@
           "inputs": [
             {
               "internalType": "uint256",
+              "name": "characterId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "elementId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "mintElements",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
               "name": "location",
               "type": "uint256"
             }
@@ -4115,7 +4161,7 @@
       }
     },
     "DungeonCharacterFacet": {
-      "address": "0x58a4122b8A4fC268DC4C5891e5E488BF7C2faCeA",
+      "address": "0x7Afe84dBcA54b417d2bEA90a4E00c4eCaBbF0e1f",
       "abi": [
         {
           "anonymous": false,
@@ -4559,7 +4605,7 @@
       }
     },
     "DungeonInfoFacet": {
-      "address": "0x261f5EeeD79924B41D85a5B42108ECCc34eD2E7E",
+      "address": "0x52E22d5d1ac32b01C9D7ccF8C6E4A8FE18eef2D6",
       "abi": [
         {
           "anonymous": false,
@@ -5189,7 +5235,7 @@
       }
     },
     "DungeonMovementFacet": {
-      "address": "0x533C8C5B0D2d150E919e3342c830860FbB346cA6",
+      "address": "0xFBACCcC6D75C6e4047Ace2Eb1a1FcAAD8054d89a",
       "abi": [
         {
           "anonymous": false,
@@ -5679,7 +5725,7 @@
       }
     },
     "DungeonTokenTransferer": {
-      "address": "0x3130D0b5f4E82a94eAdB388d99F244A616Ab1f06",
+      "address": "0x0cD930361abbe8c755bC3d94d872f0113B3F4a62",
       "abi": [
         {
           "anonymous": false,
@@ -6310,7 +6356,7 @@
       ]
     },
     "DungeonTokenTransferer_Implementation": {
-      "address": "0x73FdDd748C0554786bd9B354dEd32D2e767280c1",
+      "address": "0x29C6f13E731F75Fd4B3FeCda38EF9Cda87a03e05",
       "abi": [
         {
           "anonymous": false,
@@ -6798,7 +6844,7 @@
       ]
     },
     "DungeonTokenTransferer_Proxy": {
-      "address": "0x3130D0b5f4E82a94eAdB388d99F244A616Ab1f06",
+      "address": "0x0cD930361abbe8c755bC3d94d872f0113B3F4a62",
       "abi": [
         {
           "inputs": [
@@ -6946,7 +6992,7 @@
       ]
     },
     "Dungeon_DiamondProxy": {
-      "address": "0xC04fEaD57c2990929Ab3ac205474dEaC093820C3",
+      "address": "0xB99b54A05C4F98c5Fc6c73580935310dCF981508",
       "abi": [
         {
           "inputs": [
@@ -8515,7 +8561,7 @@
       ]
     },
     "Elements": {
-      "address": "0x13E756b0c8bd24D408441eD20Dc7138dcD2b608C",
+      "address": "0xc8fa2d3B20108Fdb00487Fed687a7c786CE2d2Bb",
       "abi": [
         {
           "anonymous": false,
@@ -9180,7 +9226,7 @@
       ]
     },
     "Elements_Implementation": {
-      "address": "0x2C36e96a37640A45c3175716ff8956Ded985704A",
+      "address": "0xEEE6612F52E33171BB0687d1771bbC56dED3F3e4",
       "abi": [
         {
           "anonymous": false,
@@ -9702,7 +9748,7 @@
       ]
     },
     "Elements_Proxy": {
-      "address": "0x13E756b0c8bd24D408441eD20Dc7138dcD2b608C",
+      "address": "0xc8fa2d3B20108Fdb00487Fed687a7c786CE2d2Bb",
       "abi": [
         {
           "inputs": [
@@ -9850,7 +9896,7 @@
       ]
     },
     "Gears": {
-      "address": "0xEfe0573431e55C521CDb1D48fD761a80a7f93cEa",
+      "address": "0x823C544CDAae989EC9908E585f3088d80Cebfe3C",
       "abi": [
         {
           "anonymous": false,
@@ -10380,7 +10426,7 @@
       ]
     },
     "Gears_Implementation": {
-      "address": "0x60B52296490aed8bC8DDB9B5313dD9468a5252b2",
+      "address": "0xC68561e97f31971524afBdd801F102C1739414C9",
       "abi": [
         {
           "anonymous": false,
@@ -10767,7 +10813,7 @@
       ]
     },
     "Gears_Proxy": {
-      "address": "0xEfe0573431e55C521CDb1D48fD761a80a7f93cEa",
+      "address": "0x823C544CDAae989EC9908E585f3088d80Cebfe3C",
       "abi": [
         {
           "inputs": [
@@ -10915,7 +10961,7 @@
       ]
     },
     "Player": {
-      "address": "0x42E0d761c9822551584dAed841E6e080365fB883",
+      "address": "0x25D874AfCd883990C157F6216bBB221241338ead",
       "abi": [
         {
           "anonymous": false,
@@ -11402,7 +11448,7 @@
       ]
     },
     "Player_Implementation": {
-      "address": "0x4114eF47a0E39c7d9DedD04a6dB278E9b593925B",
+      "address": "0xbF62354C15E413b87a54A1539C6C389910a614ca",
       "abi": [
         {
           "anonymous": false,
@@ -11746,7 +11792,7 @@
       ]
     },
     "Player_Proxy": {
-      "address": "0x42E0d761c9822551584dAed841E6e080365fB883",
+      "address": "0x25D874AfCd883990C157F6216bBB221241338ead",
       "abi": [
         {
           "inputs": [
@@ -11894,7 +11940,7 @@
       ]
     },
     "PureDungeon": {
-      "address": "0x188D44C61d35FE163c46eF979b895eD2d1b27186",
+      "address": "0x4f91af7F7E68201e1f0c44D7aB02dE48D94cbF75",
       "abi": [
         {
           "inputs": [
@@ -12499,7 +12545,7 @@
       ]
     },
     "ReadOnlyDungeon": {
-      "address": "0x0e2Ed73138ae0104E6Acbfae2aC9D89AE968F01F",
+      "address": "0xb44941ECd643Eb32848368A295236F992de162ae",
       "abi": [
         {
           "inputs": [
@@ -13104,7 +13150,7 @@
       ]
     },
     "Rooms": {
-      "address": "0x41e1FBF31fb9C8C4028F006C9b3FDd1B772b8B73",
+      "address": "0x0f606C7eb9381fD893Bb3ff46c9B5Fa7287F443F",
       "abi": [
         {
           "anonymous": false,
@@ -13652,7 +13698,7 @@
       ]
     },
     "Rooms_Implementation": {
-      "address": "0xc1c320BDdf32C15aD161Ba6056b99f7AeBF24c67",
+      "address": "0x5368D999133005EC2865eE694Fb6DA8f0B3671E6",
       "abi": [
         {
           "anonymous": false,
@@ -14057,7 +14103,7 @@
       ]
     },
     "Rooms_Proxy": {
-      "address": "0x41e1FBF31fb9C8C4028F006C9b3FDd1B772b8B73",
+      "address": "0x0f606C7eb9381fD893Bb3ff46c9B5Fa7287F443F",
       "abi": [
         {
           "inputs": [
@@ -14205,7 +14251,7 @@
       ]
     },
     "UBF": {
-      "address": "0x462750f1138DF29956B4F663e2e697D3461E7998",
+      "address": "0x7eba7E440A6f6BcB4F45B3dDF60B839A89515Db6",
       "abi": [
         {
           "anonymous": false,
@@ -14544,7 +14590,7 @@
       ]
     },
     "UBF_Implementation": {
-      "address": "0x605Bf810404AF284CCC87a83CF781A5DC014059d",
+      "address": "0x7910a46AE16e2719A8c206f05B8943b7352A26bc",
       "abi": [
         {
           "anonymous": false,
@@ -14744,7 +14790,7 @@
       ]
     },
     "UBF_Proxy": {
-      "address": "0x462750f1138DF29956B4F663e2e697D3461E7998",
+      "address": "0x7eba7E440A6f6BcB4F45B3dDF60B839A89515Db6",
       "abi": [
         {
           "inputs": [

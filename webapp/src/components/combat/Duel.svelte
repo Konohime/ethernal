@@ -15,6 +15,8 @@
 
   import MapText from 'components/map/MapText';
 
+  export let toggleMonsterOverlayForEscape;
+
   let app;
   let container;
   let _w;
@@ -80,7 +82,19 @@
         // eslint-disable-next-line no-console
         console.log($dungeon.cache.characterStatus);
         if (duel.combat.monster.isDead()) {
-          // ...
+          if ($dungeon.cache.characterStatus === 'claiming rewards') {
+            // Rewards already confirmed on-chain — open loot immediately
+            mapOverlay.open('loot');
+          } else {
+            // Monster is dead locally but monsterDefeated TX hasn't confirmed yet.
+            // Trigger a retry via kill-monster so the backend re-sends the TX.
+            const coords = $dungeon.cache.currentRoom && $dungeon.cache.currentRoom.coordinates;
+            if (coords) {
+              // eslint-disable-next-line no-console
+              console.log('Monster already dead on load, triggering monsterDefeated retry at', coords);
+              $dungeon.cache.action('kill-monster', coords);
+            }
+          }
         } else if ($dungeon.cache.characterStatus === 'just died' || duel.combat.character.isDead()) {
           duel.renderer.characterDefeated();
         }
@@ -97,11 +111,16 @@
       }
     };
 
-    if (loader.progress === 100) {
-      createScene();
-    }
-
-    loader.onComplete.add(createScene);
+    // Assets are loaded via PIXI.Assets directly (MapArea.svelte), not via Loader.shared.
+    // Poll until both spritesheets are available, then create the scene.
+    const waitForAssets = () => {
+      if (PIXI.Assets.get('sheet') && PIXI.Assets.get('fx_curses')) {
+        createScene();
+      } else {
+        requestAnimationFrame(waitForAssets);
+      }
+    };
+    waitForAssets();
 
     container.appendChild(app.view);
 

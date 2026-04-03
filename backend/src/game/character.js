@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const { events, pastEvents, db } = require('../db/provider');
 const { uint256, cleanRoom, copy } = require('../data/utils');
-const { locationToCoordinates, isAddress, decodeDirections } = require('./utils');
+const { locationToCoordinates, coordinatesToLocation, isAddress, decodeDirections } = require('./utils');
 const DungeonComponent = require('./dungeonComponent.js');
 
 class Character extends DungeonComponent {
@@ -262,8 +262,36 @@ class Character extends DungeonComponent {
   };
 
   async status(character) {
-    const { status } = await this._info(character);
-    return status;
+    const info = await this._info(character);
+    const stored = info && info.status;
+
+    // If status is in a complex in-progress state, trust the stored value
+    if (stored && ['attacking monster', 'just died', 'claiming rewards', 'dead', 'not in dungeon'].includes(stored.status)) {
+      return stored;
+    }
+
+    // For 'exploring', verify the room: a reorg may have left the status stale while
+    // the room actually has a monster. Reload from chain so the frontend gets the
+    // correct status on page load without waiting for an unrelated blockchain event.
+    // Skip the re-check if the player intentionally escaped (escaped: true) — they are
+    // allowed to be 'exploring' in a room that still has a monster.
+    if (!stored || (stored.status === 'exploring' && !stored.escaped)) {
+      try {
+        const { Dungeon } = this.contracts;
+        // Clear memoize cache so we read fresh on-chain data (not a stale replay snapshot)
+        const location = coordinatesToLocation(info.coordinates);
+        Dungeon.cached.getRoomInfo.delete(location);
+        const freshRoom = await this.dungeon.map.reloadRoom(info.coordinates);
+        if (freshRoom && freshRoom.hasMonster) {
+          const corrected = await this.changeStatus(character, { status: 'blocked by monster' }, true);
+          return corrected;
+        }
+      } catch (e) {
+        console.warn('status: on-chain recheck failed', e.message);
+      }
+    }
+
+    return stored;
   }
 
   async changeStatus(character, status, force = false) {
