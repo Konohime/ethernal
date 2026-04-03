@@ -1876,6 +1876,7 @@ class MapRenderer {
       return; // Don't re-throw; error is displayed via notification
     }
     moving = false;
+    this.updateAllFog();
   }
 
   hideFurthestChunks() {

@@ -233,6 +233,11 @@ class Cache {
 
       this.on('character-escaped', ({ character, coordinates, statusUpdates }) => {
         this.applyStatusUpdates(statusUpdates);
+        if (character === this.characterId) {
+          // Clear stale combat reference so the map/UI don't show old combat data
+          _currentCombat.set(null);
+          this.calculateReachableRooms();
+        }
         if (coordinates === this.characterCoordinates) {
           if (character === this.characterId) {
             this._emitUpdate('characterEscaped', character);
@@ -661,12 +666,19 @@ class Cache {
     if (rooms) this.applyRoomUpdates(rooms);
 
     const characterRoom = this.rooms[coordinates];
-    if (!this.currentCombat && characterRoom && characterRoom.combat) {
+    // Don't restore stale combat data if the player has escaped from this room.
+    const currentStatusData = get(_statusData);
+    const isEscaped = currentStatusData && currentStatusData.escaped;
+    if (!this.currentCombat && !isEscaped && characterRoom && characterRoom.combat) {
       _currentCombat.set(characterRoom.combat);
     }
     if (characterRoom) {
       characterRoom.onlineCharacters = Array.from(new Set([this.characterId, ...characterRoom.onlineCharacters]));
       _currentRoom.set(roomGenerator(characterRoom));
+    } else {
+      // Subscribe returned no rooms (e.g. fresh backend DB). Set a minimal currentRoom
+      // so characterCoordinates is correct and incoming room updates are processed properly.
+      _currentRoom.set(roomGenerator({ coordinates, onlineCharacters: [this.characterId] }));
     }
     this.calculateReachableRooms();
 
@@ -704,7 +716,10 @@ class Cache {
 
       if (this.characterCoordinates === room.coordinates) {
         _currentRoom.set(roomGenerator(this.rooms[room.coordinates]));
-        if (room.combat) {
+        // Only update currentCombat if the player hasn't escaped from this room.
+        const statusData = get(_statusData);
+        const isEscaped = statusData && statusData.escaped;
+        if (room.combat && !isEscaped) {
           _currentCombat.set(room.combat);
         }
       }
