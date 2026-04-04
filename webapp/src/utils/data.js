@@ -10,9 +10,9 @@ export const groupBy = (xs, key) =>
   }, {});
 
 export const gearImage = ({ image = 'item_book.png' }) =>
-  image.startsWith('https://') ? image : `https://assets.dev.ethernal.world/gears/${image}`;
+  image.startsWith('https://') ? image : `/images/gears/${image}`;
 
-export const monsterImage = image => `https://assets.dev.ethernal.world/monsters/${image}`;
+export const monsterImage = image => `/images/monsters/${image}`;
 
 export const groupActions = ({ actions, slotType }) => {
   if (!actions) {
