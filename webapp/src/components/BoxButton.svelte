@@ -2,13 +2,13 @@
   import { needFood, currentDuel } from 'lib/cache';
   import { isMobile } from 'stores/screen';
 
-  export let loadingText;
+  export let loadingText = null;
   export let isDisabled = false;
   export let type = 'primary';
   export let onClick;
-  export let onMouseDown;
-  export let onMouseUp;
-  export let background;
+  export let onMouseDown = null;
+  export let onMouseUp = null;
+  export let background = null;
   export let loadingForever = false;
   export let needsFood = false;
   export let notInDuel = false;
