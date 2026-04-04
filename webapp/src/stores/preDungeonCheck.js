@@ -54,8 +54,8 @@ const store = derived(
         const { characterId, isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
 
         let characterInfo;
-        const { minBalance } = config($wallet.chainId);
-        let refill = minBalance;
+        const { price } = config($wallet.chainId);
+        let refill = price;
         try {
           characterInfo = await fetchCache(`characters/${characterId}`);
         } catch (e) {
@@ -102,16 +102,19 @@ const store = derived(
           _set({ status: 'SigningBackIn', delegateAccount });
 
           try {
-            // Read current on-chain energy so we can top up exactly enough for addDelegate.
+            // addDelegate calls _refill (adds ETH to energy) then _addDelegate (deducts CONTRACT_MIN_BALANCE).
+            // We need to send enough so that after deduction, the player has at least `value` (price) of usable energy.
             const CONTRACT_MIN_BALANCE = BigInt(config($wallet.chainId).contractMinBalance);
             const [onChainEnergy] = await wallet.call('Player', 'getEnergy', $wallet.address);
             const currentEnergy = BigInt(onChainEnergy.toString());
-            const needed = currentEnergy < CONTRACT_MIN_BALANCE
-              ? CONTRACT_MIN_BALANCE - currentEnergy
+            // After addDelegate, final energy = currentEnergy + sent - CONTRACT_MIN_BALANCE
+            // We want final energy >= value (price), so sent >= value + CONTRACT_MIN_BALANCE - currentEnergy
+            const targetEnergy = BigInt(value) + CONTRACT_MIN_BALANCE;
+            const needed = currentEnergy < targetEnergy
+              ? targetEnergy - currentEnergy
               : BigInt(0);
 
-            // Use max(needed, UI-provided value) so we never send less than expected
-            const valueToSend = needed > BigInt(value) ? toBeHex(needed) : value;
+            const valueToSend = needed > 0n ? toBeHex(needed) : '0x0';
             const txOpts = { gas: gasEstimate, gasPrice };
             if (BigInt(valueToSend) > BigInt(0)) txOpts.value = valueToSend;
 
