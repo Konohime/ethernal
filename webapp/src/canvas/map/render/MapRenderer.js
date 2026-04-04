@@ -827,7 +827,7 @@ class MapRenderer {
       if (door) {
         door.unlock(() => {
           this.doors[doorId] = undefined;
-          door.room.chunk.content.removeChild(door);
+          door.room.chunk.contentUpper.removeChild(door);
         });
       } else {
         console.log('door not found', _currentX, _currentY, doorId);
@@ -1059,7 +1059,7 @@ class MapRenderer {
       return;
     }
     this.removeObject(monster);
-    this.monsters[coords] = null;
+    delete this.monsters[coords];
     this.dirty = true;
   }
 
@@ -1097,7 +1097,7 @@ class MapRenderer {
       return;
     }
     this.removeObject(npc);
-    this.npcs[coords] = null;
+    delete this.npcs[coords];
     this.dirty = true;
   }
 
@@ -1139,7 +1139,7 @@ class MapRenderer {
       return;
     }
     this.removeObject(chest);
-    this.chests[coords] = null;
+    delete this.chests[coords];
     this.dirty = true;
   }
 

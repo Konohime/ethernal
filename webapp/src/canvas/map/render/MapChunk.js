@@ -164,18 +164,16 @@ class MapChunk extends CulledContainer {
 
     Array.from(roomCoords).forEach(coords => {
       if (this.map.droppedLoot[coords]) {
-        this.map.droppedLoot[coords].forEach(loot => {
-          this.map.removeDroppedLoot(coords);
+        [...this.map.droppedLoot[coords]].forEach(loot => {
           loot.destroy();
         });
-        this.map.droppedLoot[coords] = [];
+        delete this.map.droppedLoot[coords];
       }
       if (this.map.tombs[coords]) {
-        this.map.tombs[coords].forEach(tomb => {
-          this.map.removeTomb(coords);
+        [...this.map.tombs[coords]].forEach(tomb => {
           tomb.destroy();
         });
-        this.map.tombs[coords] = [];
+        delete this.map.tombs[coords];
       }
       if (this.map.monsters[coords]) {
         this.map.monsters[coords].destroy();
@@ -220,8 +218,8 @@ class MapChunk extends CulledContainer {
         this.createContent();
         this.onUpdate();
         this.renderFog();
-        this.showingLock = false;
       }
+      this.showingLock = false;
     }, this.map.showDelay);
   }
 

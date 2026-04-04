@@ -2,6 +2,7 @@
 import io from 'socket.io-client';
 import { writable, get, derived } from 'svelte/store';
 import { subscribe } from 'svelte/internal';
+import { tick } from 'svelte';
 // BigNumber removed - using native BigInt in ethers v6
 import retry from 'p-retry';
 import equal from 'fast-deep-equal';
@@ -55,6 +56,20 @@ class Cache {
         });
 
       await this.once('accepted');
+
+      // Register critical handlers before fetchAll so events during init aren't lost
+      this.on('ready', () => {
+        log.info(`backend restarted, reloading ...`);
+        window.location.reload();
+      });
+
+      this.on('update', update => this.applyUpdate(update));
+      this.on('reorg', update => this.applyUpdate(update, true));
+
+      this.on('room-actualised', ({ roomUpdates }) => {
+        this.applyRoomUpdates(roomUpdates);
+      });
+
       await this.fetchAll();
 
       // welcome screen
@@ -89,14 +104,6 @@ class Cache {
         ({ character }) => this.characterLeft(character),
         ({ character }) => character !== this.characterId,
       );
-
-      this.on('ready', () => {
-        log.info(`backend restarted, reloading ...`);
-        window.location.reload();
-      });
-
-      this.on('update', update => this.applyUpdate(update));
-      this.on('reorg', update => this.applyUpdate(update, true));
 
       this.on('move', e => {
         this.applyRoomUpdates(e.roomUpdates);
@@ -274,8 +281,9 @@ class Cache {
 
       this.on(
         'refill',
-        ({ characterInfo }) => {
+        async ({ characterInfo }) => {
           this.applyCharacterInfo(characterInfo);
+          await tick();
           this.calculateReachableRooms();
         },
         ({ character }) => character === this.characterId,
@@ -1331,7 +1339,7 @@ export const combatLog = derived([currentDuel], async ([$currentDuel], set) => {
 });
 
 export const needFood = derived([playerEnergy, wallet], ([$playerEnergy, $wallet], set) => {
-  if ($playerEnergy) {
+  if ($playerEnergy != null) {
     set(BigInt($playerEnergy) < BigInt(config($wallet.chainId).minBalance) * 5n);
     // set(true);
   }

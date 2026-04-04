@@ -21,6 +21,17 @@ const settings = Object.freeze({
     '84532': '10000000000000', // 0.00001 ETH - Base Sepolia (needFood threshold = minBalance*5 = 0.00005 ETH)
     '8453': '1000000000000000',  // 0.001 ETH - Base Mainnet
   },
+  contractMinBalance: {
+    default: '1500000000000000',
+    '4': '1000000000000000',
+    '42': '1000000000000000',
+    '15001': '150000000000000',
+    '80001': '1500000000000000',
+    '77': '1000000000000000',
+    '100': '100000000000000000',
+    '84532': '1000000000000000', // 0.001 ETH - deployed Player.sol MIN_BALANCE
+    '8453': '1000000000000000',  // 0.001 ETH - deployed Player.sol MIN_BALANCE
+  },
   gasPrice: {
     default: '1000000000',
     '15001': '100000000',

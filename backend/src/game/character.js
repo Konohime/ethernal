@@ -100,7 +100,13 @@ class Character extends DungeonComponent {
 
   async handleRefill(playerAddress, newEnergy) {
     const player = playerAddress.toLowerCase();
-    const energy = newEnergy.toString();
+    const { Player } = this.contracts;
+    // Read actual on-chain energy instead of trusting the event value.
+    // When addDelegate calls _refill then _addDelegate, the Refill event
+    // is emitted before _addDelegate deducts MIN_BALANCE, so the event
+    // energy is higher than the final on-chain energy.
+    const { energy: onChainEnergy } = await Player.cached.getEnergy(player);
+    const energy = onChainEnergy.toString();
     console.log(`player ${player} refill, now has ${energy}`);
     const characters = await this.byPlayer(player);
     const updates = characters.map(character => ({ ...character, energy }));

@@ -103,9 +103,7 @@ const store = derived(
 
           try {
             // Read current on-chain energy so we can top up exactly enough for addDelegate.
-            // The deployed contract has MIN_BALANCE = 1000000000000000 (0.001 ETH),
-            // which may differ from config.minBalance when that value was later reduced.
-            const CONTRACT_MIN_BALANCE = BigInt('1000000000000000'); // 0.001 ETH as deployed
+            const CONTRACT_MIN_BALANCE = BigInt(config($wallet.chainId).contractMinBalance);
             const [onChainEnergy] = await wallet.call('Player', 'getEnergy', $wallet.address);
             const currentEnergy = BigInt(onChainEnergy.toString());
             const needed = currentEnergy < CONTRACT_MIN_BALANCE
