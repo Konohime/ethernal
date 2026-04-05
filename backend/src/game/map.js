@@ -66,9 +66,8 @@ class DungeonMap extends DungeonComponent {
 
     const room = await this.reloadRoom(coordinates);
 
-    if (!events.replaying) {
+    if (room && !events.replaying) {
       this.sockets.emit('room-actualised', { roomUpdates: [cleanRoom(room)] });
-    
     }
   }
 

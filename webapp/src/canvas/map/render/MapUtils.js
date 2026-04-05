@@ -286,6 +286,7 @@ export const drawTile = (tilemap, textureId, tx, ty, dim, flipX, flipY, rotate) 
  * @param sprite {RoomSprite} The RoomSprite to draw.
  */
 export const drawSprite = (tilemap, sprite, tx, ty) => {
+  if (!sprite) return;
   drawTile(
     tilemap,
     sprite.sheet.index,

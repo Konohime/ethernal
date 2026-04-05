@@ -719,6 +719,7 @@ class Cache {
 
   applyRoomUpdates(roomUpdates) {
     roomUpdates.forEach(room => {
+      if (!room || !room.coordinates) return;
       const existingRoom = this.rooms[room.coordinates];
       this.rooms[room.coordinates] = { ...existingRoom, ...room };
 

@@ -245,13 +245,21 @@ class MapChunk extends CulledContainer {
     this.tilemapUpper.__bitmaps = bitmaps;
 
     this.rooms.forEach(room => {
-      room.drawExterior(this, 'lower');
-      room.drawInterior(this, 'lower');
+      try {
+        room.drawExterior(this, 'lower');
+        room.drawInterior(this, 'lower');
+      } catch (err) {
+        console.error(`[MapChunk] Error drawing room ${room.data?.coordinates} (lower):`, err);
+      }
     });
 
     this.rooms.forEach(room => {
-      room.drawExterior(this, 'upper');
-      room.drawInterior(this, 'upper');
+      try {
+        room.drawExterior(this, 'upper');
+        room.drawInterior(this, 'upper');
+      } catch (err) {
+        console.error(`[MapChunk] Error drawing room ${room.data?.coordinates} (upper):`, err);
+      }
     });
 
     // NOTE: Do NOT set .width/.height on CompositeTilemap — in PIXI 7, assigning
