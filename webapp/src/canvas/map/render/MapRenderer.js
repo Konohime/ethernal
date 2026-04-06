@@ -1742,6 +1742,10 @@ class MapRenderer {
       if (!room) return;
       if (room.status === 'undiscovered') {
         const { parent } = room;
+        // Only show discovery arrows for rooms directly adjacent to the character
+        // (distance 1). Multi-step paths to undiscovered rooms will be rejected
+        // by the contract since movePath requires all intermediate rooms to exist.
+        if (parent.distance > 1) return;
         const dir = parent.exit;
         const parentRoom = this.rooms[parent.coordinates];
         if (!parentRoom) return;
