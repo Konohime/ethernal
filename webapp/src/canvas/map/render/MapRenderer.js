@@ -488,31 +488,11 @@ class MapRenderer {
     }
 
     const v = this.cullProvider.viewport;
-    const min = this.minimalCullArea;
 
-    TMP_Rect.copyFrom(this.app.screen);
-    /*
-        TMP_Rect.x += 200;
-        TMP_Rect.y += 200;
-        TMP_Rect.width -= 400;
-        TMP_Rect.height -= 400;
-    */
-    this.cameraComposer.listen.updateTransform();
-    this.cameraComposer.transformRect(TMP_Rect, v, true);
-
-    const process =
-      force ||
-      this.camera.lastMutation === MUTATION_TYPE.SCALE ||
-      !v.width ||
-      !v.height ||
-      v.x < min.x ||
-      v.y < min.y ||
-      v.right > min.right ||
-      v.bottom > min.bottom;
-
-    if (!process) {
-      return;
-    }
+    // Use the screen rect directly as the viewport.
+    // isOutsideViewport() converts chunk positions to screen space via toGlobal(),
+    // so the viewport must also be in screen space for correct comparison.
+    v.copyFrom(this.app.screen);
 
     let first = true;
 
@@ -523,17 +503,9 @@ class MapRenderer {
       chunk.cullProvider = this.cullProvider;
       chunk._doCull();
 
-      // ivan: cull place, do not modify
       if (!chunk.culled) {
         chunk.show();
         childs.push(chunk);
-
-        if (first) {
-          min.copyFrom(chunk.dims);
-          first = false;
-        } else {
-          min.enlarge(chunk.dims);
-        }
       }
     }
 
