@@ -1,6 +1,9 @@
 <script>
+  import { formatEther } from 'ethers';
+
   import characterChoice from 'stores/characterChoice';
   import claim from 'stores/claim';
+  import config from 'data/config';
   import preDungeon from 'stores/preDungeon';
   import preDungeonCheck from 'stores/preDungeonCheck';
   import wallet from 'stores/wallet';
@@ -11,8 +14,7 @@
   import UseKeyScreen from 'screens/Intro/UseKeyScreen';
   import WalletSetupScreen from 'screens/Intro/WalletSetupScreen';
 
-  // @TODO - DETERMINE CORRECT PRICE
-  const FOOD_PRICE = 0.4;
+  $: FOOD_PRICE = formatEther(config($wallet.chainId).price);
 </script>
 
 {#if $preDungeon.roomId === 'final'}
@@ -25,7 +27,11 @@
         disableSkip="true"
         waitText="The elemental counts your money while you check the food...."
         text="An elemental appears: “You need food to survive in the dungeon. Remember, in the Ethernal every action
-        will cost you food.”"
+        will cost you food.”
+
+        (This single transaction creates your character, funds your food reserve and sets up a
+        temporary delegate key so your in-game actions — moves, combat, trades — can be signed
+        silently without a wallet popup every time.)"
         next="{async () => {
           await preDungeonCheck.join($characterChoice);
         }}"

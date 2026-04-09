@@ -1341,8 +1341,11 @@ export const combatLog = derived([currentDuel], async ([$currentDuel], set) => {
 
 export const needFood = derived([playerEnergy, wallet], ([$playerEnergy, $wallet], set) => {
   if ($playerEnergy != null) {
-    set(BigInt($playerEnergy) < BigInt(config($wallet.chainId).minBalance) * 5n);
-    // set(true);
+    // Threshold: 20% of the full food capacity (config.price == MAX_FOOD on this chain).
+    // Using `minBalance * 5` caused the bar to report "needFood" even when full on chains
+    // where minBalance * 5 > MAX_FOOD.
+    const maxFood = BigInt(config($wallet.chainId).price);
+    set(BigInt($playerEnergy) < (maxFood * 20n) / 100n);
   }
 });
 

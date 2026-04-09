@@ -172,8 +172,9 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint128 energy = _players[account].energy;
         energy += uint128(value);
         if (energy > uint128(MAX_FOOD)) {
+            // Compute refund BEFORE clamping — otherwise `energy - MAX_FOOD` is always 0.
+            refund = uint256(energy) - MAX_FOOD;
             energy = uint128(MAX_FOOD);
-            refund = energy - MAX_FOOD;
         }
         _players[account].energy = energy;
         emit Refill(account, energy);

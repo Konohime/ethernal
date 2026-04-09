@@ -103,22 +103,23 @@ const store = derived(
 
           try {
             // addDelegate calls _refill (adds ETH to energy) then _addDelegate (deducts CONTRACT_MIN_BALANCE).
-            // We need to send enough so that after deduction, the player has at least `value` (price) of usable energy.
+            // Send exactly what's needed to cover the delegate cost — energy is capped at MAX_FOOD
+            // (== price on current chains), so sending more would just be refunded by the contract
+            // and confuses the user. Target: energy >= CONTRACT_MIN_BALANCE before deduction.
             const CONTRACT_MIN_BALANCE = BigInt(config($wallet.chainId).contractMinBalance);
             const [onChainEnergy] = await wallet.call('Player', 'getEnergy', $wallet.address);
             const currentEnergy = BigInt(onChainEnergy.toString());
-            // After addDelegate, final energy = currentEnergy + sent - CONTRACT_MIN_BALANCE
-            // We want final energy >= value (price), so sent >= value + CONTRACT_MIN_BALANCE - currentEnergy
-            const targetEnergy = BigInt(value) + CONTRACT_MIN_BALANCE;
-            const needed = currentEnergy < targetEnergy
-              ? targetEnergy - currentEnergy
+            const needed = currentEnergy < CONTRACT_MIN_BALANCE
+              ? CONTRACT_MIN_BALANCE - currentEnergy
               : BigInt(0);
 
             const valueToSend = needed > 0n ? toBeHex(needed) : '0x0';
             const txOpts = { gas: gasEstimate, gasPrice };
             if (BigInt(valueToSend) > BigInt(0)) txOpts.value = valueToSend;
 
-            // Single atomic tx: addDelegate is payable and calls _refill internally
+            // Single atomic tx: addDelegate is payable and calls _refill internally.
+            // Energy lost here will be topped up right after by the auto UBF claim
+            // (triggered in stores/dungeon.js as soon as the dungeon finishes loading).
             console.log('Adding delegate...', {
               currentEnergy: currentEnergy.toString(),
               needed: needed.toString(),
@@ -184,29 +185,11 @@ const store = derived(
             location = coordinatesToLocation('0,0');
           }
 
-          // Étape 1: Refill (acheter de l'énergie) d'abord
-          console.log('Step 1: Refilling energy...');
-          const refillTx = await wallet.tx(
-            { gas: gasEstimate, gasPrice, value },
-            'Player',
-            'refill',
-          );
-          await refillTx.wait();
-          console.log('Refill done!');
-
-          // Étape 2: Créer et entrer dans le dungeon (sans paiement cette fois)
-          console.log('Step 2: Creating character and entering dungeon...');
-          console.log('DEBUG createAndEnter args:', {
-            delegate: delegateAccount.address,
-            value: "0",
-            name: name,
-            characterClass: characterClass,
-            characterClassType: typeof characterClass,
-            location: location,
-            locationType: typeof location,
-          });
+          // Single TX: createAndEnter is payable — _enter() calls _refill() with excess msg.value,
+          // then _addDelegate() to set up the delegate. No separate refill() needed.
+          console.log('Creating character and entering dungeon (single TX)...');
           const tx = await wallet.tx(
-            { gas: gasEstimate, gasPrice },
+            { gas: gasEstimate, gasPrice, value },
             'Player',
             'createAndEnter',
             delegateAccount.address,
@@ -216,7 +199,6 @@ const store = derived(
             BigInt(location),
           );
           const receipt = await tx.wait();
-          console.log({ receipt });
           console.log('gas used for join', receipt.gasUsed.toString());
 
           const { isCharacterInDungeon, isDelegateReady } = await checkCharacter();

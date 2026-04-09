@@ -38,6 +38,13 @@
   .content h3 {
     font-size: 20px;
   }
+  .explain {
+    font-size: 11px;
+    font-style: italic;
+    color: $color-lightGrey;
+    padding: 12px 16px 0;
+    line-height: 1.5;
+  }
 </style>
 
 <DefaultScreen>
@@ -50,8 +57,17 @@
     </div>
     {#if ressurectedId}
       <p>is waiting for you at dungeon entrance.</p>
+      <p class="explain">
+        This transaction re-enters your resurrected character into the dungeon.
+        No ETH is spent — only a signature and gas.
+      </p>
     {:else}
       <p>is waiting for you in the dungeon.</p>
+      <p class="explain">
+        This single transaction reconnects your character and tops up the energy
+        needed to play (moves, combat, etc.). Your game actions after this are
+        free — they're signed silently by a temporary delegate key.
+      </p>
     {/if}
 
     <div>

@@ -40,6 +40,28 @@ export const dungeon = derived([wallet, preDungeonCheck], async ([$wallet, $preD
       set('loading');
       d = await loadDungeon($wallet);
       set(d);
+
+      // Auto-claim UBF if available (fire-and-forget, meta-tx via delegate = no wallet popup).
+      // Must NOT be awaited here: svelte's `derived` async callback cancels its continuation
+      // once `set()` triggers downstream updates, so awaited code after `set(d)` never runs.
+      (async () => {
+        try {
+          console.log('[auto-ubf] checking UBF claim availability...');
+          const info = await d.ubfInfo();
+          const amount = info.amount ?? info[0];
+          const claimed = info.claimed ?? info[3];
+          console.log('[auto-ubf] ubfInfo', { amount: amount?.toString(), claimed });
+          if (amount && BigInt(amount) > 0n && !claimed) {
+            console.log('[auto-ubf] claiming...');
+            await d.claimUbf();
+            console.log('[auto-ubf] claimed successfully');
+          } else {
+            console.log('[auto-ubf] nothing to claim');
+          }
+        } catch (e) {
+          console.warn('[auto-ubf] skipped:', e.reason || e.message || e);
+        }
+      })();
     }
   } else {
     lastWalletAddress = null;
