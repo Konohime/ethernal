@@ -9,6 +9,7 @@
 
   let name;
   let characterClass = '0';
+  let spriteId = null;
   $: text = classes[characterClass];
 </script>
 
@@ -17,11 +18,11 @@
   btnText="Go forth"
   btnPressed="{() => {
     if (name && name !== '') {
-      characterChoice.setData({ name, characterClass });
+      characterChoice.setData({ name, characterClass, spriteId });
       next();
     }
   }}"
   btnDisabled="{!(name && name !== '')}"
 >
-  <SelectCharacterClass bind:characterClass bind:name />
+  <SelectCharacterClass bind:characterClass bind:name bind:spriteId />
 </DefaultScreen>

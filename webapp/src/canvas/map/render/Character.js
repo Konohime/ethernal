@@ -18,8 +18,35 @@ const colorMap = [
   { original: 0x211574, target: 0x743d15 },
 ];
 
+const SPRITE_CDN = 'https://cb-media.sfo3.cdn.digitaloceanspaces.com/pixelbrokers/current/sprites';
+const CELL_SIZE = 96;
+const FRAME_SIZE = 48;
+const FRAME_OFFSET = 24;
+const FRAME_COUNT = 6;
+// Row mapping: 0=front(south), 1=side/left(west), 2=back(north)
+const ROW_FRONT = 0;
+const ROW_SIDE = 1;
+const ROW_BACK = 2;
+
+function buildCustomFrames(baseTexture) {
+  const makeRow = row =>
+    Array.from({ length: FRAME_COUNT }, (_, col) =>
+      new PIXI.Texture(baseTexture, new PIXI.Rectangle(
+        col * CELL_SIZE + FRAME_OFFSET,
+        row * CELL_SIZE + FRAME_OFFSET,
+        FRAME_SIZE,
+        FRAME_SIZE,
+      )),
+    );
+  return {
+    front: makeRow(ROW_FRONT),
+    side: makeRow(ROW_SIDE),
+    back: makeRow(ROW_BACK),
+  };
+}
+
 class Character extends PIXI.Container {
-  constructor(type, viewport, dstRoom, ui, charId, charClass) {
+  constructor(type, viewport, dstRoom, ui, charId, charClass, spriteId) {
     super();
 
     this.charId = charId;
@@ -44,27 +71,38 @@ class Character extends PIXI.Container {
     const spritesheet_legacy = PIXI.Assets.get('sheet');
     const animations_legacy = spritesheet_legacy.animations;
     let { char_front_walk, char_side_walk, char_back_walk, char_torch } = animations_legacy;
-    const classSheetMap = {
-      [CharacterClass.EXPLORER]: 'char_explorer',
-      [CharacterClass.MAGE]: 'char_mage',
-      [CharacterClass.BARBARIAN]: 'char_berseker',
-      [CharacterClass.WARRIOR]: 'char_warrior',
-    };
-    const classAnimPrefix = {
-      [CharacterClass.EXPLORER]: 'char_adv',
-      [CharacterClass.MAGE]: 'char_wiz',
-      [CharacterClass.BARBARIAN]: 'char_bar',
-      [CharacterClass.WARRIOR]: 'char_war',
-    };
 
-    const sheetAlias = classSheetMap[charClass];
-    const prefix = classAnimPrefix[charClass];
-    if (sheetAlias) {
-      const charAnims = PIXI.Assets.get(sheetAlias).animations;
-      char_front_walk = charAnims[`${prefix}_front`];
-      char_back_walk = charAnims[`${prefix}_back`];
-      char_side_walk = charAnims[`${prefix}_side`];
+    // Check for pre-loaded custom sprite
+    const customSpriteUrl = spriteId != null ? `${SPRITE_CDN}/${spriteId}.png` : null;
+    const customTexture = customSpriteUrl ? PIXI.Assets.get(customSpriteUrl) : null;
+
+    if (customTexture) {
+      const frames = buildCustomFrames(customTexture.baseTexture || customTexture);
+      char_front_walk = frames.front;
+      char_back_walk = frames.back;
+      char_side_walk = frames.side;
+    } else {
+      const charAnims = PIXI.Assets.get('character_classes').animations;
+
+      if (charClass === CharacterClass.EXPLORER) {
+        char_front_walk = charAnims.char_adv_front;
+        char_back_walk = charAnims.char_adv_back;
+        char_side_walk = charAnims.char_adv_side;
+      } else if (charClass === CharacterClass.MAGE) {
+        char_front_walk = charAnims.char_wiz_front;
+        char_back_walk = charAnims.char_wiz_back;
+        char_side_walk = charAnims.char_wiz_side;
+      } else if (charClass === CharacterClass.BARBARIAN) {
+        char_front_walk = charAnims.char_bar_front;
+        char_back_walk = charAnims.char_bar_back;
+        char_side_walk = charAnims.char_bar_side;
+      } else if (charClass === CharacterClass.WARRIOR) {
+        char_front_walk = charAnims.char_war_front;
+        char_back_walk = charAnims.char_war_back;
+        char_side_walk = charAnims.char_war_side;
+      }
     }
+
     const moveS = new PIXI.AnimatedSprite(char_front_walk);
     const moveW = new PIXI.AnimatedSprite(char_side_walk);
     const moveE = new PIXI.AnimatedSprite(char_side_walk);
@@ -75,7 +113,8 @@ class Character extends PIXI.Container {
     moveE.tint = this.tint;
     moveN.tint = this.tint;
 
-    const scale = 0.65;
+    const isCustom = !!customTexture;
+    const scale = isCustom ? 0.667 : 1; // 48px custom frames scaled to ~32px to match class sprites
     const pos = { x: 0, y: -2 };
     moveS.position.set(pos.x, pos.y);
     moveW.position.set(pos.x, pos.y);
@@ -94,8 +133,9 @@ class Character extends PIXI.Container {
     lookAround.scale.set(1.25, 1.25);
     lookAround.tint = this.tint;
 
+    const pivotSize = isCustom ? FRAME_SIZE / 2 : 16;
     this.view = new PIXI.SimplePlane(moveE.texture);
-    this.view.pivot.set(24, 24);
+    this.view.pivot.set(pivotSize, pivotSize);
 
     if (true || type === 'other') {
       this.view.material = new ReplacementMaterial(PIXI.Texture.WHITE, colorMap);
@@ -109,6 +149,37 @@ class Character extends PIXI.Container {
     this.addChild(this.view);
     this.showName();
     this.interactive = true;
+
+    // Async load custom sprite if not cached yet
+    if (customSpriteUrl && !customTexture) {
+      this._loadCustomSprite(customSpriteUrl);
+    }
+  }
+
+  async _loadCustomSprite(url) {
+    try {
+      const texture = await PIXI.Assets.load(url);
+      const frames = buildCustomFrames(texture.baseTexture || texture);
+
+      const scale = 0.667;
+      const pivotSize = FRAME_SIZE / 2;
+
+      this.charAnimations.moveS.textures = frames.front;
+      this.charAnimations.moveW.textures = frames.side;
+      this.charAnimations.moveE.textures = frames.side;
+      this.charAnimations.moveN.textures = frames.back;
+
+      [this.charAnimations.moveS, this.charAnimations.moveW, this.charAnimations.moveE, this.charAnimations.moveN]
+        .forEach(anim => {
+          anim.scale.set(scale, scale);
+        });
+      this.charAnimations.moveE.scale.x = -scale;
+
+      this.view.pivot.set(pivotSize, pivotSize);
+      this._syncAnimation(this.activeAnimation);
+    } catch (e) {
+      console.warn('Failed to load custom sprite, keeping class sprite:', e);
+    }
   }
 
   _syncAnimation(target) {
