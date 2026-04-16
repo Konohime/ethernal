@@ -44,34 +44,26 @@ class Character extends PIXI.Container {
     const spritesheet_legacy = PIXI.Assets.get('sheet');
     const animations_legacy = spritesheet_legacy.animations;
     let { char_front_walk, char_side_walk, char_back_walk, char_torch } = animations_legacy;
-    // TODO: Figure out what the plan is to implement sprites separated for components. -Josh
-    const charAnims = PIXI.Assets.get('character_classes').animations;
+    const classSheetMap = {
+      [CharacterClass.EXPLORER]: 'char_explorer',
+      [CharacterClass.MAGE]: 'char_mage',
+      [CharacterClass.BARBARIAN]: 'char_berseker',
+      [CharacterClass.WARRIOR]: 'char_warrior',
+    };
+    const classAnimPrefix = {
+      [CharacterClass.EXPLORER]: 'char_adv',
+      [CharacterClass.MAGE]: 'char_wiz',
+      [CharacterClass.BARBARIAN]: 'char_bar',
+      [CharacterClass.WARRIOR]: 'char_war',
+    };
 
-    // DEBUG CODE
-    // char_front_walk = charAnims.char_wiz_front;
-    // char_back_walk = charAnims.char_wiz_back;
-    // char_side_walk = charAnims.char_wiz_side;
-
-    if (charClass === CharacterClass.EXPLORER) {
-      char_front_walk = charAnims.char_adv_front;
-      char_back_walk = charAnims.char_adv_back;
-      char_side_walk = charAnims.char_adv_side;
-      // this.tint = 0xecc41e;
-    } else if (charClass === CharacterClass.MAGE) {
-      char_front_walk = charAnims.char_wiz_front;
-      char_back_walk = charAnims.char_wiz_back;
-      char_side_walk = charAnims.char_wiz_side;
-      // this.tint = 0xecc41e;
-    } else if (charClass === CharacterClass.BARBARIAN) {
-      char_front_walk = charAnims.char_bar_front;
-      char_back_walk = charAnims.char_bar_back;
-      char_side_walk = charAnims.char_bar_side;
-      // this.tint = 0xecc41e;
-    } else if (charClass === CharacterClass.WARRIOR) {
-      char_front_walk = charAnims.char_war_front;
-      char_back_walk = charAnims.char_war_back;
-      char_side_walk = charAnims.char_war_side;
-      // this.tint = 0xecc41e;
+    const sheetAlias = classSheetMap[charClass];
+    const prefix = classAnimPrefix[charClass];
+    if (sheetAlias) {
+      const charAnims = PIXI.Assets.get(sheetAlias).animations;
+      char_front_walk = charAnims[`${prefix}_front`];
+      char_back_walk = charAnims[`${prefix}_back`];
+      char_side_walk = charAnims[`${prefix}_side`];
     }
     const moveS = new PIXI.AnimatedSprite(char_front_walk);
     const moveW = new PIXI.AnimatedSprite(char_side_walk);
@@ -83,7 +75,7 @@ class Character extends PIXI.Container {
     moveE.tint = this.tint;
     moveN.tint = this.tint;
 
-    const scale = 1;
+    const scale = 0.65;
     const pos = { x: 0, y: -2 };
     moveS.position.set(pos.x, pos.y);
     moveW.position.set(pos.x, pos.y);
@@ -103,7 +95,7 @@ class Character extends PIXI.Container {
     lookAround.tint = this.tint;
 
     this.view = new PIXI.SimplePlane(moveE.texture);
-    this.view.pivot.set(16, 16);
+    this.view.pivot.set(24, 24);
 
     if (true || type === 'other') {
       this.view.material = new ReplacementMaterial(PIXI.Texture.WHITE, colorMap);

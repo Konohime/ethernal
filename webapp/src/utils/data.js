@@ -102,5 +102,5 @@ export const statusText = status => {
   return text;
 };
 
-const portraits = ['port_war_6x.png', 'port_adv_6x.png', 'port_wiz_6x.png', 'port_bar_6x.png'];
-export const classPortrait = (characterClass = 0) => `/images/ui/portraits/${portraits[characterClass]}`;
+const portraits = ['warrior.png', 'explorer.png', 'mage.png', 'berseker.png'];
+export const classPortrait = (characterClass = 0) => `/images/map/${portraits[characterClass]}`;
