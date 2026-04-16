@@ -79,10 +79,10 @@
       { alias: 'icon_armor_s', src: '/images/ui/icon_armor_s.png' },
       
       // Portraits
-      { alias: 'portrait_adv', src: '/images/ui/portraits/port_adv_6x.png' },
-      { alias: 'portrait_bar', src: '/images/ui/portraits/port_bar_6x.png' },
-      { alias: 'portrait_war', src: '/images/ui/portraits/port_war_6x.png' },
-      { alias: 'portrait_wiz', src: '/images/ui/portraits/port_wiz_6x.png' },
+      { alias: 'portrait_adv', src: '/images/map/explorer.png' },
+      { alias: 'portrait_bar', src: '/images/map/berseker.png' },
+      { alias: 'portrait_war', src: '/images/map/warrior.png' },
+      { alias: 'portrait_wiz', src: '/images/map/mage.png' },
       
       // More icons
       { alias: 'icon_atk_s', src: '/images/ui/icon_atk_s.png' },
@@ -99,7 +99,10 @@
       
       // Spritesheets (JSON with textures)
       { alias: 'fx_curses', src: `/images/fx_curses.json?${COMMIT}` },
-      { alias: 'character_classes', src: `/images/map/character_classes.json?${COMMIT}` },
+      { alias: 'char_explorer', src: `/images/map/explorer_sprite.json?${COMMIT}` },
+      { alias: 'char_berseker', src: `/images/map/berseker_sprite.json?${COMMIT}` },
+      { alias: 'char_warrior', src: `/images/map/warrior_sprite.json?${COMMIT}` },
+      { alias: 'char_mage', src: `/images/map/mage_sprite.json?${COMMIT}` },
       
       // Map assets
       { alias: 'arrows', src: '/images/map/arrows.png' },
