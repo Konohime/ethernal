@@ -45,7 +45,7 @@
     <img class="unique" src="/images/game-icons/diamond.png" alt="diamond" />
   {/if}
 
-  <img class="icon" alt="{gear.name}" src="{gearImage(gear)}" />
+  <img class="icon" alt="{gear.name}" src="{gearImage(gear)}" on:error="{e => { e.target.style.opacity = '0'; }}" />
 
   {#if durability < 1000 && maxDurability > 0}
     <div class="durability-bar">

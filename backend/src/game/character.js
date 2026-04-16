@@ -30,8 +30,12 @@ class Character extends DungeonComponent {
     console.log('character ' + characterId + ' entered the dungeon');
     const character = characterId.toString();
     const player = playerAddress.toLowerCase();
+    const { Dungeon } = this.contracts;
+    // Clear stale cache so getCharacterInfo re-fetches the on-chain location (LOCATION_ZERO after enter)
+    Dungeon.cached.getCharacterInfo.delete(character);
     const initialInfo = await this.fetchCharacterInfo(character, player, name);
-    initialInfo.status = { status: 'exploring', newCharacter: true };
+    // Preserve monster-blocking status from initialCharacterStatus; only add newCharacter flag
+    initialInfo.status = { ...initialInfo.status, newCharacter: true };
     await this.storeCharacter(initialInfo);
     const characterInfo = await this.info(characterId, initialInfo);
     this.sockets.emit('character-entered', { character, player, characterInfo });

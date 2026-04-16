@@ -15,6 +15,8 @@
 
   import MapText from 'components/map/MapText';
 
+  export let toggleMonsterOverlayForEscape;
+
   let app;
   let container;
   let _w;
@@ -97,11 +99,16 @@
       }
     };
 
-    if (loader.progress === 100) {
-      createScene();
-    }
-
-    loader.onComplete.add(createScene);
+    // Assets are loaded via PIXI.Assets directly (MapArea.svelte), not via Loader.shared.
+    // Poll until both spritesheets are available, then create the scene.
+    const waitForAssets = () => {
+      if (PIXI.Assets.get('sheet') && PIXI.Assets.get('fx_curses')) {
+        createScene();
+      } else {
+        requestAnimationFrame(waitForAssets);
+      }
+    };
+    waitForAssets();
 
     container.appendChild(app.view);
 

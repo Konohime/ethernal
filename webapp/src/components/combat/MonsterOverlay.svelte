@@ -187,7 +187,7 @@
           {/if}
 
           <div class="image" in:scale>
-            <img alt="{monster.name}" src="{monsterImage(monster.image)}" />
+            <img alt="{monster.name}" src="{monsterImage(monster.image)}" on:error="{e => { e.target.style.display = 'none'; }}" />
           </div>
 
           <p>Level {monster.stats.level} | {monster.stats.health} HP | {monsterType}</p>
