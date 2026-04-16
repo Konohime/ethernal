@@ -395,7 +395,7 @@ class Room extends Dirtable {
    */
   drawFog(chunk) {
     const tilemap = chunk.tilemapFog;
-    tilemap.fogMap = [];
+    if (!tilemap.fogMap) tilemap.fogMap = [];
     const exemptions = [];
     const addException = (tx, ty) => {
       if (!exemptions[tx]) exemptions[tx] = [];
