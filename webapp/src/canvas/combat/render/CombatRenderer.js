@@ -686,6 +686,7 @@ class CombatRenderer {
       card.selected = false;
     });
 
+
     this.monsterAttackDeck.cards.forEach(card => {
       card.alpha = 0;
       card.visible = true;

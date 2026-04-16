@@ -32,16 +32,16 @@ export class OtherInfo extends PIXI.Container {
     let profileTexture = PIXI.utils.TextureCache[`ui_combat_profile.png`];
     if (actor.characterClass === CharacterClass.MAGE) {
       profileTexture = PIXI.utils.TextureCache.portrait_wiz;
-      scale /= 5.1;
+      scale /= 25;
     } else if (actor.characterClass === CharacterClass.EXPLORER) {
       profileTexture = PIXI.utils.TextureCache.portrait_adv;
-      scale /= 5.1;
+      scale /= 25;
     } else if (actor.characterClass === CharacterClass.BARBARIAN) {
       profileTexture = PIXI.utils.TextureCache.portrait_bar;
-      scale /= 5.1;
+      scale /= 25;
     } else if (actor.characterClass === CharacterClass.WARRIOR) {
       profileTexture = PIXI.utils.TextureCache.portrait_war;
-      scale /= 5.1;
+      scale /= 25;
     }
 
     this.profile = new PIXI.Sprite(profileTexture);

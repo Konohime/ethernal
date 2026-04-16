@@ -2557,7 +2557,7 @@
       }
     },
     "DungeonActionsFacet": {
-      "address": "0x8c079dAea16Da1c19C707Fa92352296Bd92BE982",
+      "address": "0x29f0cdf9f60c4B2C16f2e0303AA79009f78569ED",
       "abi": [
         {
           "anonymous": false,
@@ -3096,7 +3096,7 @@
       }
     },
     "DungeonAdmin": {
-      "address": "0x4DD559385dD53ed5eFEc7B6aFd98A3C2DA06269c",
+      "address": "0x2419ea3390877B6deEf4489F6e1e6aC2C79BDFe2",
       "abi": [
         {
           "inputs": [
@@ -3441,7 +3441,7 @@
       ]
     },
     "DungeonAdminFacet": {
-      "address": "0x0D5cA4B9a4dd4aB8f729c7E18508e6AD8E452967",
+      "address": "0xC68f88461cF59d0dd44ab008C9579CeC743dDC7E",
       "abi": [
         {
           "anonymous": false,
@@ -4161,7 +4161,7 @@
       }
     },
     "DungeonCharacterFacet": {
-      "address": "0x7Afe84dBcA54b417d2bEA90a4E00c4eCaBbF0e1f",
+      "address": "0xB85aD109454e3f2157ddf9d813510E6d7e720b42",
       "abi": [
         {
           "anonymous": false,
@@ -4605,7 +4605,7 @@
       }
     },
     "DungeonInfoFacet": {
-      "address": "0x52E22d5d1ac32b01C9D7ccF8C6E4A8FE18eef2D6",
+      "address": "0xde4dA84abA8E0956c8169dc467c4D5c55F6f30Aa",
       "abi": [
         {
           "anonymous": false,
@@ -5235,7 +5235,7 @@
       }
     },
     "DungeonMovementFacet": {
-      "address": "0xFBACCcC6D75C6e4047Ace2Eb1a1FcAAD8054d89a",
+      "address": "0xcB5B2800d74718F5ce93b3873a79e20BD1d7f491",
       "abi": [
         {
           "anonymous": false,
@@ -6356,7 +6356,7 @@
       ]
     },
     "DungeonTokenTransferer_Implementation": {
-      "address": "0x29C6f13E731F75Fd4B3FeCda38EF9Cda87a03e05",
+      "address": "0x97095D11909ab5da18771097A756BE2de8B45c21",
       "abi": [
         {
           "anonymous": false,
@@ -11448,7 +11448,7 @@
       ]
     },
     "Player_Implementation": {
-      "address": "0xbF62354C15E413b87a54A1539C6C389910a614ca",
+      "address": "0xAF3aC2d4fbc79F76Bf11197BdC5D0eb7d85E2214",
       "abi": [
         {
           "anonymous": false,
@@ -14590,7 +14590,7 @@
       ]
     },
     "UBF_Implementation": {
-      "address": "0x7910a46AE16e2719A8c206f05B8943b7352A26bc",
+      "address": "0xEa58345191c7370c9a7De88A1D680793771275Fe",
       "abi": [
         {
           "anonymous": false,

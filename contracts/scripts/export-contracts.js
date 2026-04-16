@@ -21,7 +21,8 @@ async function main() {
   ];
   
   const result = {
-    chainId: 84532,
+    name: 'base-sepolia',
+    chainId: '84532',
     contracts: {}
   };
   
@@ -31,7 +32,8 @@ async function main() {
       const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
       result.contracts[name] = {
         address: data.address,
-        abi: data.abi
+        abi: data.abi,
+        ...(data.linkedData ? { linkedData: data.linkedData } : {}),
       };
       console.log(`Added ${name}: ${data.address}`);
     } else {
