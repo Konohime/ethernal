@@ -43,12 +43,14 @@ contract UBF is Proxied, UBFDataLayout, Pool, Constants {
     }
 
     function claimUBF() external {
-        _claimUBF(msg.sender);
+        revert("USE_CHARACTER_CLAIM");
     }
 
     function claimUBFAsCharacter(uint256 characterId) external {
         require(msg.sender == address(_playerContract), "NOT_AUTHORIZED");
-        address account = address(uint160(_charactersContract.getSubOwner(characterId)));
+        uint256 subOwner = _charactersContract.getSubOwner(characterId);
+        require(subOwner != 0, "NOT_IN_DUNGEON");
+        address account = address(uint160(subOwner));
         _claimUBF(account);
     }
 
@@ -60,6 +62,11 @@ contract UBF is Proxied, UBFDataLayout, Pool, Constants {
         claimed = _claimedSlots[account][slot - 1];
     }
 
+    function getActivity(address account) external view returns (uint256 activity) {
+        uint256 slot = block.timestamp / SLOT_INTERVAL;
+        activity = _timeSlots[account][slot - 1];
+    }
+
     function getClaimAmount(address account) external view returns (uint256 amount) {
         return _getClaimAmount(account);
     }
@@ -68,6 +75,7 @@ contract UBF is Proxied, UBFDataLayout, Pool, Constants {
         uint256 slot = block.timestamp / SLOT_INTERVAL;
         require(slot != 0, "WAIT_NEXT_SLOT");
         require(!_claimedSlots[account][slot - 1], "ALREADY_CLAIMED");
+        require(_timeSlots[account][slot - 1] > 0, "NO_ACTIVITY");
 
         uint256 amount = _getClaimAmount(account);
         require(amount > 0, "NOTHING_TO_CLAIM");

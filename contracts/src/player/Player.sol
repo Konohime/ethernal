@@ -10,6 +10,8 @@ import "../utils/Constants.sol";
 contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants {
     event Call(bool success, bytes returnData);
     event Refill(address indexed playerAddress, uint256 newEnergy);
+    event DelegateAdded(address indexed player, address indexed delegate);
+    event DelegateRemoved(address indexed player, address indexed delegate);
 
     function postUpgrade(
         Characters charactersContract,
@@ -116,6 +118,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         }
 
         (success, returnData) = _executeWithSpecificGas(destination, gasLimit, data);
+        require(success, "call failed");
 
         PlayerStruct storage player = _players[address(uint160(playerAddress))];
         uint256 energy = player.energy;
@@ -183,7 +186,6 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         }
     }
 
-    // TODO add Events for Delegates
     function addDelegate(address payable _delegate) public payable {
         address payable sender = _msgSender();
         if (msg.value > 0) {
@@ -192,12 +194,21 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         _addDelegate(sender, _delegate);
     }
 
+    function removeDelegate(address _delegate) external {
+        address sender = _msgSender();
+        require(_delegates[_delegate] == sender, "NOT_YOUR_DELEGATE");
+        delete _delegates[_delegate];
+        emit DelegateRemoved(sender, _delegate);
+    }
+
     function _addDelegate(address sender, address payable _delegate) internal {
         require(_delegate != address(0), "no zero address delegate");
+        require(_delegates[_delegate] == address(0) || _delegates[_delegate] == sender, "DELEGATE_ALREADY_ASSIGNED");
         require(_players[sender].energy >= uint128(MIN_BALANCE), "not enough energy");
         _players[sender].energy -= uint128(MIN_BALANCE);
         _delegate.transfer(MIN_BALANCE);
         _delegates[_delegate] = sender;
+        emit DelegateAdded(sender, _delegate);
     }
 
     function _getFirstParam(bytes memory data) internal pure returns (uint256) {

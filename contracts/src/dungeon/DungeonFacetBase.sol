@@ -448,10 +448,11 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
     }
 
     function _initializeTaxDueDate(uint256 owner) internal {
-        if (owner != 0 && _roomsContract.subBalanceOf(owner) == 0) {
+        address ownerAddr = address(uint160(owner));
+        if (owner != 0 && _taxDueDate[ownerAddr] == 0) {
             uint256 dueDate = block.timestamp + 5 days;
-            _taxDueDate[address(uint160(owner))] = dueDate;
-            emit RoomTaxPay(address(uint160(owner)), 0, dueDate);
+            _taxDueDate[ownerAddr] = dueDate;
+            emit RoomTaxPay(ownerAddr, 0, dueDate);
         }
     }
 }

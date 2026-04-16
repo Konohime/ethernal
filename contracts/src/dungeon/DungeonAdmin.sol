@@ -22,8 +22,8 @@ contract DungeonAdmin {
         _backendAddress = backendAddress;
     }
 
-    function forward(address to, bytes memory data) public payable onlyBackend returns (bool success) {
-        return _dungeon.forward{value: msg.value}(to, data);
+    function forward(address to, bytes memory data) public onlyBackend returns (bool success) {
+        return _dungeon.forward(to, data);
     }
 
     modifier onlyBackend() {
