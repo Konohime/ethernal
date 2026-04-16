@@ -8,7 +8,7 @@ try {
   //
 }
 
-let $data = fromLocalStorage || { name: '', characterClass: 0 };
+let $data = fromLocalStorage || { name: '', characterClass: 0, spriteId: null };
 window.$characterChoice = $data;
 
 const { subscribe, set } = writable($data);
@@ -23,7 +23,7 @@ export default {
     set($data);
   },
   clear: () => {
-    set({ name: '', characterClass: 0 });
+    set({ name: '', characterClass: 0, spriteId: null });
     localStorage.removeItem('characterChoice');
   },
 };

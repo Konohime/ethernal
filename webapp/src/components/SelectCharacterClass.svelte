@@ -4,6 +4,41 @@
 
   export let name;
   export let characterClass = '0';
+  export let spriteId = null;
+
+  const SPRITE_CDN = 'https://cb-media.sfo3.cdn.digitaloceanspaces.com/pixelbrokers/current/sprites';
+
+  let useCustomSprite = false;
+  let spriteIdInput = '';
+  let spritePreviewUrl = '';
+  let spriteError = false;
+
+  function onSpriteIdInput() {
+    spriteError = false;
+    const id = parseInt(spriteIdInput, 10);
+    if (!isNaN(id) && id >= 0 && id <= 9999) {
+      spritePreviewUrl = `${SPRITE_CDN}/${id}.png`;
+      spriteId = id;
+    } else {
+      spritePreviewUrl = '';
+      spriteId = null;
+    }
+  }
+
+  function onSpriteLoadError() {
+    spriteError = true;
+    spriteId = null;
+  }
+
+  function toggleCustomSprite(enabled) {
+    useCustomSprite = enabled;
+    if (!enabled) {
+      spriteId = null;
+      spriteIdInput = '';
+      spritePreviewUrl = '';
+      spriteError = false;
+    }
+  }
 
   $: text = classes[characterClass];
 </script>
@@ -74,6 +109,74 @@
       margin-left: 25px;
     }
   }
+  .sprite-section {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    h3 {
+      margin-bottom: 10px;
+    }
+  }
+  .sprite-toggle {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    justify-content: center;
+  }
+  .sprite-option {
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid $color-grey;
+    font-size: 11px;
+    transition: border-color 0.15s;
+
+    input {
+      display: none;
+    }
+    &.active {
+      border-color: $color-light;
+      color: $color-light;
+    }
+  }
+  .sprite-input-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+
+    label {
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 120px;
+      text-align: center;
+      border: 3px solid $color-grey;
+      background: transparent;
+      color: $color-light;
+      outline: none;
+
+      &:focus {
+        border-color: $color-light;
+      }
+    }
+  }
+  .sprite-preview {
+    text-align: center;
+
+    img {
+      width: 96px;
+      height: auto;
+      image-rendering: pixelated;
+      border: 1px solid $color-grey;
+      padding: 2px;
+    }
+  }
+  .sprite-error {
+    color: #ff4848;
+    font-size: 11px;
+    text-align: center;
+  }
 </style>
 
 <h3>Select a class</h3>
@@ -104,6 +207,42 @@
       {/each}
     </ul>
   </div>
+</div>
+
+<div class="sprite-section">
+  <h3>Custom Sprite</h3>
+  <div class="sprite-toggle">
+    <label class="sprite-option" class:active="{!useCustomSprite}">
+      <input type="radio" name="spriteMode" checked="{!useCustomSprite}" on:change="{() => toggleCustomSprite(false)}" />
+      Default class sprite
+    </label>
+    <label class="sprite-option" class:active="{useCustomSprite}">
+      <input type="radio" name="spriteMode" checked="{useCustomSprite}" on:change="{() => toggleCustomSprite(true)}" />
+      PixelBroker sprite
+    </label>
+  </div>
+
+  {#if useCustomSprite}
+    <div class="sprite-input-row">
+      <label>Sprite ID (0–9999)</label>
+      <input
+        type="number"
+        min="0"
+        max="9999"
+        placeholder="ex: 42"
+        bind:value="{spriteIdInput}"
+        on:input="{onSpriteIdInput}"
+      />
+    </div>
+    {#if spritePreviewUrl && !spriteError}
+      <div class="sprite-preview">
+        <img src="{spritePreviewUrl}" alt="Sprite #{spriteIdInput}" on:error="{onSpriteLoadError}" />
+      </div>
+    {/if}
+    {#if spriteError}
+      <p class="sprite-error">Sprite not found</p>
+    {/if}
+  {/if}
 </div>
 
 <div class="input-container">

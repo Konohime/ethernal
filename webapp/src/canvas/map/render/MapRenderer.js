@@ -18,6 +18,7 @@ import { aroundCoordinates, overrideFloor, formatCoordinates, parseCoordinates }
 import { mapModal, menuOverlay, notificationOverlay } from 'stores/screen';
 
 import NameTag from 'canvas/common/NameTag';
+import characterChoice from 'stores/characterChoice';
 import log from 'utils/log';
 import RoomType from '../RoomType';
 import Camera, { MUTATION_TYPE } from './Camera';
@@ -711,7 +712,8 @@ class MapRenderer {
       return;
     }
     const { characterClass } = stats;
-    character = this.addObjectAtCoords(new Character(type, this.container, to, this.ui, charId, characterClass), to, {
+    const spriteId = (type === 'my') ? get(characterChoice).spriteId : null;
+    character = this.addObjectAtCoords(new Character(type, this.container, to, this.ui, charId, characterClass, spriteId), to, {
       noCull: true,
       animate,
       x: 6.5,
