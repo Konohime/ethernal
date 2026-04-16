@@ -116,8 +116,20 @@ class PlayerWallet {
           result.returnData = callEvent.args[1];
         }
       } else if (result.status === 0) {
-        // Outer TX reverted (e.g. not enough energy) — no logs emitted
-        throw { reason: 'transaction reverted', receipt: result };
+        // Outer TX reverted — replay via eth_call at the same block to extract the actual revert reason
+        let outerReason = 'transaction reverted';
+        try {
+          const txData = await this.provider.getTransaction(tx.hash);
+          if (txData) {
+            await this.provider.call(
+              { to: txData.to, data: txData.data, from: txData.from, gasLimit: txData.gasLimit },
+              result.blockNumber,
+            );
+          }
+        } catch (callErr) {
+          outerReason = callErr.reason || callErr.revert?.args?.[0] || callErr.message || outerReason;
+        }
+        throw { reason: outerReason, receipt: result };
       } else if (result.logs.length === 0 && result.status !== 0) {
         // should not reach here
         throw { receipt: result };

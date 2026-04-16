@@ -39,6 +39,9 @@ contract DungeonMovementFacet is DungeonFacetBase {
             );
             _addInitialGears(characterId);
             _elementsContract.mint(characterId, PureDungeon.FRAGMENTS, 10);
+        } else if (_elementsContract.subBalanceOf(characterId, PureDungeon.FRAGMENTS) == 0) {
+            // Re-entering character with no fragments: give a starter pack so they can discover rooms
+            _elementsContract.mint(characterId, PureDungeon.FRAGMENTS, 10);
         }
         uint256 entryLocation;
         if (
