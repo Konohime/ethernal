@@ -22,12 +22,16 @@ contract DungeonAdminFacet is DungeonFacetBase {
         _adminContract = adminContract;
     }
 
-    function forward(address to, bytes memory data) public payable onlyAdmin returns (bool success) {
-        uint256 value = msg.value;
+    function forward(address to, bytes memory data) public onlyAdmin returns (bool success) {
+        require(_allowedForwardTargets[to], "TARGET_NOT_ALLOWED");
         assembly {
-            success := call(gas(), to, value, add(data, 0x20), mload(data), 0, 0)
+            success := call(gas(), to, 0, add(data, 0x20), mload(data), 0, 0)
         }
         require(success, "failed to forward");
+    }
+
+    function setAllowedForwardTarget(address target, bool allowed) external onlyOwner {
+        _allowedForwardTargets[target] = allowed;
     }
 
     function updateCharacter(

@@ -203,7 +203,7 @@ contract DungeonTokenTransferer is Proxied, DungeonTokenTransfererDataLayout {
         emit GearSale(seller, buyer, gearId, coins);
     }
 
-    function exchange(Offer calldata seller, Offer calldata buyer) external {
+    function exchange(Offer calldata seller, Offer calldata buyer) external onlyDungeon {
         for (uint256 i = 0; i < seller.amounts.length; i++) {
             uint256 id = i + 1;
             if (buyer.amounts[i] > 0) {

@@ -32,6 +32,9 @@ contract DungeonActionsFacet is DungeonFacetBase {
         uint256 buyer = _charactersContract.getSubOwner(characterId);
         _initializeTaxDueDate(buyer);
         _roomsContract.subTransferFrom(address(this), owner, buyer, location);
+        if (_roomsContract.subBalanceOf(owner) == 0) {
+            delete _taxDueDate[address(uint160(owner))];
+        }
     }
 
     function abandonRoom(uint256 characterId, uint256 location) external onlyPlayer {
@@ -39,6 +42,9 @@ contract DungeonActionsFacet is DungeonFacetBase {
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
         _roomsContract.subTransferFrom(address(this), owner, uint256(uint160(address(this))), location);
+        if (_roomsContract.subBalanceOf(owner) == 0) {
+            delete _taxDueDate[address(uint160(owner))];
+        }
     }
 
     function deactivateRoom(uint256 characterId, uint256 location) external onlyPlayer {
@@ -75,6 +81,7 @@ contract DungeonActionsFacet is DungeonFacetBase {
         address owner = address(uint160(_charactersContract.getSubOwner(characterId)));
         uint256 rooms = _roomsContract.subBalanceOf(uint256(uint160(owner)));
         require(rooms > 0, "not dungeon keeper");
+        require(_taxDueDate[owner] >= block.timestamp, "already foreclosed");
         uint256 tax = PureDungeon._roomsTax(rooms, periods);
         _elementsContract.transferFrom(owner, address(0), PureDungeon.COINS, tax);
         _taxDueDate[owner] += TAX_PERIOD * periods;

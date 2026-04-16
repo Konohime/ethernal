@@ -72,4 +72,6 @@ contract DungeonDataLayout {
     mapping(address => uint256) _taxDueDate;
 
     mapping(uint256 => string) _customRoomNames;
+
+    mapping(address => bool) _allowedForwardTargets;
 }
