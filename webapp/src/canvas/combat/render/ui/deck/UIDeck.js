@@ -136,6 +136,13 @@ class UIDeck extends PIXI.Container {
 
   show(callback) {
     this._hideRequested = false;
+
+    // Cancel any pending hide animation to prevent it from overriding our show
+    if (this._currentEase) {
+      this._currentEase.remove();
+      this._currentEase = null;
+    }
+
     this.deck.updateFromCache();
     this.visible = true;
     this.applied = false;
@@ -159,8 +166,9 @@ class UIDeck extends PIXI.Container {
       }
     });
 
-    const showDeck = ease.add(this, { alpha: 1 }, { duration: 600 });
-    showDeck.on('complete', () => {
+    this._currentEase = ease.add(this, { alpha: 1 }, { duration: 600 });
+    this._currentEase.on('complete', () => {
+      this._currentEase = null;
       if (callback) {
         callback.call();
       }
@@ -170,8 +178,16 @@ class UIDeck extends PIXI.Container {
 
   hide(callback) {
     this._hideRequested = true;
-    const hideDeck = ease.add(this, { alpha: 0 }, { duration: 200 });
-    hideDeck.on('complete', () => {
+
+    // Cancel any pending show animation
+    if (this._currentEase) {
+      this._currentEase.remove();
+      this._currentEase = null;
+    }
+
+    this._currentEase = ease.add(this, { alpha: 0 }, { duration: 200 });
+    this._currentEase.on('complete', () => {
+      this._currentEase = null;
       if (this._hideRequested) {
         this.visible = false;
       }

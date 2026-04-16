@@ -666,6 +666,17 @@ class CombatRenderer {
     this.actionBtn.disable();
     this.actionBtn.visible = false;
 
+    // Clear stale selection from previous turn
+    this.selection = {};
+
+    // Hide confirm buttons so they don't linger from the previous turn
+    if (this.confirmAttackButton) {
+      this.confirmAttackButton.hideImmediately();
+    }
+    if (this.confirmDefenseButton) {
+      this.confirmDefenseButton.hideImmediately();
+    }
+
     this.charAttackDeck.cards.forEach(card => {
       card.alpha = 0;
       card.selected = false;
@@ -691,6 +702,12 @@ class CombatRenderer {
       button.updateTransform();
     });
 
+    // Hide the Attack! button from the previous turn
+    if (this.uiAttackButton) {
+      this.uiAttackButton.visible = false;
+      this.uiAttackButton.disable();
+    }
+
     Object.values(this.charInfo.modifiers).forEach(modifier => {
       modifier.setHighlighted(false);
     });
@@ -713,30 +730,34 @@ class CombatRenderer {
    * @param type {string}
    */
   selectFromDeck(type) {
-    // Disable deck and attack buttons.
-    [this.uiAttackSelectButton, this.uiDefenseSelectButton, this.uiAttackButton].forEach(button => {
-      button.disable();
-      button.updateTransform();
-      button.visible = false;
-    });
+    try {
+      // Disable deck and attack buttons.
+      [this.uiAttackSelectButton, this.uiDefenseSelectButton, this.uiAttackButton].forEach(button => {
+        button.disable();
+        button.updateTransform();
+        button.visible = false;
+      });
 
-    let hiddenDeck = this.charAttackDeck;
-    let selectedDeck = this.charDefenseDeck;
-    let selectedMonsterDeck = this.monsterAttackDeck;
-    if (type === DeckType.ATTACK) {
-      hiddenDeck = this.charDefenseDeck;
-      selectedDeck = this.charAttackDeck;
-      selectedMonsterDeck = this.monsterDefenseDeck;
+      let hiddenDeck = this.charAttackDeck;
+      let selectedDeck = this.charDefenseDeck;
+      let selectedMonsterDeck = this.monsterAttackDeck;
+      if (type === DeckType.ATTACK) {
+        hiddenDeck = this.charDefenseDeck;
+        selectedDeck = this.charAttackDeck;
+        selectedMonsterDeck = this.monsterDefenseDeck;
+      }
+
+      hiddenDeck.hide();
+      selectedDeck.show();
+
+      selectedMonsterDeck.cards.forEach(c => {
+        c.alpha = 1;
+      });
+      selectedMonsterDeck.y = this.centerY - selectedMonsterDeck.height * 2 - 20;
+      selectedMonsterDeck.show();
+    } catch (err) {
+      console.error('[CombatRenderer] selectFromDeck error:', err);
     }
-
-    hiddenDeck.hide();
-    selectedDeck.show();
-
-    selectedMonsterDeck.cards.forEach(c => {
-      c.alpha = 1;
-    });
-    selectedMonsterDeck.y = this.centerY - selectedMonsterDeck.height * 2 - 20;
-    selectedMonsterDeck.show();
   }
 
   finished(character, monster) {

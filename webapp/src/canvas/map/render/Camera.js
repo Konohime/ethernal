@@ -242,17 +242,29 @@ class Camera extends PIXI.Container {
     iter.on('pointerup', onDragEnd, this);
     iter.on('pointerupoutside', onDragEnd, this);
 
-    let scale = 2;
+    let scale = 3; // Must match initial scale index: scales[3] = 1
 
+    const canvas = app.view || app.canvas;
     const wheel = event => {
+      // Only handle wheel events that originated on the canvas element,
+      // not from other UI elements like the inventory panel.
+      if (event.target !== canvas) {
+        return;
+      }
+
+      event.preventDefault();
+
       this.lastMutation = MUTATION_TYPE.SCALE;
 
       let target = scale;
-      if (event.deltaY < 0 && scale - 1 > 0) {
+      if (event.deltaY < 0 && scale - 1 >= 0) {
         target += Math.floor(event.deltaY / 10);
-      } else if (event.deltaY > 0 && scale + 1 < scales.length - 1) {
+      } else if (event.deltaY > 0 && scale + 1 <= scales.length - 1) {
         target += Math.floor(event.deltaY / 10);
       }
+
+      // Clamp target to valid range
+      target = Math.max(0, Math.min(scales.length - 1, target));
 
       if (target !== scale) {
         const s = scales[target];
@@ -264,7 +276,7 @@ class Camera extends PIXI.Container {
         }
       }
     };
-    app.view.addEventListener('wheel', wheel);
+    canvas.addEventListener('wheel', wheel, { passive: false });
   }
 
   getTopLeftPixel() {
