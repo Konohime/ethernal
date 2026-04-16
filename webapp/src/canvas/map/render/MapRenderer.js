@@ -577,7 +577,12 @@ class MapRenderer {
     if (!old && newest.onlineCharacters?.length) {
       newest.onlineCharacters.forEach(character => {
         if (character === cache.characterId) {
-          this.addCharacter(cache.characterId, newest.coordinates, cache.characterStatus, 'my');
+          // Skip adding my character if a move is in progress — the path animation
+          // and characterMoved event handle this. Adding here with from=null causes
+          // moveMyCharacter to teleport (fade out) the character unexpectedly.
+          if (!moving) {
+            this.addCharacter(cache.characterId, newest.coordinates, cache.characterStatus, 'my');
+          }
         } else {
           const info = cache.onlineCharacters[character];
           if (info) {
@@ -1875,6 +1880,13 @@ class MapRenderer {
       return; // Don't re-throw; error is displayed via notification
     }
     moving = false;
+    // Refocus camera on the new room to ensure surrounding chunks are created
+    // and the camera is centered, preventing a black screen if the character
+    // moved to a newly discovered room in a different chunk.
+    const newCoords = global.dungeon.cache.currentRoom?.coordinates;
+    if (newCoords) {
+      this.refocus(newCoords, 500);
+    }
     this.updateAllFog();
   }
 
