@@ -97,49 +97,78 @@ const store = derived(
           characterChoice.clear();
         }
 
+        let checkBackInRunning = false;
         store.checkBackIn = async value => {
-          const gasEstimate = toBeHex(BigInt(4000000));
-          _set({ status: 'SigningBackIn', delegateAccount });
-
-          try {
-            // addDelegate calls _refill (adds ETH to energy) then _addDelegate (deducts CONTRACT_MIN_BALANCE).
-            // Send exactly what's needed to cover the delegate cost — energy is capped at MAX_FOOD
-            // (== price on current chains), so sending more would just be refunded by the contract
-            // and confuses the user. Target: energy >= CONTRACT_MIN_BALANCE before deduction.
-            const CONTRACT_MIN_BALANCE = BigInt(config($wallet.chainId).contractMinBalance);
-            const [onChainEnergy] = await wallet.call('Player', 'getEnergy', $wallet.address);
-            const currentEnergy = BigInt(onChainEnergy.toString());
-            const needed = currentEnergy < CONTRACT_MIN_BALANCE
-              ? CONTRACT_MIN_BALANCE - currentEnergy
-              : BigInt(0);
-
-            const valueToSend = needed > 0n ? toBeHex(needed) : '0x0';
-            const txOpts = { gas: gasEstimate, gasPrice };
-            if (BigInt(valueToSend) > BigInt(0)) txOpts.value = valueToSend;
-
-            // Single atomic tx: addDelegate is payable and calls _refill internally.
-            // Energy lost here will be topped up right after by the auto UBF claim
-            // (triggered in stores/dungeon.js as soon as the dungeon finishes loading).
-            console.log('Adding delegate...', {
-              currentEnergy: currentEnergy.toString(),
-              needed: needed.toString(),
-              valueToSend,
-            });
-            const tx = await wallet.tx(txOpts, 'Player', 'addDelegate', delegateAccount.address);
-            await tx.wait();
-            console.log('Delegate added!');
-          } catch (e) {
-            _set({ status: 'Error', error: { code: 'checkBackIn', message: e.toString(), e, wallet } });
+          // Concurrent-call guard: if a re-render of WelcomeBackScreen (from any state
+          // flicker on the wallet store) causes a second click/trigger, swallow it.
+          if (checkBackInRunning) {
+            console.log('checkBackIn already running, skipping duplicate call');
             return;
           }
+          checkBackInRunning = true;
+          try {
+            // Idempotency: if the delegate is already set on-chain (e.g. the first
+            // checkBackIn tx landed but the UI re-rendered WelcomeBack due to a wallet
+            // store flicker), we must NOT send another addDelegate — that would waste
+            // a TX and re-deduct MIN_BALANCE for nothing.
+            const alreadyReady = await wallet.call(
+              'Player',
+              'isDelegateFor',
+              delegateAccount.address,
+              $wallet.address,
+            );
+            if (alreadyReady) {
+              console.log('Delegate already set on-chain, skipping addDelegate');
+              const state = await checkCharacter();
+              _set({ status: 'Done', ...state });
+              return;
+            }
 
-          const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
-          _set({
-            status: 'Done',
-            isDelegateReady,
-            isCharacterInDungeon,
-            insufficientBalance,
-          });
+            const gasEstimate = toBeHex(BigInt(4000000));
+            _set({ status: 'SigningBackIn', delegateAccount });
+
+            try {
+              // addDelegate calls _refill (adds ETH to energy) then _addDelegate (deducts MIN_BALANCE).
+              // Send exactly what's needed to cover the delegate cost — energy is capped at MAX_FOOD
+              // (== price on current chains), so sending more would just be refunded by the contract
+              // and confuses the user. Target: energy >= CONTRACT_MIN_BALANCE before deduction.
+              const CONTRACT_MIN_BALANCE = BigInt(config($wallet.chainId).contractMinBalance);
+              const [onChainEnergy] = await wallet.call('Player', 'getEnergy', $wallet.address);
+              const currentEnergy = BigInt(onChainEnergy.toString());
+              const needed = currentEnergy < CONTRACT_MIN_BALANCE
+                ? CONTRACT_MIN_BALANCE - currentEnergy
+                : BigInt(0);
+
+              const valueToSend = needed > 0n ? toBeHex(needed) : '0x0';
+              const txOpts = { gas: gasEstimate, gasPrice };
+              if (BigInt(valueToSend) > BigInt(0)) txOpts.value = valueToSend;
+
+              // Single atomic tx: addDelegate is payable and calls _refill internally.
+              // Energy lost here will be topped up right after by the auto UBF claim
+              // (triggered in stores/dungeon.js as soon as the dungeon finishes loading).
+              console.log('Adding delegate...', {
+                currentEnergy: currentEnergy.toString(),
+                needed: needed.toString(),
+                valueToSend,
+              });
+              const tx = await wallet.tx(txOpts, 'Player', 'addDelegate', delegateAccount.address);
+              await tx.wait();
+              console.log('Delegate added!');
+            } catch (e) {
+              _set({ status: 'Error', error: { code: 'checkBackIn', message: e.toString(), e, wallet } });
+              return;
+            }
+
+            const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
+            _set({
+              status: 'Done',
+              isDelegateReady,
+              isCharacterInDungeon,
+              insufficientBalance,
+            });
+          } finally {
+            checkBackInRunning = false;
+          }
         };
 
         store.enter = async ({ ressurectedId, characterInfo }) => {
