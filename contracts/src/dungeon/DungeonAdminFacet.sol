@@ -3,35 +3,18 @@ pragma solidity ^0.8.20;
 
 import "./DungeonFacetBase.sol";
 import "./PureDungeon.sol";
-import "../utils/BlockHashRegister.sol";
-import "../characters/Characters.sol";
-import "../tokens/Elements.sol";
-import "../tokens/Gears.sol";
-import "../player/Player.sol";
 
 contract DungeonAdminFacet is DungeonFacetBase {
-    function postUpgrade(
-        address blockHashRegister,
-        Player playerContract,
-        address payable owner,
-        address adminContract
-    ) external onlyOwner {
-        _playerContract = playerContract;
-        playerContract.register();
-        _blockHashRegister = BlockHashRegister(blockHashRegister);
-        _adminContract = adminContract;
-    }
-
     function forward(address to, bytes memory data) public onlyAdmin returns (bool success) {
         require(_allowedForwardTargets[to], "TARGET_NOT_ALLOWED");
+        bytes4 selector;
+        require(data.length >= 4, "DATA_TOO_SHORT");
         assembly {
-            success := call(gas(), to, 0, add(data, 0x20), mload(data), 0, 0)
+            selector := mload(add(data, 0x20))
         }
+        require(_allowedForwardSelectors[to][selector], "SELECTOR_NOT_ALLOWED");
+        (success, ) = to.call(data);
         require(success, "failed to forward");
-    }
-
-    function setAllowedForwardTarget(address target, bool allowed) external onlyOwner {
-        _allowedForwardTargets[target] = allowed;
     }
 
     function updateCharacter(
@@ -197,13 +180,6 @@ contract DungeonAdminFacet is DungeonFacetBase {
         emit QuestUpdate(character, id, status, data);
     }
 
-    // TODO: remove when not needed
-    function batchMineVaultElements(uint256 id, address[] calldata players, uint256[] calldata amounts) external onlyAdmin {
-        for (uint256 i = 0; i < players.length; i++) {
-            _elementsContract.mintVault(players[i], id, amounts[i]);
-        }
-    }
-
     function generateRoomIncome(uint256 location, address benefactor, uint16[8] calldata income) external onlyAdmin {
         for (uint8 i = 0; i < income.length; i++) {
             uint256 id = i + 1;
@@ -215,22 +191,4 @@ contract DungeonAdminFacet is DungeonFacetBase {
         }
     }
 
-    function mintElements(uint256 characterId, uint256 elementId, uint256 amount) external onlyOwner {
-        _elementsContract.mint(characterId, elementId, amount);
-    }
-
-    function start(
-        Characters characters,
-        Elements elements,
-        Gears gears,
-        Rooms rooms
-    ) external onlyOwner {
-        _charactersContract = characters;
-        _elementsContract = elements;
-        _gearsContract = gears;
-        _roomsContract = rooms;
-        Room storage room = _rooms[PureDungeon.LOCATION_ZERO];
-        require(room.kind == 0, "dungeon already started");
-        _discoverRoom(PureDungeon.LOCATION_ZERO, 0, PureDungeon.DOWN);
-    }
 }

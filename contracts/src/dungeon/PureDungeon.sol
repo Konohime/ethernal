@@ -94,7 +94,7 @@ library PureDungeon {
     }
 
     function _bountyToLocation(uint256 bounty) internal pure returns (uint256 location){
-        return location - BOUNTY + LOCATION_ZERO;
+        return bounty - BOUNTY + LOCATION_ZERO;
     }
 
     function generateMonsterIndex(

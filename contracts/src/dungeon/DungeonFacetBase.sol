@@ -350,8 +350,11 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
                     && nextRoom.randomEvent != 2
                     && _roomsContract.getData(location) == 0
             ) {
-                blockNumber = uint64(block.number);
-                _blockHashRegister.request();
+                // Commit-reveal: store the FUTURE target block returned by the
+                // register. Its hash is unknown at tx signing time, so neither
+                // the user nor the sequencer (without colluding on block N+1)
+                // can pre-compute the monster outcome.
+                blockNumber = _blockHashRegister.request();
                 if (nextRoom.monsterBlockNumber == 0) {
                     nextRoom.monsterBlockNumber = blockNumber;
                 }
@@ -367,8 +370,7 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         Area storage area = _areas[areaLoc];
         if (area.eventBlockNumber == 0 && block.number % 3 == 0) {
             if (blockNumber == 0) {
-                blockNumber = uint64(block.number);
-                _blockHashRegister.request();
+                blockNumber = _blockHashRegister.request();
             }
             area.eventBlockNumber = blockNumber;
             emit RandomEvent(areaLoc, blockNumber);
@@ -432,19 +434,23 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         }
         _elementsContract.subBurnFrom(discoverer, PureDungeon.FRAGMENTS, PureDungeon._discoveryCost(location));
         Room storage nextRoom = _rooms[location];
-        nextRoom.blockNumber = uint64(block.number);
-        nextRoom.monsterBlockNumber = uint64(block.number);
+        // Commit-reveal: `request()` returns the future block whose hash will
+        // seed room layout, loot, and monster generation. Storing the target
+        // instead of `block.number` is what makes the outcome unknowable at
+        // tx signing time.
+        uint64 targetBlock = _blockHashRegister.request();
+        nextRoom.blockNumber = targetBlock;
+        nextRoom.monsterBlockNumber = targetBlock;
         nextRoom.direction = direction;
         nextRoom.areaAtDiscovery = area.discovered;
         nextRoom.index = area.currentIndex++;
         nextRoom.lastRoomIndex = area.lastRoomIndex;
         nextRoom.discoverer = discoverer;
         area.lastRoom = location;
-        _blockHashRegister.request();
         uint256 discovererOwner = _charactersContract.getSubOwner(discoverer);
         _initializeTaxDueDate(discovererOwner);
         _roomsContract.mintId(location, discovererOwner);
-        emit RoomDiscovered(location, uint64(block.number), nextRoom.direction);
+        emit RoomDiscovered(location, targetBlock, nextRoom.direction);
     }
 
     function _initializeTaxDueDate(uint256 owner) internal {

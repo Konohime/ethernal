@@ -27,24 +27,6 @@ contract ERC1155Token is Proxied, ERC1155TokenDataLayout {
         emit SubTransferSingle(0, 0, id, amount);
     }
 
-    // TODO remove after fix
-    function mintTo(
-        address owner,
-        uint256 id,
-        uint256 amount
-    ) public {
-        require(msg.sender == _tokenOwner, "NOT_AUTHORIZED_MINT");
-        _balances[owner][id] += amount;
-        emit TransferSingle(address(0), owner, id, amount);
-    }
-
-    // TODO remove after fix
-    function subMint(uint256 id, uint256 amount) public {
-        require(msg.sender == _tokenOwner, "NOT_AUTHORIZED_MINT");
-        _subBalances[0][id] += amount;
-        emit SubTransferSingle(0, 0, id, amount);
-    }
-
     function mint(
         uint256 subOwner,
         uint256 id,

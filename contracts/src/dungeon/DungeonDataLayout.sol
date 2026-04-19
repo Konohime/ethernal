@@ -74,4 +74,8 @@ contract DungeonDataLayout {
     mapping(uint256 => string) _customRoomNames;
 
     mapping(address => bool) _allowedForwardTargets;
+
+    // Per-target selector whitelist — appended to preserve storage layout.
+    // Even if a target is whitelisted, only explicit selectors may be invoked.
+    mapping(address => mapping(bytes4 => bool)) _allowedForwardSelectors;
 }
