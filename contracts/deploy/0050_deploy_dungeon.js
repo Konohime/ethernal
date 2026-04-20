@@ -16,6 +16,7 @@ module.exports = async ({deployments, network, getNamedAccounts}) => {
     facets: [
       'DungeonActionsFacet',
       'DungeonAdminFacet',
+      'DungeonOwnerFacet',
       'DungeonCharacterFacet',
       'DungeonInfoFacet',
       'DungeonMovementFacet',

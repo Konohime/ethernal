@@ -1,24 +1,68 @@
 {
-  "address": "0x4F56f3B9783DE18F9433C752E6b897806F9Ab81C",
+  "address": "0xF42d58471f9F22c720A41057fc736e95aD739de6",
   "abi": [
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
-          "name": "blockNumber",
+          "name": "targetBlock",
           "type": "uint256"
         }
       ],
-      "name": "HashRequest",
+      "name": "HashExpired",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "targetBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "salt",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "requester",
+          "type": "address"
+        }
+      ],
+      "name": "HashRequested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "targetBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "blockHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "HashSaved",
       "type": "event"
     },
     {
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "blockNumber",
+          "name": "targetBlock",
           "type": "uint256"
         }
       ],
@@ -47,28 +91,15 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "blockNumber",
-          "type": "uint256"
-        }
-      ],
-      "name": "getOrCompute",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "request",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "targetBlock",
+          "type": "uint64"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -80,28 +111,28 @@
       "type": "function"
     }
   ],
-  "transactionHash": "0x37311d4094836e26c2ee7e439797570fb154328af5ff5cd0f8ee7f934820e1af",
+  "transactionHash": "0x400462fefa53520c9b14451d669c7130ec0c3795dd058401a35049c81c7b4051",
   "receipt": {
     "to": null,
-    "from": "0x78fAf6C26b364141fAd67c544A2DdE6Bc985baf4",
-    "contractAddress": "0x4F56f3B9783DE18F9433C752E6b897806F9Ab81C",
-    "transactionIndex": 9,
-    "gasUsed": "178748",
+    "from": "0xd55AC580ab7386d593EcA3aaBA54989980cFc7c6",
+    "contractAddress": "0xF42d58471f9F22c720A41057fc736e95aD739de6",
+    "transactionIndex": 14,
+    "gasUsed": "453057",
     "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-    "blockHash": "0xcf62ec0993311e808b0a3d7b824c21ea9b0e6d0d200e6cf7a1dc647c32bd4eb8",
-    "transactionHash": "0x37311d4094836e26c2ee7e439797570fb154328af5ff5cd0f8ee7f934820e1af",
+    "blockHash": "0xe68bbf3b71e166f5a9b33f9f1a03469dd9f3e091d338302c136efc0dea6de20a",
+    "transactionHash": "0x400462fefa53520c9b14451d669c7130ec0c3795dd058401a35049c81c7b4051",
     "logs": [],
-    "blockNumber": 36000969,
-    "cumulativeGasUsed": "1955516",
+    "blockNumber": 40405858,
+    "cumulativeGasUsed": "4595988",
     "status": 1,
     "byzantium": true
   },
   "args": [],
-  "numDeployments": 1,
-  "solcInputHash": "3705cadeb86e4cfd473ba34c32cdc277",
-  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"HashRequest\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"get\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBlockToActualise\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"getOrCompute\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"request\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"save\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/utils/BlockHashRegister.sol\":\"BlockHashRegister\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"src/utils/BlockHashRegister.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\ncontract BlockHashRegister {\\n    mapping(uint256 => bytes32) _blockHashes;\\n    uint256 _blockToActualise;\\n\\n    event HashRequest(uint256 blockNumber);\\n\\n    function get(uint256 blockNumber) external view returns (bytes32) {\\n        return _blockHashes[blockNumber];\\n    }\\n\\n    function getOrCompute(uint256 blockNumber) external view returns (bytes32) {\\n        bytes32 blockHash = _blockHashes[blockNumber];\\n        if (uint256(blockHash) == 0) {\\n            return _computeBlockHash(blockNumber);\\n        }\\n        return blockHash;\\n    }\\n\\n    function getBlockToActualise() external view returns (uint256) {\\n        return _blockToActualise;\\n    }\\n\\n    function request() external {\\n        uint256 blockNumber = _blockToActualise;\\n        if (blockNumber < block.number) {\\n            _save(blockNumber);\\n            _blockToActualise = block.number;\\n            emit HashRequest(block.number);\\n        }\\n    }\\n\\n    function save() external {\\n        uint256 blockNumber = _blockToActualise;\\n        if (blockNumber < block.number) {\\n            _save(blockNumber);\\n            _blockToActualise = 0;\\n        }\\n    }\\n\\n    function _computeBlockHash(uint256 blockNumber) internal view returns (bytes32) {\\n        if (blockNumber < 256 || blockNumber > block.number - 256) {\\n            return blockhash(blockNumber);\\n        } else {\\n            uint256 moduloBlockNumber = block.number - ((block.number - blockNumber - 1) % 256) + 1;\\n            return blockhash(moduloBlockNumber);\\n        }\\n    }\\n\\n    function _save(uint256 blockNumber) internal returns (bytes32) {\\n        bytes32 blockHash = _computeBlockHash(blockNumber);\\n        _blockHashes[blockNumber] = blockHash;\\n        return blockHash;\\n    }\\n}\\n\",\"keccak256\":\"0xf459998169e51b1d23409abbd6b4665fe58231e06d60c6c715dcb80a995d66db\",\"license\":\"MIT\"}},\"version\":1}",
-  "bytecode": "0x6080806040523461001657610245908161001c8239f35b600080fdfe604060808152600436101561001357600080fd5b600090813560e01c8063338cdca11461010257806342dad49e146100c5578063803ee1d91461009e5780639507d39a146100775763d88d7f461461005657600080fd5b346100735781600319360112610073576020906001549051908152f35b5080fd5b50346100735760203660031901126100735780602092600435815280845220549051908152f35b5034610073576020366003190112610073576020906100be600435610168565b9051908152f35b5034610073578160031936011261007357600154904382106100e5578280f35b6100ee826101b2565b918352826020528220558060015538808280f35b5034610073578160031936011261007357600154438110610121578280f35b7fa21755eabd8128750f344a2d1ce0cd3e1a2f2eb74ac9642568c437ca76f9005a918161014f6020936101b2565b908552848352818520554360015551438152a138808280f35b806000526000602052604060002054908115610182575090565b61018c91506101b2565b90565b9190820391821161019c57565b634e487b7160e01b600052601160045260246000fd5b61010080821080156101fb575b156101c957504090565b906101d4904361018f565b90600019828181011161019c576101ec92084361018f565b6001810180911161019c574090565b5060ff19430143811161019c5782116101bf56fea2646970667358221220b1d83342ca47e01f06b81f7594f74c357ddc646013cb45a625cf90ef0c88986264736f6c63430008140033",
-  "deployedBytecode": "0x604060808152600436101561001357600080fd5b600090813560e01c8063338cdca11461010257806342dad49e146100c5578063803ee1d91461009e5780639507d39a146100775763d88d7f461461005657600080fd5b346100735781600319360112610073576020906001549051908152f35b5080fd5b50346100735760203660031901126100735780602092600435815280845220549051908152f35b5034610073576020366003190112610073576020906100be600435610168565b9051908152f35b5034610073578160031936011261007357600154904382106100e5578280f35b6100ee826101b2565b918352826020528220558060015538808280f35b5034610073578160031936011261007357600154438110610121578280f35b7fa21755eabd8128750f344a2d1ce0cd3e1a2f2eb74ac9642568c437ca76f9005a918161014f6020936101b2565b908552848352818520554360015551438152a138808280f35b806000526000602052604060002054908115610182575090565b61018c91506101b2565b90565b9190820391821161019c57565b634e487b7160e01b600052601160045260246000fd5b61010080821080156101fb575b156101c957504090565b906101d4904361018f565b90600019828181011161019c576101ec92084361018f565b6001810180911161019c574090565b5060ff19430143811161019c5782116101bf56fea2646970667358221220b1d83342ca47e01f06b81f7594f74c357ddc646013cb45a625cf90ef0c88986264736f6c63430008140033",
+  "numDeployments": 2,
+  "solcInputHash": "dd8ef9e4cb12f6b7c300326f49f4b58b",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"targetBlock\",\"type\":\"uint256\"}],\"name\":\"HashExpired\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"targetBlock\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"salt\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"requester\",\"type\":\"address\"}],\"name\":\"HashRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"targetBlock\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"blockHash\",\"type\":\"bytes32\"}],\"name\":\"HashSaved\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"targetBlock\",\"type\":\"uint256\"}],\"name\":\"get\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBlockToActualise\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"request\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"targetBlock\",\"type\":\"uint64\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"save\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"get(uint256)\":{\"notice\":\"Retrieve the seed for a previously-committed targetBlock. Returns bytes32(0) if not yet available OR if the 256-block window has elapsed. Callers MUST check for zero and handle expiration \\u2014 never fall back to a predictable value.\"},\"request()\":{\"notice\":\"Commit to using the hash of `block.number + 1` as entropy. Returns the target block number \\u2014 the caller MUST store this to later retrieve the seed via `get(targetBlock)`.\"},\"save()\":{\"notice\":\"Persist the currently-pending hash. Callable by anyone \\u2014 the output is deterministic, so griefing is limited to paying gas on someone's behalf.\"}},\"notice\":\"Commit-reveal randomness register. Security model \\u2014 three layers combine to make the final seed unpredictable to any single actor (user or sequencer): 1. FUTURE-BLOCK COMMITMENT. `request()` targets `block.number + 1`, a block    that is NOT YET MINED when the caller signs the transaction. The caller    cannot know `blockhash(targetBlock)` at commit time. 2. PER-REQUEST SALT. At `request()` time we derive an implicit salt from    the calling context (msg.sender, block.prevrandao, block.timestamp,    gasleft()) that is recorded in storage. The sequencer sees msg.sender    but cannot freely manipulate `gasleft()` mid-transaction without    breaking the call. The salt is cryptographically mixed into the output. 3. NO PREDICTABLE FALLBACK. If the 256-block window expires without a    `save()`, the register returns bytes32(0). Callers MUST treat this as    \\\"entropy lost\\\" and either retry or fall back to a safe default. The old    contract returned a blockhash of an unrelated, publicly-readable block    after 256 blocks \\u2014 that was the L-4 finding. Consumer contract responsibilities: - Call `request()` at action time and store the returned `targetBlock`. - Later, call `get(targetBlock)` to retrieve the seed. If it returns   bytes32(0), handle the expired case explicitly \\u2014 never assume a   \\\"default\\\" outcome. - Periodically call `save()` to persist hashes before the 256-block   window closes on the register's shared `_blockToActualise` slot.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/utils/BlockHashRegister.sol\":\"BlockHashRegister\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"details\":{\"constantOptimizer\":true,\"cse\":true,\"deduplicate\":true,\"inliner\":true,\"jumpdestRemover\":true,\"orderLiterals\":true,\"peephole\":true,\"yul\":true,\"yulDetails\":{\"optimizerSteps\":\"dhfoDgvulfnTUtnIf:fDnTOc\",\"stackAllocation\":true}},\"runs\":1},\"remappings\":[],\"viaIR\":true},\"sources\":{\"src/utils/BlockHashRegister.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\n/// @notice Commit-reveal randomness register.\\n///\\n/// Security model \\u2014 three layers combine to make the final seed unpredictable\\n/// to any single actor (user or sequencer):\\n///\\n/// 1. FUTURE-BLOCK COMMITMENT. `request()` targets `block.number + 1`, a block\\n///    that is NOT YET MINED when the caller signs the transaction. The caller\\n///    cannot know `blockhash(targetBlock)` at commit time.\\n///\\n/// 2. PER-REQUEST SALT. At `request()` time we derive an implicit salt from\\n///    the calling context (msg.sender, block.prevrandao, block.timestamp,\\n///    gasleft()) that is recorded in storage. The sequencer sees msg.sender\\n///    but cannot freely manipulate `gasleft()` mid-transaction without\\n///    breaking the call. The salt is cryptographically mixed into the output.\\n///\\n/// 3. NO PREDICTABLE FALLBACK. If the 256-block window expires without a\\n///    `save()`, the register returns bytes32(0). Callers MUST treat this as\\n///    \\\"entropy lost\\\" and either retry or fall back to a safe default. The old\\n///    contract returned a blockhash of an unrelated, publicly-readable block\\n///    after 256 blocks \\u2014 that was the L-4 finding.\\n///\\n/// Consumer contract responsibilities:\\n/// - Call `request()` at action time and store the returned `targetBlock`.\\n/// - Later, call `get(targetBlock)` to retrieve the seed. If it returns\\n///   bytes32(0), handle the expired case explicitly \\u2014 never assume a\\n///   \\\"default\\\" outcome.\\n/// - Periodically call `save()` to persist hashes before the 256-block\\n///   window closes on the register's shared `_blockToActualise` slot.\\ncontract BlockHashRegister {\\n    struct Entry {\\n        bytes32 blockHash;\\n        bytes32 salt;\\n    }\\n\\n    // Legacy slot \\u2014 kept first for storage layout compatibility with the\\n    // previously deployed register (`mapping(uint256 => bytes32) _blockHashes`).\\n    // Unused at runtime; reads go through `_entries`.\\n    mapping(uint256 => bytes32) _legacyBlockHashes;\\n    uint256 _blockToActualise;\\n\\n    // Appended state.\\n    mapping(uint256 => Entry) _entries;\\n    mapping(uint256 => bytes32) _pendingSalt;\\n\\n    event HashRequested(uint256 indexed targetBlock, bytes32 salt, address indexed requester);\\n    event HashSaved(uint256 indexed targetBlock, bytes32 blockHash);\\n    event HashExpired(uint256 indexed targetBlock);\\n\\n    /// @notice Commit to using the hash of `block.number + 1` as entropy.\\n    /// Returns the target block number \\u2014 the caller MUST store this to later\\n    /// retrieve the seed via `get(targetBlock)`.\\n    function request() external returns (uint64 targetBlock) {\\n        uint256 prev = _blockToActualise;\\n        if (prev != 0 && prev < block.number) {\\n            _persist(prev);\\n        }\\n        targetBlock = uint64(block.number) + 1;\\n        _blockToActualise = targetBlock;\\n\\n        // Implicit salt: cannot be derived without reading storage (sequencer\\n        // cannot pre-compute it off-chain for another user's session).\\n        bytes32 salt = keccak256(\\n            abi.encode(\\n                msg.sender,\\n                block.number,\\n                block.timestamp,\\n                block.prevrandao,\\n                gasleft(),\\n                targetBlock,\\n                tx.origin,\\n                address(this).balance\\n            )\\n        );\\n        _pendingSalt[targetBlock] = salt;\\n        emit HashRequested(targetBlock, salt, msg.sender);\\n    }\\n\\n    /// @notice Persist the currently-pending hash. Callable by anyone \\u2014 the\\n    /// output is deterministic, so griefing is limited to paying gas on\\n    /// someone's behalf.\\n    function save() external {\\n        uint256 target = _blockToActualise;\\n        if (target != 0 && target < block.number) {\\n            _persist(target);\\n            _blockToActualise = 0;\\n        }\\n    }\\n\\n    /// @notice Retrieve the seed for a previously-committed targetBlock.\\n    /// Returns bytes32(0) if not yet available OR if the 256-block window has\\n    /// elapsed. Callers MUST check for zero and handle expiration \\u2014 never\\n    /// fall back to a predictable value.\\n    function get(uint256 targetBlock) external view returns (bytes32) {\\n        Entry memory e = _entries[targetBlock];\\n        if (e.blockHash != bytes32(0)) {\\n            return keccak256(abi.encode(e.blockHash, e.salt, targetBlock));\\n        }\\n        if (targetBlock >= block.number) {\\n            return bytes32(0); // still in the future \\u2014 not ready\\n        }\\n        if (block.number - targetBlock > 256) {\\n            return bytes32(0); // expired \\u2014 no predictable fallback\\n        }\\n        bytes32 h = blockhash(targetBlock);\\n        if (h == bytes32(0)) {\\n            return bytes32(0);\\n        }\\n        bytes32 salt = _pendingSalt[targetBlock];\\n        return keccak256(abi.encode(h, salt, targetBlock));\\n    }\\n\\n    function getBlockToActualise() external view returns (uint256) {\\n        return _blockToActualise;\\n    }\\n\\n    function _persist(uint256 targetBlock) internal {\\n        if (targetBlock >= block.number) return;\\n        if (block.number - targetBlock > 256) {\\n            delete _pendingSalt[targetBlock];\\n            emit HashExpired(targetBlock);\\n            return;\\n        }\\n        bytes32 h = blockhash(targetBlock);\\n        if (h == bytes32(0)) return;\\n        _entries[targetBlock] = Entry({blockHash: h, salt: _pendingSalt[targetBlock]});\\n        delete _pendingSalt[targetBlock];\\n        emit HashSaved(targetBlock, h);\\n    }\\n}\\n\",\"keccak256\":\"0x479034c65d18c9a54c8e6c74c9ddc63c95a289e335cd18a3634db966abc3784b\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60806040523461001a5760405161073c610020823961073c90f35b600080fdfe6080604052600436101561001257600080fd5b60003560e01c8063338cdca11461005257806342dad49e1461004d5780639507d39a146100485763d88d7f460361005757610102565b6100d6565b6100a6565b61006d565b600080fd5b600091031261005757565b9052565b565b346100575761007d36600461005c565b6100a26100886102ba565b604051918291826001600160401b03909116815260200190565b0390f35b34610057576100b636600461005c565b6100be6103cc565b604051005b9060208282031261005757503590565b90565b34610057576100a26100f16100ec3660046100c3565b6104a7565b6040515b9182918290815260200190565b346100575761011236600461005c565b6100a26100f161057e565b6100d39081565b6100d3905461011d565b6100d36100d36100d39290565b6101486100d36100d39290565b6001600160401b031690565b634e487b7160e01b600052601160045260246000fd5b6001600160401b03908116911601906001600160401b03821161018957565b610154565b6100d39081906001600160401b031681565b90600019905b9181191691161790565b906101c06100d36101c79261012e565b82546101a0565b9055565b6100d3906101df906001600160a01b031682565b6001600160a01b031690565b6100d3906101cb565b6100d3906101eb565b610067906101df565b9593919897969492909861010087019960008801610223916101fd565b60208701526040860152606085015260808401526001600160401b031660a083015260c08201610252916101fd565b60e00152565b634e487b7160e01b600052604160045260246000fd5b90601f01601f191681019081106001600160401b0382111761028f57604052565b610258565b9061029e9061018e565b600052602052604060002090565b906101c06100d36101c79290565b6102c46001610124565b6102ce600061012e565b811415806103c3575b6103b4575b5043906103736102eb8361013b565b6103006001916102fa8361013b565b9061016a565b93610378856103186103118261018e565b80956101b0565b339261035642918561034a445a873291610331306101f4565b319361033c60405190565b998a9860208a019889610206565b9081038252038261026e565b610368610361825190565b9160200190565b209485916003610294565b6102ac565b6103af6103a57ffd1b07ddf3530cf6f236d39f743f2efc4aa91976f55bc8d689018ebb7045e309926101f4565b936100f560405190565b0390a3565b6103bd906105ef565b386102dc565b504381106102d7565b6103d66001610124565b6000906103e28261012e565b8114158061040f575b6103f3575050565b61006b91610403610408926105ef565b61012e565b60016101b0565b504381106103eb565b9061029e9061012e565b9061006b61042f60405190565b928361026e565b6100d36040610422565b9061006b6104686001610451610436565b9461046261045e82610124565b8752565b01610124565b6020840152565b6100d390610440565b90815260608101939261006b929091604091610496905b6020830152565b0152565b9190820391821161018957565b6104ba6104b5826002610418565b61046f565b80519060006104c88161012e565b9283906104d4565b9190565b03610564575050436104e38190565b83101561055e57826104f49161049a565b6105026104d061010061012e565b1161055957814090808214610553575061054490610529610524846003610418565b610124565b9061034a61053660405190565b948593602085019384610478565b61054f610361825190565b2090565b91505090565b905090565b50905090565b610544925060206105786105299284015190565b92015190565b6100d36001610124565b9160001960089290920291821b911b6101a6565b91906105ab6100d36101c79390565b908354610588565b61006b9160009161059c565b61006b91906105d8906020906001906105de8185875190565b906102ac565b0192015190565b9061006b916105bf565b438082101561070257816106029161049a565b6106106104d061010061012e565b116106b75780409060006106266100d38261012e565b83146106b2576106769061067183600361066c6106466105248484610418565b61065c610651610436565b9161048f8b89850152565b610667846002610418565b6105e5565b610418565b6105b3565b6106ad6106a37fcb2365ce35c7118557a97fa2af2eb7925122333504b71884e8023b6cd29eb6229261012e565b926100f560405190565b0390a2565b505050565b6106c76000610671836003610418565b6106f17f0459fb2b0120148a579d408a2d204bca92ae16937a0cc2e7f6e50b614761f0c39161012e565b906106fb60405190565b80806106ad565b505056fea26469706673582212209bc22d334a0ae96cf37cff0347ae876e5847d7c7b5cadd6d5373e571849072d064736f6c63430008140033",
+  "deployedBytecode": "0x6080604052600436101561001257600080fd5b60003560e01c8063338cdca11461005257806342dad49e1461004d5780639507d39a146100485763d88d7f460361005757610102565b6100d6565b6100a6565b61006d565b600080fd5b600091031261005757565b9052565b565b346100575761007d36600461005c565b6100a26100886102ba565b604051918291826001600160401b03909116815260200190565b0390f35b34610057576100b636600461005c565b6100be6103cc565b604051005b9060208282031261005757503590565b90565b34610057576100a26100f16100ec3660046100c3565b6104a7565b6040515b9182918290815260200190565b346100575761011236600461005c565b6100a26100f161057e565b6100d39081565b6100d3905461011d565b6100d36100d36100d39290565b6101486100d36100d39290565b6001600160401b031690565b634e487b7160e01b600052601160045260246000fd5b6001600160401b03908116911601906001600160401b03821161018957565b610154565b6100d39081906001600160401b031681565b90600019905b9181191691161790565b906101c06100d36101c79261012e565b82546101a0565b9055565b6100d3906101df906001600160a01b031682565b6001600160a01b031690565b6100d3906101cb565b6100d3906101eb565b610067906101df565b9593919897969492909861010087019960008801610223916101fd565b60208701526040860152606085015260808401526001600160401b031660a083015260c08201610252916101fd565b60e00152565b634e487b7160e01b600052604160045260246000fd5b90601f01601f191681019081106001600160401b0382111761028f57604052565b610258565b9061029e9061018e565b600052602052604060002090565b906101c06100d36101c79290565b6102c46001610124565b6102ce600061012e565b811415806103c3575b6103b4575b5043906103736102eb8361013b565b6103006001916102fa8361013b565b9061016a565b93610378856103186103118261018e565b80956101b0565b339261035642918561034a445a873291610331306101f4565b319361033c60405190565b998a9860208a019889610206565b9081038252038261026e565b610368610361825190565b9160200190565b209485916003610294565b6102ac565b6103af6103a57ffd1b07ddf3530cf6f236d39f743f2efc4aa91976f55bc8d689018ebb7045e309926101f4565b936100f560405190565b0390a3565b6103bd906105ef565b386102dc565b504381106102d7565b6103d66001610124565b6000906103e28261012e565b8114158061040f575b6103f3575050565b61006b91610403610408926105ef565b61012e565b60016101b0565b504381106103eb565b9061029e9061012e565b9061006b61042f60405190565b928361026e565b6100d36040610422565b9061006b6104686001610451610436565b9461046261045e82610124565b8752565b01610124565b6020840152565b6100d390610440565b90815260608101939261006b929091604091610496905b6020830152565b0152565b9190820391821161018957565b6104ba6104b5826002610418565b61046f565b80519060006104c88161012e565b9283906104d4565b9190565b03610564575050436104e38190565b83101561055e57826104f49161049a565b6105026104d061010061012e565b1161055957814090808214610553575061054490610529610524846003610418565b610124565b9061034a61053660405190565b948593602085019384610478565b61054f610361825190565b2090565b91505090565b905090565b50905090565b610544925060206105786105299284015190565b92015190565b6100d36001610124565b9160001960089290920291821b911b6101a6565b91906105ab6100d36101c79390565b908354610588565b61006b9160009161059c565b61006b91906105d8906020906001906105de8185875190565b906102ac565b0192015190565b9061006b916105bf565b438082101561070257816106029161049a565b6106106104d061010061012e565b116106b75780409060006106266100d38261012e565b83146106b2576106769061067183600361066c6106466105248484610418565b61065c610651610436565b9161048f8b89850152565b610667846002610418565b6105e5565b610418565b6105b3565b6106ad6106a37fcb2365ce35c7118557a97fa2af2eb7925122333504b71884e8023b6cd29eb6229261012e565b926100f560405190565b0390a2565b505050565b6106c76000610671836003610418565b6106f17f0459fb2b0120148a579d408a2d204bca92ae16937a0cc2e7f6e50b614761f0c39161012e565b906106fb60405190565b80806106ad565b505056fea26469706673582212209bc22d334a0ae96cf37cff0347ae876e5847d7c7b5cadd6d5373e571849072d064736f6c63430008140033",
   "devdoc": {
     "kind": "dev",
     "methods": {},
@@ -109,26 +140,53 @@
   },
   "userdoc": {
     "kind": "user",
-    "methods": {},
+    "methods": {
+      "get(uint256)": {
+        "notice": "Retrieve the seed for a previously-committed targetBlock. Returns bytes32(0) if not yet available OR if the 256-block window has elapsed. Callers MUST check for zero and handle expiration — never fall back to a predictable value."
+      },
+      "request()": {
+        "notice": "Commit to using the hash of `block.number + 1` as entropy. Returns the target block number — the caller MUST store this to later retrieve the seed via `get(targetBlock)`."
+      },
+      "save()": {
+        "notice": "Persist the currently-pending hash. Callable by anyone — the output is deterministic, so griefing is limited to paying gas on someone's behalf."
+      }
+    },
+    "notice": "Commit-reveal randomness register. Security model — three layers combine to make the final seed unpredictable to any single actor (user or sequencer): 1. FUTURE-BLOCK COMMITMENT. `request()` targets `block.number + 1`, a block    that is NOT YET MINED when the caller signs the transaction. The caller    cannot know `blockhash(targetBlock)` at commit time. 2. PER-REQUEST SALT. At `request()` time we derive an implicit salt from    the calling context (msg.sender, block.prevrandao, block.timestamp,    gasleft()) that is recorded in storage. The sequencer sees msg.sender    but cannot freely manipulate `gasleft()` mid-transaction without    breaking the call. The salt is cryptographically mixed into the output. 3. NO PREDICTABLE FALLBACK. If the 256-block window expires without a    `save()`, the register returns bytes32(0). Callers MUST treat this as    \"entropy lost\" and either retry or fall back to a safe default. The old    contract returned a blockhash of an unrelated, publicly-readable block    after 256 blocks — that was the L-4 finding. Consumer contract responsibilities: - Call `request()` at action time and store the returned `targetBlock`. - Later, call `get(targetBlock)` to retrieve the seed. If it returns   bytes32(0), handle the expired case explicitly — never assume a   \"default\" outcome. - Periodically call `save()` to persist hashes before the 256-block   window closes on the register's shared `_blockToActualise` slot.",
     "version": 1
   },
   "storageLayout": {
     "storage": [
       {
-        "astId": 13238,
+        "astId": 13967,
         "contract": "src/utils/BlockHashRegister.sol:BlockHashRegister",
-        "label": "_blockHashes",
+        "label": "_legacyBlockHashes",
         "offset": 0,
         "slot": "0",
         "type": "t_mapping(t_uint256,t_bytes32)"
       },
       {
-        "astId": 13240,
+        "astId": 13969,
         "contract": "src/utils/BlockHashRegister.sol:BlockHashRegister",
         "label": "_blockToActualise",
         "offset": 0,
         "slot": "1",
         "type": "t_uint256"
+      },
+      {
+        "astId": 13974,
+        "contract": "src/utils/BlockHashRegister.sol:BlockHashRegister",
+        "label": "_entries",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_uint256,t_struct(Entry)13963_storage)"
+      },
+      {
+        "astId": 13978,
+        "contract": "src/utils/BlockHashRegister.sol:BlockHashRegister",
+        "label": "_pendingSalt",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_uint256,t_bytes32)"
       }
     ],
     "types": {
@@ -143,6 +201,36 @@
         "label": "mapping(uint256 => bytes32)",
         "numberOfBytes": "32",
         "value": "t_bytes32"
+      },
+      "t_mapping(t_uint256,t_struct(Entry)13963_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => struct BlockHashRegister.Entry)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Entry)13963_storage"
+      },
+      "t_struct(Entry)13963_storage": {
+        "encoding": "inplace",
+        "label": "struct BlockHashRegister.Entry",
+        "members": [
+          {
+            "astId": 13960,
+            "contract": "src/utils/BlockHashRegister.sol:BlockHashRegister",
+            "label": "blockHash",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bytes32"
+          },
+          {
+            "astId": 13962,
+            "contract": "src/utils/BlockHashRegister.sol:BlockHashRegister",
+            "label": "salt",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_bytes32"
+          }
+        ],
+        "numberOfBytes": "64"
       },
       "t_uint256": {
         "encoding": "inplace",
