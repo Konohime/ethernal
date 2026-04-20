@@ -7,15 +7,15 @@
   "scripts": {
     "test": "mocha",
     "start": "node src/server.js",
-    "debug": "cp ../webapp/contracts/development.json src/dev_contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-local-leaderboard MNEMONIC=\"walk oyster enemy scare wear enable today wire index arrow page dynamic\" cross-env DEV=true node --inspect-brk src/server.js",
-    "debug:staging": "cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard MNEMONIC='abandon tank soap whale staff shadow spy sail garlic artefact suggest volcano' ETH_URL=https://rpc-mumbai.matic.today BLOCKTIME=2 node --inspect-brk src/server.js",
+    "debug": "shx cp ../webapp/contracts/development.json src/dev_contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-local-leaderboard DEV=true node --inspect-brk src/server.js",
+    "debug:staging": "shx cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard BLOCKTIME=2 node --inspect-brk src/server.js",
     "sokol": "cross-env ETH_URL=https://sokol.poa.network node src/server.js",
-    "dev-prod": "cp ../webapp/contracts/production.json src/dev_contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone MNEMONIC=\"walk oyster enemy scare wear enable today wire index arrow page dynamic\" DEV=true ETH_URL=https://sokol.poa.network nodemon src/server.js",
-    "dev": "cp ../webapp/contracts/development.json src/dev_contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-local-leaderboard MNEMONIC=\"walk oyster enemy scare wear enable today wire index arrow page dynamic\" cross-env DEV=true nodemon src/server.js",
-    "dev:staging": "cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard MNEMONIC='abandon tank soap whale staff shadow spy sail garlic artefact suggest volcano' ETH_URL=https://rpc-mumbai.matic.today BLOCKTIME=2 nodemon src/server.js",
-    "dev:staging:node": "cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard MNEMONIC='abandon tank soap whale staff shadow spy sail garlic artefact suggest volcano' ETH_URL=http://192.168.40.26:8545 BLOCKTIME=2 nodemon src/server.js",
-    "dev:staging:no-dagger": "cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard MNEMONIC='abandon tank soap whale staff shadow spy sail garlic artefact suggest volcano' ETH_URL=https://rpc-mumbai.matic.today DAGGER=disabled BLOCKTIME=2 nodemon src/server.js",
-    "staging": "cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard MNEMONIC='abandon tank soap whale staff shadow spy sail garlic artefact suggest volcano' ETH_URL=https://rpc-mumbai.matic.today BLOCKTIME=2 node src/server.js",
+    "dev-prod": "shx cp ../webapp/contracts/production.json src/dev_contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone DEV=true ETH_URL=https://sokol.poa.network nodemon src/server.js",
+    "dev": "shx cp ../webapp/contracts/development.json src/dev_contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-local-leaderboard DEV=true nodemon src/server.js",
+    "dev:staging": "shx cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard BLOCKTIME=2 nodemon src/server.js",
+    "dev:staging:node": "shx cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard ETH_URL=http://192.168.40.26:8545 BLOCKTIME=2 nodemon src/server.js",
+    "dev:staging:no-dagger": "shx cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard DAGGER=disabled BLOCKTIME=2 nodemon src/server.js",
+    "staging": "shx cp ../webapp/contracts/staging.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-dev-leaderboard BLOCKTIME=2 node src/server.js",
     "dev:prod": "cp ../webapp/contracts/production.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-alpha-leaderboard ETH_URL=https://rpc-mumbai.matic.today BLOCKTIME=2 nodemon src/server.js",
     "dev:prod:node": "cp ../webapp/contracts/production.json src/contractsInfo.json && cross-env PRIVILEGED_ADDRESSES=everyone LEADERBOARD=ethernal-alpha-leaderboard ETH_URL=http://192.168.40.26:8545 BLOCKTIME=2 nodemon src/server.js",
     "db": "bash ./scripts/start-local-db.sh",
@@ -45,7 +45,8 @@
     "nodemon": "^2.0.1",
     "prettier": "^2.0.5",
     "request-promise": "^4.2.5",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "shx": "^0.4.0"
   },
   "engines": {
     "node": ">=12"
