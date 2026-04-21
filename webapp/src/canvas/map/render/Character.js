@@ -76,31 +76,30 @@ class Character extends PIXI.Container {
     const customSpriteUrl = spriteId != null ? `${SPRITE_CDN}/${spriteId}.png` : null;
     const customTexture = customSpriteUrl ? PIXI.Assets.get(customSpriteUrl) : null;
 
+    // Per-class 48px spritesheets, loaded in MapArea.svelte under these aliases.
+    const CLASS_SHEETS = {
+      [CharacterClass.EXPLORER]:  { alias: 'char_explorer', prefix: 'char_adv' },
+      [CharacterClass.MAGE]:      { alias: 'char_mage',     prefix: 'char_wiz' },
+      [CharacterClass.BARBARIAN]: { alias: 'char_berseker', prefix: 'char_bar' },
+      [CharacterClass.WARRIOR]:   { alias: 'char_warrior',  prefix: 'char_war' },
+    };
+    const classSheetCfg = CLASS_SHEETS[charClass];
+    const classSheet = classSheetCfg ? PIXI.Assets.get(classSheetCfg.alias) : null;
+
+    let useLargeFrames = false;
     if (customTexture) {
       const frames = buildCustomFrames(customTexture.baseTexture || customTexture);
       char_front_walk = frames.front;
       char_back_walk = frames.back;
       char_side_walk = frames.side;
-    } else {
-      const charAnims = PIXI.Assets.get('character_classes').animations;
-
-      if (charClass === CharacterClass.EXPLORER) {
-        char_front_walk = charAnims.char_adv_front;
-        char_back_walk = charAnims.char_adv_back;
-        char_side_walk = charAnims.char_adv_side;
-      } else if (charClass === CharacterClass.MAGE) {
-        char_front_walk = charAnims.char_wiz_front;
-        char_back_walk = charAnims.char_wiz_back;
-        char_side_walk = charAnims.char_wiz_side;
-      } else if (charClass === CharacterClass.BARBARIAN) {
-        char_front_walk = charAnims.char_bar_front;
-        char_back_walk = charAnims.char_bar_back;
-        char_side_walk = charAnims.char_bar_side;
-      } else if (charClass === CharacterClass.WARRIOR) {
-        char_front_walk = charAnims.char_war_front;
-        char_back_walk = charAnims.char_war_back;
-        char_side_walk = charAnims.char_war_side;
-      }
+      useLargeFrames = true;
+    } else if (classSheet && classSheet.animations) {
+      const anims = classSheet.animations;
+      const p = classSheetCfg.prefix;
+      char_front_walk = anims[`${p}_front`] || char_front_walk;
+      char_back_walk  = anims[`${p}_back`]  || char_back_walk;
+      char_side_walk  = anims[`${p}_side`]  || char_side_walk;
+      useLargeFrames = true;
     }
 
     const moveS = new PIXI.AnimatedSprite(char_front_walk);
@@ -113,8 +112,9 @@ class Character extends PIXI.Container {
     moveE.tint = this.tint;
     moveN.tint = this.tint;
 
-    const isCustom = !!customTexture;
-    const scale = isCustom ? 0.667 : 1; // 48px custom frames scaled to ~32px to match class sprites
+    // 48px frames (per-class sheets or custom PixelBroker) are scaled down
+    // to ~32px to match the legacy fallback sprite on the map.
+    const scale = useLargeFrames ? 0.667 : 1;
     const pos = { x: 0, y: -2 };
     moveS.position.set(pos.x, pos.y);
     moveW.position.set(pos.x, pos.y);
@@ -133,7 +133,7 @@ class Character extends PIXI.Container {
     lookAround.scale.set(1.25, 1.25);
     lookAround.tint = this.tint;
 
-    const pivotSize = isCustom ? FRAME_SIZE / 2 : 16;
+    const pivotSize = useLargeFrames ? FRAME_SIZE / 2 : 16;
     this.view = new PIXI.SimplePlane(moveE.texture);
     this.view.pivot.set(pivotSize, pivotSize);
 
