@@ -46,13 +46,18 @@
 <style lang="scss">
   @import '../styles/variables';
 
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 4px;
+  }
   .container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     margin-left: 20px;
     margin-right: 20px;
-    margin-bottom: 20px;
   }
   .selection-box {
     cursor: pointer;
@@ -81,11 +86,17 @@
     height: 46px;
   }
   h3 {
-    margin-top: 0px;
-    margin-bottom: 25px;
+    margin: 0;
   }
   .input-container {
-    padding: 12px 0 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+
+    label {
+      font-size: 12px;
+    }
   }
   input {
     margin-top: 4px;
@@ -103,25 +114,29 @@
     justify-content: start;
     text-align: left;
     padding: 10px;
-    height: 110px;
+    min-height: 80px;
 
     ul {
       margin-left: 25px;
     }
   }
   .sprite-section {
-    margin-top: 10px;
-    margin-bottom: 10px;
-
     h3 {
-      margin-bottom: 10px;
+      margin: 0 0 8px;
+      font-size: 14px;
     }
   }
   .sprite-toggle {
     display: flex;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     justify-content: center;
+  }
+  .sprite-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
   }
   .sprite-option {
     cursor: pointer;
@@ -140,18 +155,17 @@
   }
   .sprite-input-row {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    margin-bottom: 10px;
+    gap: 8px;
 
     label {
       font-size: 11px;
-      margin-bottom: 4px;
     }
     input {
-      width: 120px;
+      width: 90px;
       text-align: center;
-      border: 3px solid $color-grey;
+      border: 2px solid $color-grey;
       background: transparent;
       color: $color-light;
       outline: none;
@@ -165,7 +179,7 @@
     text-align: center;
 
     img {
-      width: 96px;
+      width: 64px;
       height: auto;
       image-rendering: pixelated;
       border: 1px solid $color-grey;
@@ -179,73 +193,76 @@
   }
 </style>
 
-<h3>Select a class</h3>
-<div class="container">
-  <label class:disabled="{characterClass !== '0'}" class="selection-box">
-    <input type="radio" bind:group="{characterClass}" value="{'0'}" />
-    <img src="{classPortrait('0')}" alt="{classes['0'][0]}" />
-  </label>
-  <label class:disabled="{characterClass !== '1'}" class="selection-box">
-    <input type="radio" bind:group="{characterClass}" value="{'1'}" />
-    <img src="{classPortrait('1')}" alt="{classes['1'][0]}" />
-  </label>
-  <label class:disabled="{characterClass !== '2'}" class="selection-box">
-    <input type="radio" bind:group="{characterClass}" value="{'2'}" />
-    <img src="{classPortrait('2')}" alt="{classes['2'][0]}" />
-  </label>
-  <label class:disabled="{characterClass !== '3'}" class="selection-box">
-    <input type="radio" bind:group="{characterClass}" value="{'3'}" />
-    <img src="{classPortrait('3')}" alt="{classes['3'][0]}" />
-  </label>
-</div>
-<div class="container description">
-  <div>
-    <h4>{text[0]}</h4>
-    <ul>
-      {#each text[1] as desc}
-        <li>{desc}</li>
-      {/each}
-    </ul>
-  </div>
-</div>
-
-<div class="sprite-section">
-  <h3>Custom Sprite</h3>
-  <div class="sprite-toggle">
-    <label class="sprite-option" class:active="{!useCustomSprite}">
-      <input type="radio" name="spriteMode" checked="{!useCustomSprite}" on:change="{() => toggleCustomSprite(false)}" />
-      Default class sprite
-    </label>
-    <label class="sprite-option" class:active="{useCustomSprite}">
-      <input type="radio" name="spriteMode" checked="{useCustomSprite}" on:change="{() => toggleCustomSprite(true)}" />
-      PixelBroker sprite
-    </label>
+<div class="form">
+  <div class="input-container">
+    <label>Name your character</label>
+    <input maxlength="19" type="text" placeholder="..." bind:value="{name}" />
   </div>
 
-  {#if useCustomSprite}
-    <div class="sprite-input-row">
-      <label>Sprite ID (0–9999)</label>
-      <input
-        type="number"
-        min="0"
-        max="9999"
-        placeholder="ex: 42"
-        bind:value="{spriteIdInput}"
-        on:input="{onSpriteIdInput}"
-      />
+  <h3>Select a class</h3>
+  <div class="container">
+    <label class:disabled="{characterClass !== '0'}" class="selection-box">
+      <input type="radio" bind:group="{characterClass}" value="{'0'}" />
+      <img src="{classPortrait('0')}" alt="{classes['0'][0]}" />
+    </label>
+    <label class:disabled="{characterClass !== '1'}" class="selection-box">
+      <input type="radio" bind:group="{characterClass}" value="{'1'}" />
+      <img src="{classPortrait('1')}" alt="{classes['1'][0]}" />
+    </label>
+    <label class:disabled="{characterClass !== '2'}" class="selection-box">
+      <input type="radio" bind:group="{characterClass}" value="{'2'}" />
+      <img src="{classPortrait('2')}" alt="{classes['2'][0]}" />
+    </label>
+    <label class:disabled="{characterClass !== '3'}" class="selection-box">
+      <input type="radio" bind:group="{characterClass}" value="{'3'}" />
+      <img src="{classPortrait('3')}" alt="{classes['3'][0]}" />
+    </label>
+  </div>
+  <div class="container description">
+    <div>
+      <h4>{text[0]}</h4>
+      <ul>
+        {#each text[1] as desc}
+          <li>{desc}</li>
+        {/each}
+      </ul>
     </div>
-    {#if spritePreviewUrl && !spriteError}
-      <div class="sprite-preview">
-        <img src="{spritePreviewUrl}" alt="Sprite #{spriteIdInput}" on:error="{onSpriteLoadError}" />
+  </div>
+
+  <div class="sprite-section">
+    <div class="sprite-toggle">
+      <label class="sprite-option" class:active="{!useCustomSprite}">
+        <input type="radio" name="spriteMode" checked="{!useCustomSprite}" on:change="{() => toggleCustomSprite(false)}" />
+        Default sprite
+      </label>
+      <label class="sprite-option" class:active="{useCustomSprite}">
+        <input type="radio" name="spriteMode" checked="{useCustomSprite}" on:change="{() => toggleCustomSprite(true)}" />
+        PixelBroker
+      </label>
+    </div>
+
+    {#if useCustomSprite}
+      <div class="sprite-body">
+        <div class="sprite-input-row">
+          <label>Sprite ID</label>
+          <input
+            type="number"
+            min="0"
+            max="9999"
+            placeholder="0–9999"
+            bind:value="{spriteIdInput}"
+            on:input="{onSpriteIdInput}"
+          />
+        </div>
+        {#if spritePreviewUrl && !spriteError}
+          <div class="sprite-preview">
+            <img src="{spritePreviewUrl}" alt="Sprite #{spriteIdInput}" on:error="{onSpriteLoadError}" />
+          </div>
+        {/if}
+        {#if spriteError}
+          <p class="sprite-error">Sprite not found</p>
+        {/if}
       </div>
     {/if}
-    {#if spriteError}
-      <p class="sprite-error">Sprite not found</p>
-    {/if}
-  {/if}
-</div>
-
-<div class="input-container">
-  <label>Name your character</label>
-  <input maxlength="19" type="text" placeholder="..." bind:value="{name}" />
+  </div>
 </div>
