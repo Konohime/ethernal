@@ -163,7 +163,7 @@ class Events {
     return chunks;
   }
 
-  async replay(fromBlock = 0, toBlock = 'latest', { blockChunk = 10000 } = {}) {
+  async replay(fromBlock = 0, toBlock = 'latest', { blockChunk = 9999 } = {}) {
     const chunks = await this.generateBlockChunks(fromBlock, toBlock, blockChunk);
     const lastBlock = chunks[chunks.length - 1].toBlock;
     this.targetBlockNumber = lastBlock;
