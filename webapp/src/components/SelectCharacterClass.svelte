@@ -102,17 +102,25 @@
       margin-left: 25px;
     }
   }
-  .sprite-section {
-    h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-    }
-  }
   .sprite-toggle {
     display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: 8px;
+    align-items: center;
     justify-content: center;
+  }
+  .sprite-id-input {
+    width: 70px;
+    padding: 6px 8px;
+    text-align: center;
+    border: 2px solid $color-grey;
+    background: transparent;
+    color: $color-light;
+    outline: none;
+    font-size: 12px;
+
+    &:focus {
+      border-color: $color-light;
+    }
   }
   .sprite-body {
     display: flex;
@@ -133,28 +141,6 @@
     &.active {
       border-color: $color-light;
       color: $color-light;
-    }
-  }
-  .sprite-input-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-
-    label {
-      font-size: 11px;
-    }
-    input {
-      width: 90px;
-      text-align: center;
-      border: 2px solid $color-grey;
-      background: transparent;
-      color: $color-light;
-      outline: none;
-
-      &:focus {
-        border-color: $color-light;
-      }
     }
   }
 </style>
@@ -195,30 +181,25 @@
     </div>
   </div>
 
-  <div class="sprite-section">
-    <div class="sprite-toggle">
-      <label class="sprite-option" class:active="{!useCustomSprite}">
-        <input type="radio" name="spriteMode" checked="{!useCustomSprite}" on:change="{() => toggleCustomSprite(false)}" />
-        Default sprite
-      </label>
-      <label class="sprite-option" class:active="{useCustomSprite}">
-        <input type="radio" name="spriteMode" checked="{useCustomSprite}" on:change="{() => toggleCustomSprite(true)}" />
-        PixelBroker
-      </label>
-    </div>
-
+  <div class="sprite-toggle">
+    <label class="sprite-option" class:active="{!useCustomSprite}">
+      <input type="radio" name="spriteMode" checked="{!useCustomSprite}" on:change="{() => toggleCustomSprite(false)}" />
+      Default sprite
+    </label>
+    <label class="sprite-option" class:active="{useCustomSprite}">
+      <input type="radio" name="spriteMode" checked="{useCustomSprite}" on:change="{() => toggleCustomSprite(true)}" />
+      PixelBroker
+    </label>
     {#if useCustomSprite}
-      <div class="sprite-input-row">
-        <label>Sprite ID</label>
-        <input
-          type="number"
-          min="0"
-          max="9999"
-          placeholder="0–9999"
-          bind:value="{spriteIdInput}"
-          on:input="{onSpriteIdInput}"
-        />
-      </div>
+      <input
+        class="sprite-id-input"
+        type="number"
+        min="0"
+        max="9999"
+        placeholder="ID"
+        bind:value="{spriteIdInput}"
+        on:input="{onSpriteIdInput}"
+      />
     {/if}
   </div>
 </div>
