@@ -23,7 +23,15 @@ export default {
     set($data);
   },
   clear: () => {
-    set({ name: '', characterClass: 0, spriteId: null });
-    localStorage.removeItem('characterChoice');
+    // Preserve spriteId: it's a visual preference that should survive entering the
+    // dungeon, since the map renderer reads it to load the custom character sprite.
+    const keptSpriteId = $data && $data.spriteId != null ? $data.spriteId : null;
+    $data = { name: '', characterClass: 0, spriteId: keptSpriteId };
+    if (keptSpriteId != null) {
+      localStorage.setItem('characterChoice', JSON.stringify($data));
+    } else {
+      localStorage.removeItem('characterChoice');
+    }
+    set($data);
   },
 };

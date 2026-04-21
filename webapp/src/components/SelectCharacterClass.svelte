@@ -31,15 +31,15 @@
   .form {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 8px;
     padding: 0 4px;
+    font-size: 11px;
   }
   .container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin: 0 16px;
   }
   .selection-box {
     cursor: pointer;
@@ -52,7 +52,7 @@
     }
     img {
       border: 1px solid $color-grey;
-      padding: 2px;
+      padding: 1px;
     }
 
     &.disabled {
@@ -64,28 +64,31 @@
     }
   }
   img {
-    width: 46px;
-    height: 46px;
+    width: 36px;
+    height: 36px;
   }
   h3 {
     margin: 0;
+    font-size: 13px;
   }
   .input-container {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
+    gap: 2px;
 
     label {
-      font-size: 12px;
+      font-size: 11px;
     }
   }
   input {
-    margin-top: 4px;
-    border: 3px solid $color-grey;
+    margin-top: 2px;
+    border: 2px solid $color-grey;
     background: transparent;
     color: $color-light;
     outline: none;
+    font-size: 12px;
+    padding: 4px 6px;
   }
   input:focus {
     border-color: $color-light;
@@ -95,44 +98,43 @@
     border: 1px solid $color-grey;
     justify-content: start;
     text-align: left;
-    padding: 10px;
-    min-height: 80px;
+    padding: 6px 10px;
+    min-height: 60px;
+    font-size: 11px;
 
+    h4 { margin: 0 0 2px; font-size: 11px; }
     ul {
-      margin-left: 25px;
+      margin: 0 0 0 18px;
+      padding: 0;
     }
+    li { line-height: 1.3; }
   }
   .sprite-toggle {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
     justify-content: center;
   }
   .sprite-id-input {
     width: 70px;
-    padding: 6px 8px;
+    padding: 4px 6px;
+    margin: 0;
     text-align: center;
-    border: 2px solid $color-grey;
+    border: 1px solid $color-grey;
     background: transparent;
     color: $color-light;
     outline: none;
-    font-size: 12px;
+    font-size: 11px;
 
     &:focus {
       border-color: $color-light;
     }
   }
-  .sprite-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
   .sprite-option {
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 4px 10px;
     border: 1px solid $color-grey;
-    font-size: 11px;
+    font-size: 10px;
     transition: border-color 0.15s;
 
     input {
@@ -196,7 +198,7 @@
         type="number"
         min="0"
         max="9999"
-        placeholder="ID"
+        placeholder="0–9999"
         bind:value="{spriteIdInput}"
         on:input="{onSpriteIdInput}"
       />
