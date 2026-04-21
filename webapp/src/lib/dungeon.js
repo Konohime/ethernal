@@ -575,11 +575,11 @@ class Dungeon {
    * @returns {Promise<*>}
    */
   async approveDungeon(nft = 'Elements') {
-    return this.wallet.tx(nft, 'setApprovalForAll', this.contract.address, true).then(tx => tx.wait());
+    return this.wallet.tx(nft, 'setApprovalForAll', this.contract.target, true).then(tx => tx.wait());
   }
 
   async isDungeonApproved(nft = 'Elements') {
-    return this.wallet.call(nft, 'isApprovedForAll', get(this.wallet).address, this.contract.address);
+    return this.wallet.call(nft, 'isApprovedForAll', get(this.wallet).address, this.contract.target);
   }
 
   /**

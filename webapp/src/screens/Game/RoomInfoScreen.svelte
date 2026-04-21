@@ -89,7 +89,7 @@
   $: isOwner = $keeperRooms.map(r => r.coordinates).includes(currentCoordinates);
   $: isInRoom = $currentRoom.coordinates == currentCoordinates;
   $: isOnFloor = Number($currentFloor) === getCoordinatesFloor(currentCoordinates);
-  $: dungeonOwned = room && $dungeon.contract.address.toLowerCase() === room.keeper.player;
+  $: dungeonOwned = room && $dungeon.contract.target.toLowerCase() === room.keeper.player;
   $: canBuyRoom = room && !isOwner && isInRoom && ($foreclosedRooms.includes(currentCoordinates) || dungeonOwned);
   $: hasEnoughBuyCost = $characterBalances.coins >= ROOM_COST;
   $: canToggleRoom =
