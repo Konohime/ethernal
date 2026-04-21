@@ -6,28 +6,12 @@
   export let characterClass = '0';
   export let spriteId = null;
 
-  const SPRITE_CDN = 'https://cb-media.sfo3.cdn.digitaloceanspaces.com/pixelbrokers/current/sprites';
-
   let useCustomSprite = false;
   let spriteIdInput = '';
-  let spritePreviewUrl = '';
-  let spriteError = false;
 
   function onSpriteIdInput() {
-    spriteError = false;
     const id = parseInt(spriteIdInput, 10);
-    if (!isNaN(id) && id >= 0 && id <= 9999) {
-      spritePreviewUrl = `${SPRITE_CDN}/${id}.png`;
-      spriteId = id;
-    } else {
-      spritePreviewUrl = '';
-      spriteId = null;
-    }
-  }
-
-  function onSpriteLoadError() {
-    spriteError = true;
-    spriteId = null;
+    spriteId = !isNaN(id) && id >= 0 && id <= 9999 ? id : null;
   }
 
   function toggleCustomSprite(enabled) {
@@ -35,8 +19,6 @@
     if (!enabled) {
       spriteId = null;
       spriteIdInput = '';
-      spritePreviewUrl = '';
-      spriteError = false;
     }
   }
 
@@ -175,22 +157,6 @@
       }
     }
   }
-  .sprite-preview {
-    text-align: center;
-
-    img {
-      width: 64px;
-      height: auto;
-      image-rendering: pixelated;
-      border: 1px solid $color-grey;
-      padding: 2px;
-    }
-  }
-  .sprite-error {
-    color: #ff4848;
-    font-size: 11px;
-    text-align: center;
-  }
 </style>
 
 <div class="form">
@@ -242,26 +208,16 @@
     </div>
 
     {#if useCustomSprite}
-      <div class="sprite-body">
-        <div class="sprite-input-row">
-          <label>Sprite ID</label>
-          <input
-            type="number"
-            min="0"
-            max="9999"
-            placeholder="0–9999"
-            bind:value="{spriteIdInput}"
-            on:input="{onSpriteIdInput}"
-          />
-        </div>
-        {#if spritePreviewUrl && !spriteError}
-          <div class="sprite-preview">
-            <img src="{spritePreviewUrl}" alt="Sprite #{spriteIdInput}" on:error="{onSpriteLoadError}" />
-          </div>
-        {/if}
-        {#if spriteError}
-          <p class="sprite-error">Sprite not found</p>
-        {/if}
+      <div class="sprite-input-row">
+        <label>Sprite ID</label>
+        <input
+          type="number"
+          min="0"
+          max="9999"
+          placeholder="0–9999"
+          bind:value="{spriteIdInput}"
+          on:input="{onSpriteIdInput}"
+        />
       </div>
     {/if}
   </div>
