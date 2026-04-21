@@ -5,7 +5,12 @@
   import DefaultScreen from 'screens/DefaultScreen';
   import BoxButton from 'components/BoxButton';
 
-  const { characterInfo, refill, ressurectedId } = $preDungeonCheck;
+  const { characterInfo: rawInfo, refill, ressurectedId } = $preDungeonCheck;
+  const characterInfo = {
+    characterName: (rawInfo && rawInfo.characterName) || 'Adventurer',
+    stats: (rawInfo && rawInfo.stats) || { characterClass: 0 },
+    status: (rawInfo && rawInfo.status) || { status: 'alive' },
+  };
 
   let disabled = false;
   const ok = async () => {

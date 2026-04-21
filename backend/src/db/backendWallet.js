@@ -6,7 +6,8 @@ const { fromMnemonic } = utils.HDNode;
 class BackendWallet extends Wallet {
   constructor(...args) {
     super(...args);
-    this._noncePromise = null;
+    this._sendQueue = Promise.resolve();
+    this._nextNonce = null;
   }
 
   connect(provider) {
@@ -19,32 +20,40 @@ class BackendWallet extends Wallet {
     if (transaction.gasPrice == null) {
       transaction.gasPrice = BigNumber.from(process.env.GAS_PRICE || '1000000000');
     }
-    if (transaction.nonce == null) {
-      if (this._noncePromise == null) {
-        this._noncePromise = this.provider.getTransactionCount(this.address);
-      }
-      transaction.nonce = this._noncePromise;
-      this._noncePromise = this._noncePromise.then(nonce => nonce + 1);
-    }
 
-    const tx = await retry(async () => {
-      let tx;
-      try {
-        this.provider.clearCache();
-        tx = await super.sendTransaction(transaction);
-      } catch (err) {
-        if (err.message.includes('nonce')) {
-          console.log('incorrect nonce, trying again');
-          transaction.nonce = await this.provider.getTransactionCount(this.address);
-          this._noncePromise = null;
-          tx = await super.sendTransaction(transaction);
-        } else {
+    // Serialize all sends so nonce assignment + submission is atomic.
+    // Concurrent sends previously raced on a shared promise chain — if one failed
+    // with "nonce", all others already had stale nonces assigned and looped.
+    const run = this._sendQueue.then(async () => {
+      if (transaction.nonce == null) {
+        if (this._nextNonce == null) {
+          this._nextNonce = await this.provider.getTransactionCount(this.address, 'pending');
+        }
+        transaction.nonce = this._nextNonce;
+      }
+
+      return retry(async () => {
+        try {
+          this.provider.clearCache();
+          const tx = await super.sendTransaction(transaction);
+          this._nextNonce = transaction.nonce + 1;
+          return tx;
+        } catch (err) {
+          if (err.message && err.message.includes('nonce')) {
+            console.log('incorrect nonce, refetching');
+            const fresh = await this.provider.getTransactionCount(this.address, 'pending');
+            transaction.nonce = fresh;
+            this._nextNonce = null;
+            throw err; // let p-retry retry with fresh nonce
+          }
           throw err;
         }
-      }
-      return tx;
+      });
     });
-    return tx;
+
+    // Keep the queue chain alive even if this send fails.
+    this._sendQueue = run.catch(() => {});
+    return run;
   }
 
   static fromMnemonic(mnemonic, path = "m/44'/60'/0'/0/0", wordlist) {

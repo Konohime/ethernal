@@ -883,9 +883,20 @@ class Cache {
   }
 
   async fetch(resource) {
-    return fetch(`${this.url}/${resource}`, {
+    const res = await fetch(`${this.url}/${resource}`, {
       headers: { Accept: 'application/json' },
-    }).then(result => result.json());
+    });
+    const text = await res.text();
+    if (!text) {
+      log.warn(`empty response for ${resource}`);
+      return null;
+    }
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      log.error(`bad JSON for ${resource}: ${text.slice(0, 200)}`);
+      return null;
+    }
   }
 
   subscribeRooms(coordinates) {

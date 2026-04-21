@@ -109,6 +109,7 @@
       { alias: 'path', src: '/images/map/path.png' },
       { alias: 'tilemaps', src: `/images/map/tilemaps.json?${COMMIT}` },
       { alias: 'sheet', src: `/images/pixi-art.json?${COMMIT}` },
+      { alias: 'character_classes', src: `/images/map/character_classes.json?${COMMIT}` },
       
       // Radial menu icons
       { alias: 'icon_box_02', src: '/images/ui/icons/interaction/box02_36x36.png' },

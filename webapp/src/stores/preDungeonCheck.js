@@ -60,12 +60,14 @@ const store = derived(
           characterInfo = await fetchCache(`characters/${characterId}`);
         } catch (e) {
           console.log('failed to fetch character info from cache, using default');
-          // Fallback quand le cache n'est pas disponible
+        }
+        if (!characterInfo || !characterInfo.stats || !characterInfo.status) {
+          console.log('character info incomplete from cache, using default', characterInfo);
           characterInfo = {
-          characterName: 'TestHero',
-          stats: { characterClass: 0 },
-          status: { status: 'alive' },
-        }; 
+            characterName: (characterInfo && characterInfo.characterName) || 'TestHero',
+            stats: (characterInfo && characterInfo.stats) || { characterClass: 0 },
+            status: (characterInfo && characterInfo.status) || { status: 'alive' },
+          };
         }
 
         let ressurectedId;
