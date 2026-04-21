@@ -32,23 +32,35 @@ class BackendWallet extends Wallet {
         transaction.nonce = this._nextNonce;
       }
 
-      return retry(async () => {
+      return retry(async attempt => {
         try {
           this.provider.clearCache();
           const tx = await super.sendTransaction(transaction);
           this._nextNonce = transaction.nonce + 1;
           return tx;
         } catch (err) {
-          if (err.message && err.message.includes('nonce')) {
-            console.log('incorrect nonce, refetching');
+          // Only treat as a nonce problem when the *reason* field says so — not just
+          // the presence of the word "nonce" somewhere in the dumped tx. Also bail
+          // out early on reverts: they are deterministic, retrying burns RPC.
+          const reason = (err && (err.reason || '')) + '';
+          const code = err && err.code;
+          if (code === 'UNPREDICTABLE_GAS_LIMIT' || reason.includes('execution reverted')) {
+            throw new retry.AbortError(err);
+          }
+          const isNonceErr = /^nonce /i.test(reason)
+            || reason === 'nonce has already been used'
+            || reason === 'replacement transaction underpriced'
+            || reason === 'already known';
+          if (isNonceErr) {
             const fresh = await this.provider.getTransactionCount(this.address, 'pending');
-            transaction.nonce = fresh;
+            console.log(`nonce error (attempt ${attempt}), used=${transaction.nonce}, pending-count=${fresh}, reason="${reason}"`);
+            transaction.nonce = fresh > transaction.nonce ? fresh : transaction.nonce + 1;
             this._nextNonce = null;
-            throw err; // let p-retry retry with fresh nonce
+            throw err;
           }
           throw err;
         }
-      });
+      }, { retries: 5 });
     });
 
     // Keep the queue chain alive even if this send fails.
