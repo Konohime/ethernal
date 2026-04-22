@@ -164,7 +164,7 @@ class Character extends PIXI.Container {
     this.view = new PIXI.SimplePlane(moveE.texture);
     this.view.pivot.set(pivotSize, pivotSize);
 
-    if (true || type === 'other') {
+    if (type === 'other') {
       this.view.material = new ReplacementMaterial(PIXI.Texture.WHITE, colorMap);
     }
 
@@ -223,6 +223,11 @@ class Character extends PIXI.Container {
 
   _syncTexture(texture) {
     this.view.texture = texture;
+    // Defensive: keep the shader's uSampler in sync with the mesh texture
+    // in case a custom MeshMaterial was installed with a placeholder texture.
+    if (this.view.material && this.view.material.texture !== texture) {
+      this.view.material.texture = texture;
+    }
   }
 
   stop() {
