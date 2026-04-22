@@ -72,10 +72,6 @@ class Character extends PIXI.Container {
     const animations_legacy = spritesheet_legacy.animations;
     let { char_front_walk, char_side_walk, char_back_walk, char_torch } = animations_legacy;
 
-    // Check for pre-loaded custom sprite
-    const customSpriteUrl = spriteId != null ? `${SPRITE_CDN}/${spriteId}.png` : null;
-    const customTexture = customSpriteUrl ? PIXI.Assets.get(customSpriteUrl) : null;
-
     // Per-class 48px spritesheets, loaded in MapArea.svelte under these aliases.
     const CLASS_SHEETS = {
       [CharacterClass.EXPLORER]:  { alias: 'char_explorer', prefix: 'char_adv' },
@@ -87,19 +83,50 @@ class Character extends PIXI.Container {
     const classSheet = classSheetCfg ? PIXI.Assets.get(classSheetCfg.alias) : null;
 
     let useLargeFrames = false;
-    if (customTexture) {
-      const frames = buildCustomFrames(customTexture.baseTexture || customTexture);
-      char_front_walk = frames.front;
-      char_back_walk = frames.back;
-      char_side_walk = frames.side;
-      useLargeFrames = true;
-    } else if (classSheet && classSheet.animations) {
+
+    // Step 1: class sprite (default for the chosen class).
+    if (classSheet && classSheet.animations) {
       const anims = classSheet.animations;
       const p = classSheetCfg.prefix;
       char_front_walk = anims[`${p}_front`] || char_front_walk;
       char_back_walk  = anims[`${p}_back`]  || char_back_walk;
       char_side_walk  = anims[`${p}_side`]  || char_side_walk;
       useLargeFrames = true;
+    }
+
+    // Step 2: if a PixelBroker spriteId is chosen, override with custom sprite.
+    // Texture.from returns a placeholder that updates once the image loads.
+    const customSpriteUrl = spriteId != null ? `${SPRITE_CDN}/${spriteId}.png` : null;
+    this._customSpriteApplied = false;
+    if (customSpriteUrl) {
+      // eslint-disable-next-line no-console
+      console.log('[Character] loading PixelBroker sprite', customSpriteUrl);
+      const customTex = PIXI.Texture.from(customSpriteUrl, { crossOrigin: 'anonymous' });
+      const baseTex = customTex.baseTexture;
+
+      const applyCustom = () => {
+        if (this._customSpriteApplied) return;
+        this._customSpriteApplied = true;
+        // eslint-disable-next-line no-console
+        console.log('[Character] PixelBroker sprite ready', customSpriteUrl);
+        this._applyCustomFrames(baseTex);
+      };
+
+      if (baseTex.valid) {
+        const frames = buildCustomFrames(baseTex);
+        char_front_walk = frames.front;
+        char_back_walk = frames.back;
+        char_side_walk = frames.side;
+        useLargeFrames = true;
+        this._customSpriteApplied = true;
+      } else {
+        baseTex.once('loaded', applyCustom);
+        baseTex.once('update', applyCustom);
+        baseTex.once('error', (err) => {
+          // eslint-disable-next-line no-console
+          console.warn('[Character] failed to load PixelBroker sprite', customSpriteUrl, err);
+        });
+      }
     }
 
     const moveS = new PIXI.AnimatedSprite(char_front_walk);
@@ -149,36 +176,31 @@ class Character extends PIXI.Container {
     this.addChild(this.view);
     this.showName();
     this.interactive = true;
-
-    // Async load custom sprite if not cached yet
-    if (customSpriteUrl && !customTexture) {
-      this._loadCustomSprite(customSpriteUrl);
-    }
   }
 
-  async _loadCustomSprite(url) {
-    try {
-      const texture = await PIXI.Assets.load(url);
-      const frames = buildCustomFrames(texture.baseTexture || texture);
+  _applyCustomFrames(baseTexture) {
+    const frames = buildCustomFrames(baseTexture);
+    const scale = 0.667;
+    const pivotSize = FRAME_SIZE / 2;
 
-      const scale = 0.667;
-      const pivotSize = FRAME_SIZE / 2;
+    this.charAnimations.moveS.textures = frames.front;
+    this.charAnimations.moveW.textures = frames.side;
+    this.charAnimations.moveE.textures = frames.side;
+    this.charAnimations.moveN.textures = frames.back;
 
-      this.charAnimations.moveS.textures = frames.front;
-      this.charAnimations.moveW.textures = frames.side;
-      this.charAnimations.moveE.textures = frames.side;
-      this.charAnimations.moveN.textures = frames.back;
+    [this.charAnimations.moveS, this.charAnimations.moveW, this.charAnimations.moveE, this.charAnimations.moveN]
+      .forEach(anim => {
+        anim.scale.set(scale, scale);
+      });
+    this.charAnimations.moveE.scale.x = -scale;
 
-      [this.charAnimations.moveS, this.charAnimations.moveW, this.charAnimations.moveE, this.charAnimations.moveN]
-        .forEach(anim => {
-          anim.scale.set(scale, scale);
-        });
-      this.charAnimations.moveE.scale.x = -scale;
+    this.view.pivot.set(pivotSize, pivotSize);
 
-      this.view.pivot.set(pivotSize, pivotSize);
-      this._syncAnimation(this.activeAnimation);
-    } catch (e) {
-      console.warn('Failed to load custom sprite, keeping class sprite:', e);
+    // Force-refresh the view (bypass _syncAnimation early-return).
+    if (this.activeAnimation) {
+      this.view.scale.copyFrom(this.activeAnimation.scale);
+      this.activeAnimation.onFrameChange = t => this._syncTexture(this.activeAnimation.textures[t]);
+      this._syncTexture(this.activeAnimation.texture);
     }
   }
 
