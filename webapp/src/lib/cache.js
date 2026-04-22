@@ -860,7 +860,7 @@ class Cache {
     }
   }
 
-  calculateReachableRooms() {
+  calculateReachableRooms(force = false) {
     const previous = cache.reachableRooms;
     const recalculated =
       !this.characterCoordinates || get(needFood) || this.characterStatus !== 'exploring'
@@ -874,8 +874,9 @@ class Cache {
       prevCount: Object.keys(previous || {}).length,
       newCount: Object.keys(recalculated || {}).length,
       changed,
+      force,
     });
-    if (changed) {
+    if (changed || force) {
       _reachableRooms.set(recalculated);
     }
   }

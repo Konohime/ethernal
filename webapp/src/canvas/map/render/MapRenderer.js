@@ -1869,6 +1869,14 @@ class MapRenderer {
       return; // Don't re-throw; error is displayed via notification
     }
     moving = false;
+    // Defensively force a fresh reachable-rooms recomputation. The 'move' event
+    // handler that normally triggers this is scheduled via setTimeout, and there
+    // have been races where the handler hadn't completed (or the store update
+    // was suppressed by a stale deep-equal compare) by the time we reach here —
+    // which manifests as stale fog + missing discovery arrows. Recomputing now
+    // ensures the reachableRooms store reflects the new character position
+    // before we update fog/arrows.
+    global.dungeon.cache.calculateReachableRooms(true);
     // Refocus camera on the new room to ensure surrounding chunks are created
     // and the camera is centered, preventing a black screen if the character
     // moved to a newly discovered room in a different chunk.
