@@ -634,11 +634,16 @@ class Cache {
     const info = await retry(
       () =>
         this.fetch(`characters/${this.characterId}`).then(async info => {
-          if (String(info.characterId) === String(this.characterId)) {
-            return info;
-          } else {
-            throw new Error('backend not ready');
+          if (String(info.characterId) !== String(this.characterId)) {
+            throw new Error('backend not ready: wrong characterId');
           }
+          // For a freshly created character the backend indexer may have inserted
+          // the row but not yet applied the enter/move event that sets coordinates.
+          // Wait for coordinates before proceeding, otherwise parseCoordinates crashes.
+          if (!info.coordinates) {
+            throw new Error('backend not ready: no coordinates yet');
+          }
+          return info;
         }),
       {
         onFailedAttempt: e => log.info(e.message),
