@@ -96,6 +96,8 @@ class Character extends PIXI.Container {
 
     // Step 2: if a PixelBroker spriteId is chosen, override with custom sprite.
     // Texture.from returns a placeholder that updates once the image loads.
+    // eslint-disable-next-line no-console
+    console.log('[Character] ctor', { type, charId, charClass, spriteId });
     const customSpriteUrl = spriteId != null ? `${SPRITE_CDN}/${spriteId}.png` : null;
     this._customSpriteApplied = false;
     if (customSpriteUrl) {

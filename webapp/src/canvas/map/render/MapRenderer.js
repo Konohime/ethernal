@@ -432,6 +432,12 @@ class MapRenderer {
     this.container.addChild(this.charMenu);
 
     subscribe(reachableRooms, reachable => {
+      // eslint-disable-next-line no-console
+      console.log('[MapRenderer] reachableRooms subscribe', {
+        count: Object.keys(reachable || {}).length,
+        keys: Object.keys(reachable || {}),
+        activeChunks: this.activeChunks?.length,
+      });
       Object.keys(reachable).forEach(coordinates => {
         this.createChunk(coordinatesChunkId(coordinates));
       });
@@ -519,6 +525,11 @@ class MapRenderer {
 
   updateAllFog() {
     this.hideFurthestChunks();
+    // eslint-disable-next-line no-console
+    console.log('[MapRenderer] updateAllFog', {
+      activeChunks: this.activeChunks.length,
+      reachable: Object.keys(get(reachableRooms) || {}).length,
+    });
     if (this.activeChunks.length) {
       const reachableCoordinates = Object.keys(get(reachableRooms));
       const updateChunksIds = Array.from(new Set([...reachableCoordinates, ...this.previousReachable])).reduce(

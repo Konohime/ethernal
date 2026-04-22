@@ -866,7 +866,16 @@ class Cache {
       !this.characterCoordinates || get(needFood) || this.characterStatus !== 'exploring'
         ? {[this.characterCoordinates]: this.currentRoom}
         : bfs(this.rooms, this.moves, this.characterCoordinates, get(_characterBalances).keys);
-    if (!equal(previous, recalculated)) {
+    const changed = !equal(previous, recalculated);
+    // eslint-disable-next-line no-console
+    console.log('[cache] calculateReachableRooms', {
+      at: this.characterCoordinates,
+      status: this.characterStatus,
+      prevCount: Object.keys(previous || {}).length,
+      newCount: Object.keys(recalculated || {}).length,
+      changed,
+    });
+    if (changed) {
       _reachableRooms.set(recalculated);
     }
   }

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git show *)",
+      "Read(//tmp/**)",
+      "Bash(git hash-object *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix\\(webapp\\): reliably apply class sprite + override with PixelBroker spriteId *)",
+      "Bash(git ls-tree *)",
+      "Bash(git check-ignore *)",
+      "Bash(git check-attr *)",
+      "Bash(git update-index *)",
+      "Bash(git config *)",
+      "Bash(git diff *)",
+      "Bash(git -C C:/Users/korok/Documents/GitHub/ethernal status)",
+      "Bash(git -C C:/Users/korok/Documents/GitHub/ethernal checkout -- webapp/src/canvas/map/render/Character.js)",
+      "Bash(git -C C:/Users/korok/Documents/GitHub/ethernal merge --ff-only claude/intelligent-ramanujan-df5b2a)",
+      "Bash(git -C C:/Users/korok/Documents/GitHub/ethernal log --oneline -2 main)",
+      "Read(//c/Users/korok/Documents/GitHub/ethernal/**)",
+      "Bash(find webapp/src -name \"MapUpdates.js\")"
+    ]
+  }
+}
