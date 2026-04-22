@@ -600,7 +600,15 @@ class Cache {
   }
 
   async onceMoved() {
-    return this.once('move', e => e.character === this.characterId);
+    const result = await this.once('move', e => e.character === this.characterId);
+    // `cache.on('move', ...)` wraps its handler in setTimeout(cb, priority), so
+    // `applyMove`/`calculateReachableRooms` are scheduled as macrotasks. Our
+    // `once` listener, registered via socket.on directly, resolves synchronously
+    // during the socket dispatch — which means awaiters of `onceMoved` would
+    // otherwise resume before the cache state (currentRoom, reachableRooms) is
+    // updated. Yield one macrotask so the pending applyMove completes first.
+    await new Promise(resolve => setTimeout(resolve, 0));
+    return result;
   }
 
   async onceEquipped(gear) {
