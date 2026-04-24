@@ -34,9 +34,11 @@
     border: 1px solid $color-grey;
     padding: 1px;
     position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
   }
   .value-bar {
-    height: 14px;
+    height: 100%;
     background-color: $color-light;
     mix-blend-mode: difference;
   }

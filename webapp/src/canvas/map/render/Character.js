@@ -142,8 +142,8 @@ class Character extends PIXI.Container {
     moveN.tint = this.tint;
 
     // 48px frames (per-class sheets or custom PixelBroker) are scaled down
-    // to ~32px to match the legacy fallback sprite on the map.
-    const scale = useLargeFrames ? 0.667 : 1;
+    // to match the NPC sprite scale on the map (NPC.js uses 0.6).
+    const scale = useLargeFrames ? 0.6 : 1;
     const pos = { x: 0, y: -2 };
     moveS.position.set(pos.x, pos.y);
     moveW.position.set(pos.x, pos.y);
