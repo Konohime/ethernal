@@ -97,6 +97,11 @@ class UIDeck extends PIXI.Container {
   }
 
   reset() {
+    console.log('[BUG3] UIDeck.reset', {
+      type: this.deck.type,
+      side: this.deck.side,
+      cardCount: this.cards.length,
+    });
     this.visible = false;
     this.alpha = 0;
     this.selected = -1;
@@ -135,6 +140,19 @@ class UIDeck extends PIXI.Container {
   }
 
   show(callback) {
+    // [BUG3-DEBUG] trace deck show() calls
+    console.log('[BUG3] UIDeck.show', {
+      type: this.deck.type,
+      side: this.deck.side,
+      deckVisible: this.visible,
+      deckAlpha: this.alpha,
+      cardCount: this.cards.length,
+      cardsState: this.cards.map(c => ({
+        visible: c.visible, alpha: c.alpha, used: c.card && c.card.isUsed(),
+        contentChildren: c.content && c.content.children.length,
+        contentNormalChildren: c.contentNormal && c.contentNormal.children.length,
+      })),
+    });
     this._hideRequested = false;
 
     // Cancel any pending hide animation to prevent it from overriding our show
@@ -177,6 +195,12 @@ class UIDeck extends PIXI.Container {
   }
 
   hide(callback) {
+    console.log('[BUG3] UIDeck.hide', {
+      type: this.deck.type,
+      side: this.deck.side,
+      deckVisible: this.visible,
+      deckAlpha: this.alpha,
+    });
     this._hideRequested = true;
 
     // Cancel any pending show animation
