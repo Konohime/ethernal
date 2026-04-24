@@ -30,13 +30,30 @@ class Character extends DungeonComponent {
     console.log('character ' + characterId + ' entered the dungeon');
     const character = characterId.toString();
     const player = playerAddress.toLowerCase();
-    const { Dungeon } = this.contracts;
+    const { Dungeon, DungeonAdmin } = this.contracts;
     // Clear stale cache so getCharacterInfo re-fetches the on-chain location (LOCATION_ZERO after enter)
     Dungeon.cached.getCharacterInfo.delete(character);
     const initialInfo = await this.fetchCharacterInfo(character, player, name);
     // Preserve monster-blocking status from initialCharacterStatus; only add newCharacter flag
     initialInfo.status = { ...initialInfo.status, newCharacter: true };
     await this.storeCharacter(initialInfo);
+
+    // Grant initial fragments so the player can use fragment-priced abilities right
+    // away. Replaces the CanaryFragments/Alchemist recycler quests, whose NPCs
+    // spawned duplicates in every discovered room.
+    const INITIAL_FRAGMENTS = 100;
+    try {
+      const tx = await DungeonAdmin.updateCharacter(
+        character,
+        0, 0, 0, 0, 0,
+        [0, 0, 0, 0, 0, 0, 0, INITIAL_FRAGMENTS],
+      );
+      await tx.wait();
+      console.log(`granted ${INITIAL_FRAGMENTS} initial fragments to character ${character}`);
+    } catch (e) {
+      console.log('initial fragments grant failed', e.message);
+    }
+
     const characterInfo = await this.info(characterId, initialInfo);
     this.sockets.emit('character-entered', { character, player, characterInfo });
   }
