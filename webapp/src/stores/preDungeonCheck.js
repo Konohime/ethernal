@@ -173,77 +173,122 @@ const store = derived(
           }
         };
 
+        let enterRunning = false;
         store.enter = async ({ ressurectedId, characterInfo }) => {
-          const { location } = await fetchCache('entry');
-          await wallet
-            .tx(
-              { gas: toBeHex(BigInt(2000000)), gasPrice },
-              'Player',
-              'enter',
-              '0x0000000000000000000000000000000000000000',
-              ressurectedId,
-              '0',
-              characterInfo.characterName,
-              '0',
-              location || coordinatesToLocation('0,0'),
-            )
-            .then(tx => tx.wait());
-          const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
-          _set({
-            status: 'Done',
-            isDelegateReady,
-            isCharacterInDungeon,
-            insufficientBalance,
-          });
+          // Concurrent-call guard: a re-render of WelcomeBackScreen (wallet/preDungeon
+          // store flicker) can fire the next callback twice and produce two on-chain
+          // enter() calls — each minting a fresh character + starting rooms and
+          // wasting the user's ETH.
+          if (enterRunning) {
+            console.log('enter already running, skipping duplicate call');
+            return;
+          }
+          enterRunning = true;
+          try {
+            // Idempotency: if the character is already in the dungeon on-chain (first
+            // tx landed but the UI re-rendered), do not send another enter tx.
+            const already = await checkCharacter();
+            if (already.isCharacterInDungeon) {
+              console.log('character already in dungeon, skipping enter');
+              _set({ status: 'Done', ...already });
+              return;
+            }
+
+            const { location } = await fetchCache('entry');
+            await wallet
+              .tx(
+                { gas: toBeHex(BigInt(2000000)), gasPrice },
+                'Player',
+                'enter',
+                '0x0000000000000000000000000000000000000000',
+                ressurectedId,
+                '0',
+                characterInfo.characterName,
+                '0',
+                location || coordinatesToLocation('0,0'),
+              )
+              .then(tx => tx.wait());
+            const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
+            _set({
+              status: 'Done',
+              isDelegateReady,
+              isCharacterInDungeon,
+              insufficientBalance,
+            });
+          } finally {
+            enterRunning = false;
+          }
         };
 
+        let joinRunning = false;
         store.join = async ({ name, characterClass }) => {
-          _set({ status: 'Joining' });
-          const gasEstimate = toBeHex(BigInt(2000000));
-          const { price } = config($wallet.chainId);
-          const value = toBeHex(BigInt(price));
-
-          let location;
+          // Concurrent-call guard: DungeonScreen/TypingTextScreen can re-render and
+          // fire next() twice before the first createAndEnter tx is mined, which
+          // otherwise creates two characters and wastes price ETH.
+          if (joinRunning) {
+            console.log('join already running, skipping duplicate call');
+            return;
+          }
+          joinRunning = true;
           try {
-            const entryData = await fetchCache('entry');
-            location = entryData.location;
-            if (!location) {
-              console.warn('No entry location in response, using default 0,0');
+            // Idempotency: if the character was already created by a concurrent call
+            // (e.g. the first tx landed during a UI re-render), do not pay again.
+            const already = await checkCharacter();
+            if (already.isCharacterInDungeon) {
+              console.log('character already in dungeon, skipping createAndEnter');
+              _set({ status: 'Done', ...already });
+              return;
+            }
+
+            _set({ status: 'Joining' });
+            const gasEstimate = toBeHex(BigInt(2000000));
+            const { price } = config($wallet.chainId);
+            const value = toBeHex(BigInt(price));
+
+            let location;
+            try {
+              const entryData = await fetchCache('entry');
+              location = entryData.location;
+              if (!location) {
+                console.warn('No entry location in response, using default 0,0');
+                location = coordinatesToLocation('0,0');
+              }
+            } catch (e) {
+              console.warn('Failed to fetch entry location, using default 0,0');
               location = coordinatesToLocation('0,0');
             }
-          } catch (e) {
-            console.warn('Failed to fetch entry location, using default 0,0');
-            location = coordinatesToLocation('0,0');
+
+            // Single TX: createAndEnter is payable — _enter() calls _refill() with excess msg.value,
+            // then _addDelegate() to set up the delegate. No separate refill() needed.
+            console.log('Creating character and entering dungeon (single TX)...');
+            const tx = await wallet.tx(
+              { gas: gasEstimate, gasPrice, value },
+              'Player',
+              'createAndEnter',
+              delegateAccount.address,
+              BigInt(0),
+              name,
+              Number(characterClass),
+              BigInt(location),
+            );
+            const receipt = await tx.wait();
+            console.log('gas used for join', receipt.gasUsed.toString());
+
+            const { isCharacterInDungeon, isDelegateReady } = await checkCharacter();
+
+            if (isCharacterInDungeon) {
+              preDungeon.clear();
+              characterChoice.clear();
+            }
+            _set({
+              firstTime: true,
+              status: 'Done',
+              isDelegateReady,
+              isCharacterInDungeon,
+            });
+          } finally {
+            joinRunning = false;
           }
-
-          // Single TX: createAndEnter is payable — _enter() calls _refill() with excess msg.value,
-          // then _addDelegate() to set up the delegate. No separate refill() needed.
-          console.log('Creating character and entering dungeon (single TX)...');
-          const tx = await wallet.tx(
-            { gas: gasEstimate, gasPrice, value },
-            'Player',
-            'createAndEnter',
-            delegateAccount.address,
-            BigInt(0),
-            name,
-            Number(characterClass),
-            BigInt(location),
-          );
-          const receipt = await tx.wait();
-          console.log('gas used for join', receipt.gasUsed.toString());
-
-          const { isCharacterInDungeon, isDelegateReady } = await checkCharacter();
-
-          if (isCharacterInDungeon) {
-            preDungeon.clear();
-            characterChoice.clear();
-          }
-          _set({
-            firstTime: true,
-            status: 'Done',
-            isDelegateReady,
-            isCharacterInDungeon,
-          });
         };
       }
     } else {
