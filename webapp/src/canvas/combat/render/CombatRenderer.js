@@ -625,6 +625,7 @@ class CombatRenderer {
   }
 
   reset() {
+    console.log('[BUG3] CombatRenderer.reset START');
     if (this._charAttackCard) {
       this._charAttackCard.animateUnused(0);
       this._charAttackCard.update();
@@ -731,6 +732,7 @@ class CombatRenderer {
    * @param type {string}
    */
   selectFromDeck(type) {
+    console.log('[BUG3] CombatRenderer.selectFromDeck', { type });
     try {
       // Disable deck and attack buttons.
       [this.uiAttackSelectButton, this.uiDefenseSelectButton, this.uiAttackButton].forEach(button => {
