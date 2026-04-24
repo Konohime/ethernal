@@ -465,13 +465,10 @@ class Cache {
         ({ character }) => character === this.characterId,
       );
 
-      this.on('transfer', transfer => {
-        console.log('TRANSFER', transfer);
-      });
-
-      this.on('exchange', exchange => {
-        console.log('EXCHANGE', exchange);
-      });
+      // Debug 'transfer' and 'exchange' listeners removed: each cache.on() call
+      // registers an independent socket listener that logs via log.info(), so a
+      // leftover debug listener causes every event to appear twice in the log
+      // (once per listener) even though the backend emits it a single time.
 
       this.on('subscribe-rooms-reply', rooms => {
         this.applyRoomUpdates(rooms);

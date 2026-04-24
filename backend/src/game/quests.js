@@ -4,8 +4,11 @@ const { mapValues, toMap } = require('../data/utils');
 const DungeonComponent = require('./dungeonComponent');
 const TRANSITIONS = require('./quest/transitions');
 const Minimap = require('./quest/minimap');
-const CanaryFragments = require('./quest/canaryFragments');
-const Alchemist = require('./quest/alchemist');
+// CanaryFragments and Alchemist are disabled: initial fragments are now granted
+// at character creation (see backend/src/game/character.js handleEnter), which
+// removes the duplicated-recycler-NPC issue those quests caused.
+// const CanaryFragments = require('./quest/canaryFragments');
+// const Alchemist = require('./quest/alchemist');
 const { UnlockLevel1, UnlockLevel2, UnlockLevel3, UnlockLevel4, UnlockLevel5, UnlockLevel6, UnlockLevel7, UnlockLevel8 } = require('./quest/nextLevel');
 
 class Quests extends DungeonComponent {
@@ -16,7 +19,7 @@ class Quests extends DungeonComponent {
     super(map);
     this.available = {
       1: Minimap,
-      2: CanaryFragments,
+      // 2: CanaryFragments — disabled, fragments granted at character creation
       3: UnlockLevel1,
       4: UnlockLevel2,
       5: UnlockLevel3,
@@ -25,7 +28,7 @@ class Quests extends DungeonComponent {
       8: UnlockLevel6,
       9: UnlockLevel7,
       10: UnlockLevel8,
-      11: Alchemist,
+      // 11: Alchemist — disabled, caused duplicate recycler NPCs in every discovered room
     };
     this.initial = Object.keys(this.available);
     this.sockets
