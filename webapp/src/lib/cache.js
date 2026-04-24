@@ -73,8 +73,10 @@ class Cache {
       await this.fetchAll();
 
       // welcome screen
+      // Quest 2 (CanaryFragments) was disabled in backend — fragments are granted
+      // at character creation. Guard against undefined so init doesn't crash.
       const alchemistQuest = get(characterQuests)[2];
-      if (alchemistQuest.status === 'discovered') {
+      if (alchemistQuest && alchemistQuest.status === 'discovered') {
         this.action('accept-quest', { id: 2 });
         mapModal.open('characterEntered');
         this.pushHistory(statusesText.entered);
