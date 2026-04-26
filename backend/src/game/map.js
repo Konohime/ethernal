@@ -1,5 +1,7 @@
-const { events, db } = require('../db/provider');
+const { events, db, provider: rpcProvider } = require('../db/provider');
 const blockHash = require('../db/blockHash.js');
+const ethers = require('ethers');
+const zeroHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
 const Promise = require('bluebird');
 const retry = require('p-retry');
 const jsonDiff = require('json-diff');
@@ -138,45 +140,87 @@ class DungeonMap extends DungeonComponent {
     const { direction, areaAtDiscovery, lastRoomIndex, index, actualised, randomEvent } = roomData;
     const blockNumber = roomData.blockNumber.toNumber();
     const monsterBlockNumber = roomData.monsterBlockNumber.toNumber();
-    const roomBlockHash = await blockHash(blockNumber);
-    const [
-      ,
-      kind,
-      areaDiscovered,
-    ] = await pureCall('generateRoom(uint256,bytes32,uint8,uint8,uint8,uint8):(uint8,uint8,uint8)', [
-      location,
-      roomBlockHash,
-      direction,
-      areaAtDiscovery,
-      lastRoomIndex,
-      index,
-    ]);
 
     if (blockNumber === 0) {
       return null; // not discovered
     }
 
+    let roomBlockHash = await blockHash(blockNumber);
+    let seedAvailable = roomBlockHash && roomBlockHash !== zeroHash;
+    // Mirror the on-chain expired-seed fallback in DungeonFacetBase._actualiseRoom:
+    // once the 256-block window has elapsed without a save(), the contract
+    // derives the seed deterministically from (location, blockNumber). We must
+    // do the same here so backend-forecasted exits match what the contract
+    // will actually produce. Without this, expired-seed rooms would show no
+    // arrows on the client even though the contract is now able to actualise
+    // them with the fallback seed.
+    if (!seedAvailable) {
+      const currentBlock = await rpcProvider.getBlockNumber();
+      if (currentBlock - blockNumber > 256) {
+        roomBlockHash = ethers.utils.keccak256(
+          ethers.utils.defaultAbiCoder.encode(
+            ['string', 'uint256', 'uint64'],
+            ['DUNGEON_EXPIRED_SEED_V1', location, blockNumber],
+          ),
+        );
+        seedAvailable = true;
+      }
+    }
+    // If still not available, the seed is in-window but not yet persisted —
+    // we cannot forecast exits without diverging from what the contract will
+    // actually generate. Return a "discovered but not yet actualisable" room
+    // with empty exits — the bfs/arrow placement code skips rooms with no
+    // exit bits set, so the client won't offer impossible movements. The
+    // room becomes usable as soon as the seed appears in BlockHashRegister.
+    const [
+      ,
+      kind,
+      areaDiscovered,
+    ] = seedAvailable
+      ? await pureCall('generateRoom(uint256,bytes32,uint8,uint8,uint8,uint8):(uint8,uint8,uint8)', [
+        location,
+        roomBlockHash,
+        direction,
+        areaAtDiscovery,
+        lastRoomIndex,
+        index,
+      ])
+      : [0, 0, 0];
+
     let status = 'discovered';
-    if (actualised) {
+    if (actualised && seedAvailable) {
       status = 'actualised';
     }
 
     const [areaType] = await Dungeon.cached.getAreaTypeForRoom(location);
 
-    let { exits, locks, exitsBits } = await this.generateExits(location, roomBlockHash, direction);
+    let { exits, locks, exitsBits } = seedAvailable
+      ? await this.generateExits(location, roomBlockHash, direction)
+      : {
+        exits: { north: false, east: false, south: false, west: false },
+        locks: { north: false, east: false, south: false, west: false },
+        exitsBits: 0,
+      };
 
     let hasMonster = false;
     let monsterBlockHash;
     if (monsterBlockNumber !== 0) {
       monsterBlockHash = await blockHash(monsterBlockNumber);
-      const [monsterIndex] = await pureCall('generateMonsterIndex(uint256,bytes32,uint256,bool,uint8):(uint256)', [
-        location,
-        monsterBlockHash,
-        1,
-        blockNumber === monsterBlockNumber,
-        kind,
-      ]);
-      hasMonster = monsterIndex.toNumber() !== 0;
+      // Same rule as the room seed: only forecast a monster when the
+      // BlockHashRegister actually has the salted seed. Computing
+      // generateMonsterIndex against a raw block hash desyncs from the
+      // contract's `_checkMonster` and would either show phantom monsters
+      // or hide real ones.
+      if (monsterBlockHash && monsterBlockHash !== zeroHash) {
+        const [monsterIndex] = await pureCall('generateMonsterIndex(uint256,bytes32,uint256,bool,uint8):(uint256)', [
+          location,
+          monsterBlockHash,
+          1,
+          blockNumber === monsterBlockNumber,
+          kind,
+        ]);
+        hasMonster = monsterIndex.toNumber() !== 0;
+      }
     }
 
     return {

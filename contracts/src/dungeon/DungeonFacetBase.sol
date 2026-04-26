@@ -31,14 +31,48 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         _;
     }
 
+    /// @dev Derived deterministically when the original commit-reveal seed has
+    /// been lost (256-block window expired without a save()). Without this
+    /// fallback, a discovered-but-never-actualised room stays at kind=0 /
+    /// exits=0 forever, which soft-locks any character standing in it
+    /// (`_moveTo` requires `room.exits & dirBit`). Players have already paid
+    /// the discovery cost, so we owe them a playable room. The fallback is
+    /// publicly derivable off-chain after expiry, but the room is already
+    /// committed — there's nothing to re-roll, so the only "advantage"
+    /// granted is knowing the layout slightly before triggering actualisation.
+    function _expiredSeedFallback(uint256 location, uint64 blockNumber) internal pure returns (bytes32) {
+        return keccak256(abi.encode("DUNGEON_EXPIRED_SEED_V1", location, blockNumber));
+    }
+
     function _actualiseRoom(uint256 location) internal {
         Room storage room = _rooms[location];
         require(room.blockNumber > 0, "room not created yet");
         if (room.kind == 0) {
             bytes32 blockHash = _blockHashRegister.get(room.blockNumber);
             if (blockHash == 0) {
-                // skip as block is not actualised or not in register
-                return;
+                // The register returns 0 in two distinct cases:
+                //   (a) targetBlock is still in the future or in-window but
+                //       not yet persisted — we should wait, not fall back.
+                //   (b) >256 blocks have elapsed without anyone calling
+                //       save() within the window. The L1/L2 blockhash() opcode
+                //       can no longer return the underlying hash; the seed is
+                //       permanently lost.
+                // For (a) we return and let a future call retry. For (b) we
+                // use a deterministic fallback so the room becomes playable
+                // and the character isn't soft-locked forever.
+                // IMPORTANT: room.blockNumber is the FUTURE target returned by
+                // _blockHashRegister.request() at discovery time, so it can be
+                // greater than block.number. Computing `block.number -
+                // room.blockNumber` directly would underflow (Solidity 0.8+
+                // panics with no reason string), making every downstream
+                // function that touches this room — including monsterDefeated
+                // — revert with "Transaction reverted without a reason string".
+                // Guard with an ordering check before the subtraction.
+                if (block.number > uint256(room.blockNumber) + 256) {
+                    blockHash = _expiredSeedFallback(location, room.blockNumber);
+                } else {
+                    return;
+                }
             }
             _actualiseArea(location, blockHash);
             (uint8 exits, uint8 kind, uint8 area_discovered) = PureDungeon._generateRoom(

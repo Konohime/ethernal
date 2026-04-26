@@ -24,8 +24,9 @@ class RandomEvents extends DungeonComponent {
   }
 
   async handleRandomEvent(areaLocation, blockNumber) {
-    const { coordinates } = await this.generateRandomEvent(areaLocation, blockNumber);
-    await this.spawn(coordinates);
+    const result = await this.generateRandomEvent(areaLocation, blockNumber);
+    if (!result) return; // seed unavailable, skip
+    await this.spawn(result.coordinates);
   }
 
   async handleBlock({ number }) {
@@ -46,11 +47,50 @@ class RandomEvents extends DungeonComponent {
       if (result.length) {
         console.log('despawned events', result.length);
       }
+
+      // Late-arriving monster seeds: when a player enters a room, the contract
+      // stores `monsterBlockNumber = futureTargetBlock`. At that moment the
+      // BlockHashRegister has no salt for that block yet, so backend forecasts
+      // hasMonster=false. Once the register gets the salt (a few blocks later
+      // when someone calls save()), the contract's _checkMonster sees the
+      // monster — but nothing on the backend re-runs fetchRoomInfo, so the
+      // stored room still claims hasMonster=false. Result: client tries to
+      // move and the chain reverts with "monster blocking" while the UI shows
+      // no monster. Sweep here to reconcile.
+      try {
+        const candidates = await this.dungeon.map.roomsWith(
+          `(roomdata->>'monsterBlockNumber')::BIGINT > 0
+           AND COALESCE((roomdata->>'hasMonster')::BOOLEAN, false) = false
+           AND COALESCE(roomdata->'overrides'->>'hasMonster', '') = ''`,
+        );
+        let reconciled = 0;
+        const { Dungeon } = this.contracts;
+        for (const stored of candidates) {
+          Dungeon.cached.getRoomInfo.delete(stored.location);
+          const fresh = await this.dungeon.map.fetchRoomInfo(stored.coordinates);
+          if (fresh && fresh.hasMonster) {
+            await this.dungeon.map.reorgRoom(stored.coordinates);
+            reconciled++;
+          }
+        }
+        if (reconciled) {
+          console.log('reconciled late monster seeds for', reconciled, 'rooms');
+        }
+      } catch (e) {
+        console.log('monster seed reconciliation failed', e.message);
+      }
     }
   }
 
   async generateRandomEvent(areaLocation, blockNumber) {
     const hash = await blockHash(blockNumber);
+    const zeroHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
+    if (!hash || hash === zeroHash) {
+      // Seed not yet (or no longer) available in BlockHashRegister — the
+      // contract won't actualise this random event with a known hash, so we
+      // can't forecast it without diverging from chain state.
+      return null;
+    }
     const [
       roomLocation,
       randomEvent,

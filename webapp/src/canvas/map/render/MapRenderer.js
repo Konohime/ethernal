@@ -1865,7 +1865,20 @@ class MapRenderer {
       const reason = err.reason || (err.message && err.message.slice(0, 80)) || 'Move failed';
       notificationOverlay.open('generic', { text: `<em>Error:</em> ${reason}`, timeout: 8000 });
       // eslint-disable-next-line no-console
-      console.error('move failed', err);
+      console.error('move failed reason=', err.reason || '(no reason)', 'hash=', err.receipt?.hash || '(no hash)', 'to=', to, 'fullErr=', err);
+      // "monster blocking" means the contract sees a monster on the room the
+      // character is currently standing in, but the backend's cached
+      // hasMonster=false (stale because the monsterBlockHash wasn't yet in
+      // BlockHashRegister at last fetch). Force the backend to drop its cache
+      // and re-pull on-chain — the resulting reorg event makes the monster
+      // appear on the map and flips status to "blocked by monster".
+      if (err.reason === 'monster blocking') {
+        const here = global.dungeon.cache.characterCoordinates;
+        if (here) {
+          const url = `${global.dungeon.cache.url}/rooms/${encodeURIComponent(here)}/refresh`;
+          fetch(url, { method: 'POST' }).catch((e) => console.warn('room refresh failed', e));
+        }
+      }
       return; // Don't re-throw; error is displayed via notification
     }
     moving = false;

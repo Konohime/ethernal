@@ -95,6 +95,26 @@ class Endpoints {
         res.json(await this.dungeon.room(req.params.coordinates));
       });
 
+      // Force a fresh on-chain re-fetch of a room. Clears memoize caches so
+      // late-arriving monster seeds (and any other stored state) get picked up
+      // immediately. Webapp calls this when a tx reverts with "monster blocking"
+      // while the cached room shows hasMonster=false.
+      app.post('/rooms/:coordinates/refresh', async (req, res) => {
+        try {
+          const coordinates = req.params.coordinates;
+          const { coordinatesToLocation } = require('../game/utils.js');
+          const location = coordinatesToLocation(coordinates);
+          const { Dungeon } = this.dungeon.contracts;
+          if (Dungeon && Dungeon.cached && Dungeon.cached.getRoomInfo) {
+            Dungeon.cached.getRoomInfo.delete(location);
+          }
+          await this.dungeon.map.reorgRoom(coordinates);
+          res.json(cleanRoom(await this.dungeon.room(coordinates)));
+        } catch (e) {
+          res.status(500).json({ error: e.message });
+        }
+      });
+
       // Rooms viewport
       app.get('/map/viewport/:floor', async (req, res) => {
         const floor = Number(req.params.floor);

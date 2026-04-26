@@ -271,9 +271,24 @@ class Combat extends DungeonComponent {
         });
       }
     } catch (err) {
-      console.log('monster defeated tx failed', coordinates, err);
+      // Replay the call via eth_call at the same block to surface the actual
+      // require() string. Without this, ethers just says "transaction failed"
+      // because status=0 with no logs gives us nothing actionable.
+      let reason = err.reason || err.message;
+      try {
+        const { provider } = require('../db/provider');
+        if (tx) {
+          await provider.call(
+            { to: tx.to, data: tx.data, from: tx.from, gasLimit: tx.gasLimit },
+            err.receipt && err.receipt.blockNumber,
+          );
+        }
+      } catch (callErr) {
+        reason = callErr.reason || callErr.error?.reason || callErr.data || callErr.message || reason;
+      }
+      console.log('monster defeated tx failed', coordinates, 'reason=', reason, 'hash=', tx && tx.hash);
       Sentry.withScope(scope => {
-        scope.setExtras({ coordinates, room, tx });
+        scope.setExtras({ coordinates, room, tx, replayedReason: reason });
         Sentry.captureException(err);
       });
     }

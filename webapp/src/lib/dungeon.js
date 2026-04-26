@@ -121,7 +121,7 @@ class Dungeon {
         console.warn('failed to emit metatx-error', emitErr);
       }
       // eslint-disable-next-line no-console
-      console.log('tx failed', err);
+      console.error('tx failed reason=', err.reason || '(no reason)', 'hash=', err.receipt?.hash || tx?.hash || '(no hash)', 'errorData=', err.errorData || '(none)', 'fullErr=', err);
       Sentry.captureException(err, {
         tags: { metatx: err.reason },
         extra: { hash: err.receipt?.hash || tx?.hash },

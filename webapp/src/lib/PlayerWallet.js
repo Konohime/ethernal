@@ -118,8 +118,9 @@ class PlayerWallet {
       } else if (result.status === 0) {
         // Outer TX reverted — replay via eth_call at the same block to extract the actual revert reason
         let outerReason = 'transaction reverted';
+        let txData;
         try {
-          const txData = await this.provider.getTransaction(tx.hash);
+          txData = await this.provider.getTransaction(tx.hash);
           if (txData) {
             await this.provider.call(
               { to: txData.to, data: txData.data, from: txData.from, gasLimit: txData.gasLimit },
@@ -127,8 +128,39 @@ class PlayerWallet {
             );
           }
         } catch (callErr) {
-          outerReason = callErr.reason || callErr.revert?.args?.[0] || callErr.message || outerReason;
+          outerReason = callErr.reason || callErr.revert?.args?.[0] || callErr.shortMessage || callErr.message || outerReason;
         }
+        // The Player contract reverts with a generic "call failed" when the inner
+        // delegated call reverts BEFORE the Call event is emitted. Replay the inner
+        // call directly against the destination contract (impersonating the Player
+        // contract via eth_call's `from`) to surface the true inner revert reason
+        // (e.g. "cant move this way", "not enough fragments", "monster blocking", ...).
+        if (outerReason === 'call failed') {
+          try {
+            await this.provider.call(
+              {
+                to: this.destinationContract.target,
+                data,
+                from: this.playerContract.target,
+                gasLimit: overrides.innerGasLimit,
+              },
+              result.blockNumber,
+            );
+          } catch (innerErr) {
+            const innerReason =
+              innerErr.reason || innerErr.revert?.args?.[0] || innerErr.shortMessage || innerErr.message;
+            if (innerReason && innerReason !== 'call failed') {
+              outerReason = innerReason;
+            }
+          }
+        }
+        // eslint-disable-next-line no-console
+        console.warn(
+          'metatx reverted method=', methodName,
+          'reason=', outerReason,
+          'hash=', tx.hash,
+          'args=', args,
+        );
         throw { reason: outerReason, receipt: result };
       } else if (result.logs.length === 0 && result.status !== 0) {
         // should not reach here
