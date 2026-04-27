@@ -1,7 +1,7 @@
 // Runs after every `hardhat deploy` to wire up the freshly-deployed contracts
 // and propagate addresses to the backend and webapp.
 //
-// Three things happen here, all idempotent (safe to re-run):
+// Four things happen here, all idempotent (safe to re-run):
 //
 // 1. Update the Diamond's `_adminContract` slot to point at the current
 //    DungeonAdmin deployment. Without this, any call routed through the new
@@ -11,14 +11,23 @@
 //    handled in start script") — but if the operator only runs `compile +
 //    deploy` and not the full start sequence, the wiring is left dangling.
 //
-// 2. Regenerate `webapp/contracts/development.json` from the deployment
+// 2. Update DungeonAdmin's `_dungeon` slot to point at the current Diamond.
+//    Symmetric to (1): when the Diamond is redeployed but DungeonAdmin is
+//    reused, DungeonAdmin's `_dungeon` either points at the previous Diamond
+//    or, on a freshly-deployed DungeonAdmin where setDungeon was never called,
+//    is `address(0)`. Either way, every backend-driven call (`monsterDefeated`,
+//    `characterDefeated`, `characterEscaped`, `updateCharacter`, `updateQuest`,
+//    `updateRoomData`) is silently relayed to the wrong target and reverts —
+//    players get stuck mid-combat with no on-chain progress.
+//
+// 3. Regenerate `webapp/contracts/development.json` from the deployment
 //    artifacts via export-contracts.js, then copy that file to both
 //    `webapp/contracts/staging.json` and `backend/src/dev_contractsInfo.json`.
 //    These two files are what the running webapp and (DEV=1) backend
 //    actually read at boot — leaving them stale points everything at the
 //    OLD addresses, masking the redeploy entirely.
 //
-// 3. Print the new addresses so the operator can spot mismatches quickly.
+// 4. Print the new addresses so the operator can spot mismatches quickly.
 
 const fs = require('fs');
 const path = require('path');
@@ -59,7 +68,38 @@ module.exports = async ({ deployments, ethers, getNamedAccounts, network }) => {
     log('[post-deploy] Diamond admin repoint skipped:', e.message);
   }
 
-  // --- 2. Regenerate contracts-info files for backend and webapp ----------
+  // --- 2. Repoint DungeonAdmin._dungeon -----------------------------------
+  try {
+    const dungeonDeployment = await deployments.get('Dungeon');
+    const dungeonAdminDeployment = await deployments.get('DungeonAdmin');
+
+    const adminAbi = [
+      'function owner() view returns (address)',
+      'function getDungeonAndBackendAddress() view returns (address,address)',
+      'function setDungeon(address)',
+    ];
+    const signer = await ethers.getSigner(deployer);
+    const admin = new ethers.Contract(dungeonAdminDeployment.address, adminAbi, signer);
+    const [currentDungeonOnAdmin] = await admin.getDungeonAndBackendAddress();
+
+    if (currentDungeonOnAdmin.toLowerCase() === dungeonDeployment.address.toLowerCase()) {
+      log('[post-deploy] DungeonAdmin._dungeon already up to date');
+    } else {
+      const owner = await admin.owner();
+      if (owner.toLowerCase() !== deployer.toLowerCase()) {
+        log(`[post-deploy] DungeonAdmin._dungeon stale (${currentDungeonOnAdmin}) but owner ${owner} is not the deployer; manual setDungeon needed`);
+      } else {
+        log(`[post-deploy] DungeonAdmin._dungeon is ${currentDungeonOnAdmin}, repointing to ${dungeonDeployment.address}`);
+        const tx = await admin.setDungeon(dungeonDeployment.address, { gasLimit: 100000 });
+        const receipt = await tx.wait();
+        log(`[post-deploy] setDungeon ${receipt.status === 1 ? 'OK' : 'FAILED'} (tx ${tx.hash})`);
+      }
+    }
+  } catch (e) {
+    log('[post-deploy] DungeonAdmin._dungeon repoint skipped:', e.message);
+  }
+
+  // --- 3. Regenerate contracts-info files for backend and webapp ----------
   try {
     const repoRoot = path.resolve(__dirname, '../..');
     const exportScript = path.resolve(__dirname, '../scripts/export-contracts.js');
