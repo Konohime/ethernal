@@ -6,7 +6,9 @@
   nprogress.configure({ minimum: 0.16, showSpinner: false });
 
   nprogress.error = (skip = false) => {
-    document.getElementById('nprogress').classList.add('error');
+    const el = document.getElementById('nprogress');
+    if (!el) return;
+    el.classList.add('error');
     nprogress.set(0.95);
     if (!skip) {
       setTimeout(nprogress.done, 1500);

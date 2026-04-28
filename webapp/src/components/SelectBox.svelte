@@ -51,7 +51,7 @@
       <option value="{item.id}" selected={item.id === currentItem.id}>{item.label}</option>
     {/each}
   </select>
-  <BoxButton {type} onClick="{() => onOpen()}">
+  <BoxButton {type} {isDisabled}>
     <div class="select-box--label">
       {#if currentItem && currentItem.label}
         {currentItem.label}
