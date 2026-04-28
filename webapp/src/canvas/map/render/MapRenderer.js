@@ -1857,6 +1857,25 @@ class MapRenderer {
     } catch (err) {
       moving = false;
       this.myCharacter.moving = false;
+      // Cancel any in-flight visual path so the character doesn't keep walking
+      // toward a destination the chain rejected, and snap it back to its real
+      // (cached) position. Without this, the visual sprite drifts to the
+      // failed destination while the cache still places it at `from`, and
+      // subsequent click-to-move calls compute paths from a stale visual
+      // origin.
+      if (this.myCharacter.path) {
+        // finish(false) stops eases without teleporting to the (rejected)
+        // destination — we then snap back to `from` ourselves.
+        this.myCharacter.path.finish(false);
+        this.myCharacter.path = undefined;
+      }
+      const fromRoom = this.rooms[from];
+      if (fromRoom && fromRoom.getPosition) {
+        const pos = fromRoom.getPosition(this.myCharacter.charId);
+        if (pos) {
+          this.myCharacter.teleportTo(pos.x, pos.y);
+        }
+      }
       this.placeArrows();
       const reason = err.reason || (err.message && err.message.slice(0, 80)) || 'Move failed';
       notificationOverlay.open('generic', { text: `<em>Error:</em> ${reason}`, timeout: 8000 });
