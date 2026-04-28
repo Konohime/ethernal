@@ -109,6 +109,20 @@ module.exports = (webpackEnv, argv) => {
                 scss: true,
                 sourceMap: isDev,
               }),
+              onwarn(warning, handler) {
+                const silenced = new Set([
+                  'a11y-label-has-associated-control',
+                  'a11y-click-events-have-key-events',
+                  'a11y-no-noninteractive-element-interactions',
+                  'a11y-no-static-element-interactions',
+                  'a11y-missing-attribute',
+                  'a11y-img-redundant-alt',
+                  'css-unused-selector',
+                  'unused-export-let',
+                ]);
+                if (silenced.has(warning.code)) return;
+                handler(warning);
+              },
             },
           },
         },
@@ -134,7 +148,21 @@ module.exports = (webpackEnv, argv) => {
           use: [
             isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
             'css-loader',
-            'sass-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                sassOptions: {
+                  quietDeps: true,
+                  silenceDeprecations: [
+                    'import',
+                    'global-builtin',
+                    'color-functions',
+                    'slash-div',
+                    'legacy-js-api',
+                  ],
+                },
+              },
+            },
           ],
         },
         {
