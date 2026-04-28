@@ -9,6 +9,11 @@ const DungeonComponent = require('./dungeonComponent.js');
 class RandomEvents extends DungeonComponent {
   timeout = 60 * 60 * 1000; // 1 hour
   lastHash = new Map();
+  // Queue of RandomEvent emissions whose seed wasn't available at firing time.
+  // The contract's BlockHashRegister.request() returns a future block, so the
+  // hash typically lands a few blocks later — we retry every block tick until
+  // it resolves or the 256-block window expires (matching the chain's TTL).
+  pendingEvents = new Map();
 
   constructor(map) {
     super(map);
@@ -25,11 +30,45 @@ class RandomEvents extends DungeonComponent {
 
   async handleRandomEvent(areaLocation, blockNumber) {
     const result = await this.generateRandomEvent(areaLocation, blockNumber);
-    if (!result) return; // seed unavailable, skip
+    if (!result) {
+      const key = `${areaLocation.toString()}:${blockNumber.toString()}`;
+      this.pendingEvents.set(key, {
+        areaLocation,
+        blockNumber: Number(blockNumber),
+        firstSeenAt: Date.now(),
+      });
+      return;
+    }
     await this.spawn(result.coordinates);
   }
 
+  async retryPendingEvents(currentBlockNumber) {
+    if (!this.pendingEvents.size) return;
+    for (const [key, pending] of this.pendingEvents) {
+      // Drop entries past the contract's 256-block seed window — the on-chain
+      // event is lost too, so retrying is pointless.
+      if (currentBlockNumber - pending.blockNumber > 256) {
+        this.pendingEvents.delete(key);
+        continue;
+      }
+      try {
+        const result = await this.generateRandomEvent(pending.areaLocation, pending.blockNumber);
+        if (result) {
+          this.pendingEvents.delete(key);
+          await this.spawn(result.coordinates);
+        }
+      } catch (e) {
+        console.log('pending random event retry failed', key, e.message);
+      }
+    }
+  }
+
   async handleBlock({ number }) {
+    // Retry pending RandomEvent emissions every block — the seed usually lands
+    // within a handful of blocks of the request, so a 30-block sweep is too
+    // slow and would leave the player staring at an empty room.
+    await this.retryPendingEvents(number);
+
     if (number % 30 === 0) {
       const [npcs, chests] = await Promise.all([
         this.dungeon.map.roomsWith(`(roomdata->'npc'->>'timeout')::INTEGER < extract(epoch from now())`),
