@@ -12,6 +12,30 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     event Refill(address indexed playerAddress, uint256 newEnergy);
     event DelegateAdded(address indexed player, address indexed delegate);
     event DelegateRemoved(address indexed player, address indexed delegate);
+    event TreasuryUpdated(address indexed treasury);
+    event RefillFeeUpdated(uint16 bps);
+    event RefillFeeCollected(address indexed treasury, uint256 amount);
+
+    uint16 public constant MAX_REFILL_FEE_BPS = 1000; // 10% hard cap
+
+    function setTreasury(address payable treasury) external onlyProxyAdmin {
+        _treasury = treasury;
+        emit TreasuryUpdated(treasury);
+    }
+
+    function setRefillFee(uint16 bps) external onlyProxyAdmin {
+        require(bps <= MAX_REFILL_FEE_BPS, "fee too high");
+        _refillFeeBps = bps;
+        emit RefillFeeUpdated(bps);
+    }
+
+    function getTreasury() external view returns (address) {
+        return _treasury;
+    }
+
+    function getRefillFeeBps() external view returns (uint16) {
+        return _refillFeeBps;
+    }
 
     function postUpgrade(
         Characters charactersContract,
@@ -172,17 +196,40 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         address account,
         uint256 value
     ) internal returns (uint256 refund) {
-        uint128 energy = _players[account].energy;
-        energy += uint128(value);
-        if (energy > uint128(MAX_FOOD)) {
-            // Compute refund BEFORE clamping — otherwise `energy - MAX_FOOD` is always 0.
-            refund = uint256(energy) - MAX_FOOD;
-            energy = uint128(MAX_FOOD);
+        uint128 currentEnergy = _players[account].energy;
+
+        // Clamp the deposit to the remaining headroom before MAX_FOOD.
+        uint256 headroom = currentEnergy < MAX_FOOD ? MAX_FOOD - currentEnergy : 0;
+        uint256 toAdd = value;
+        if (toAdd > headroom) {
+            refund = toAdd - headroom;
+            toAdd = headroom;
         }
-        _players[account].energy = energy;
-        emit Refill(account, energy);
+
+        // Fee is taken from the kept amount (post-cap), so the user never overpays
+        // the fee on ETH that ends up refunded to them.
+        uint256 fee = 0;
+        address payable treasury = _treasury;
+        uint16 feeBps = _refillFeeBps;
+        if (treasury != address(0) && feeBps > 0 && toAdd > 0) {
+            fee = (toAdd * feeBps) / 10000;
+        }
+        uint256 energyAdded = toAdd - fee;
+
+        // Effects: state updated before any external call (CEI).
+        uint128 newEnergy = currentEnergy + uint128(energyAdded);
+        _players[account].energy = newEnergy;
+        emit Refill(account, newEnergy);
+
+        // Interactions: forward fee then refund.
+        if (fee > 0) {
+            (bool feeOk, ) = treasury.call{value: fee}("");
+            require(feeOk, "treasury transfer failed");
+            emit RefillFeeCollected(treasury, fee);
+        }
         if (refund > 0) {
-            sender.transfer(refund);
+            (bool refundOk, ) = sender.call{value: refund}("");
+            require(refundOk, "refund failed");
         }
     }
 

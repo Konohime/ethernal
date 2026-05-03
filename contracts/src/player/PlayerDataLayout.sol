@@ -32,4 +32,8 @@ contract PlayerDataLayout {
     Enterable _holder;
 
     Pool _pool;
+
+    // --- Refill fee (appended at the end to preserve upgradeable storage layout) ---
+    address payable _treasury;
+    uint16 _refillFeeBps; // basis points, 100 = 1%, hard-capped at 1000 (10%) by the setter
 }
