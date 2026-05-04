@@ -1,7 +1,7 @@
 // Runs after every `hardhat deploy` to wire up the freshly-deployed contracts
 // and propagate addresses to the backend and webapp.
 //
-// Four things happen here, all idempotent (safe to re-run):
+// Five things happen here, all idempotent (safe to re-run):
 //
 // 1. Update the Diamond's `_adminContract` slot to point at the current
 //    DungeonAdmin deployment. Without this, any call routed through the new
@@ -20,14 +20,21 @@
 //    `updateRoomData`) is silently relayed to the wrong target and reverts —
 //    players get stuck mid-combat with no on-chain progress.
 //
-// 3. Regenerate `webapp/contracts/development.json` from the deployment
+// 3. Set Characters roles (`_minter = Player`, `_dungeon = Diamond`) via
+//    setRoles(). Without this, Characters._minter is address(0) and the
+//    very first Player.createAndEnter reverts in mintTo() with NOT_MINTER.
+//    The role gate was introduced by the audit-fix commit; only rewire.js
+//    used to wire it manually — operators running plain `hardhat deploy`
+//    were left with a broken character-creation flow.
+//
+// 4. Regenerate `webapp/contracts/development.json` from the deployment
 //    artifacts via export-contracts.js, then copy that file to both
 //    `webapp/contracts/staging.json` and `backend/src/dev_contractsInfo.json`.
 //    These two files are what the running webapp and (DEV=1) backend
 //    actually read at boot — leaving them stale points everything at the
 //    OLD addresses, masking the redeploy entirely.
 //
-// 4. Print the new addresses so the operator can spot mismatches quickly.
+// 5. Print the new addresses so the operator can spot mismatches quickly.
 
 const fs = require('fs');
 const path = require('path');
@@ -97,6 +104,48 @@ module.exports = async ({ deployments, ethers, getNamedAccounts, network }) => {
     }
   } catch (e) {
     log('[post-deploy] DungeonAdmin._dungeon repoint skipped:', e.message);
+  }
+
+  // --- 2b. Wire Characters roles (_minter = Player, _dungeon = Diamond) ---
+  // setRoles is onlyProxyAdmin and was added in the audit-fix commit. Without
+  // it, Characters._minter is address(0) and Player.createAndEnter reverts in
+  // mintTo() with NOT_MINTER on the very first character creation. Storage
+  // slots: layout = nextId(0), _owners(1), _numPerOwners(2), _subOwner(3),
+  // _data(4), _minter(5), _dungeon(6).
+  try {
+    const charactersDeployment = await deployments.get('Characters');
+    const playerDeployment = await deployments.get('Player');
+    const dungeonDeployment = await deployments.get('Dungeon');
+
+    const minterRaw = await ethers.provider.getStorage(charactersDeployment.address, 5);
+    const dungeonOnCharsRaw = await ethers.provider.getStorage(charactersDeployment.address, 6);
+    const currentMinter = '0x' + minterRaw.slice(26);
+    const currentDungeonOnChars = '0x' + dungeonOnCharsRaw.slice(26);
+
+    const minterOk = currentMinter.toLowerCase() === playerDeployment.address.toLowerCase();
+    const dungeonOk = currentDungeonOnChars.toLowerCase() === dungeonDeployment.address.toLowerCase();
+
+    if (minterOk && dungeonOk) {
+      log('[post-deploy] Characters roles already up to date');
+    } else {
+      log(
+        `[post-deploy] Characters roles stale (minter=${currentMinter}, dungeon=${currentDungeonOnChars}), ` +
+          `setting to (minter=${playerDeployment.address}, dungeon=${dungeonDeployment.address})`,
+      );
+      const signer = await ethers.getSigner(deployer);
+      const characters = await ethers.getContractAt(
+        ['function setRoles(address minter, address dungeon) external'],
+        charactersDeployment.address,
+        signer,
+      );
+      const tx = await characters.setRoles(playerDeployment.address, dungeonDeployment.address, {
+        gasLimit: 100000,
+      });
+      const receipt = await tx.wait();
+      log(`[post-deploy] Characters.setRoles ${receipt.status === 1 ? 'OK' : 'FAILED'} (tx ${tx.hash})`);
+    }
+  } catch (e) {
+    log('[post-deploy] Characters.setRoles skipped:', e.message);
   }
 
   // --- 3. Regenerate contracts-info files for backend and webapp ----------
