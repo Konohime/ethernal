@@ -702,4 +702,23 @@ library PureDungeon {
     function _roomsTax(uint256 rooms, uint256 periods) internal pure returns (uint256) {
         return (1 + rooms / 10) * periods;
     }
+
+    // --- Skin bit helpers (gear data layout: skinId at bits [160..192]) ---
+    // Existing gears have these bits at 0 → default skin. New gears can stamp
+    // a skinId without rewriting the rest of the encoding.
+    uint256 internal constant _SKIN_MASK = uint256(0xFFFFFFFF) << 160;
+
+    function getSkinId(uint256 data) external pure returns (uint32) {
+        return _getSkinId(data);
+    }
+    function _getSkinId(uint256 data) internal pure returns (uint32) {
+        return uint32((data >> 160) & 0xFFFFFFFF);
+    }
+
+    function setSkinIdInData(uint256 data, uint32 skinId) external pure returns (uint256) {
+        return _setSkinIdInData(data, skinId);
+    }
+    function _setSkinIdInData(uint256 data, uint32 skinId) internal pure returns (uint256) {
+        return (data & ~_SKIN_MASK) | (uint256(skinId) << 160);
+    }
 }
