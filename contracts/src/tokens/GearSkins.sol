@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 /// @notice Skin pricing & treasury for Gears, kept in diamond storage so that
 /// adding this mixin to the upgradeable Gears contract cannot shift its
 /// existing storage layout.
 abstract contract GearSkins {
-    // keccak256("ethernal.gearskins.v1")
+    // Derived inline so the slot is auditable from source. Note: this changes
+    // the storage slot away from the previous magic constant. Any skin price
+    // / treasury already configured on-chain must be re-set via the admin
+    // setters after this upgrade lands. Inline derivation also catches typos
+    // at compile time, eliminating the magic-number drift risk.
     bytes32 internal constant GEARSKINS_STORAGE_SLOT =
-        0x9c6a4f3e8d2b1d4f7e3a6c1b8e2d7a4f1c3b6e9d2a5c8f1e4b7a3d6c9f2e5b80;
+        keccak256("ethernal.gearskins.v1");
 
     struct GearSkinsStorage {
         address payable treasury;

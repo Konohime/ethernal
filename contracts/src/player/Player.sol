@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./PlayerDataLayout.sol";
@@ -52,7 +52,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint256 minBalance,
         Pool pool
     ) external proxied {
-        // TODO _setTrustedForwarder(...);
+        // Trusted forwarder is configured separately via setTrustedForwarder.
         _charactersContract = charactersContract;
         _feeRecipient = feeRecipient;
         MIN_BALANCE = minBalance;
@@ -72,17 +72,6 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     }
 
     function getEnergy(address playerAddress) external view returns (uint256 energy, uint256 freeEnergy) {
-        PlayerStruct storage player = _players[playerAddress];
-        energy = player.energy;
-        freeEnergy = player.freeEnergy;
-    }
-
-    // TODO remove ?
-    function getPlayerInfo(address playerAddress, uint256 characterId)
-        external
-        view
-        returns (uint256 energy, uint256 freeEnergy)
-    {
         PlayerStruct storage player = _players[playerAddress];
         energy = player.energy;
         freeEnergy = player.freeEnergy;
@@ -174,6 +163,12 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint256 txCharge = ((initialGas - gasleft()) + 10000) * tx.gasprice;
         uint256 freeEnergyFee = (txCharge * 10) / 100; // 10% extra is used for free energy
 
+        // L8 (audit, NOT a fix): each player action burns ~11x its gas cost in
+        // energy (10x to UBF + 10% to freeEnergy). This is an intentional
+        // tokenomic decision per the original comment ("1000% is used for UBF")
+        // — sustainability of the UBF distribution depends on this multiplier.
+        // Verify the magnitude is still desired before any future tokenomics
+        // change; see audit report for context.
         uint256 poolFee = txCharge * 10; // 1000% is used for UBF
 
         require(energy >= freeEnergyFee + poolFee, "not enough energy");
@@ -347,7 +342,10 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         bytes memory data
     ) internal returns (bool success, bytes memory returnData) {
         (success, returnData) = to.call{gas: gasLimit}(data);
-        assert(gasleft() > gasLimit / 63);
-        // not enough gas provided, assert to throw all gas // TODO use EIP-1930
+        // EIP-150: only 63/64 of remaining gas is forwarded to the inner call,
+        // so if `gasleft()` after the call is at most `gasLimit / 63` the inner
+        // call may have been starved by an out-of-gas in the caller's frame.
+        // Revert with a real reason rather than consuming all gas via `assert`.
+        require(gasleft() > gasLimit / 63, "INSUFFICIENT_GAS_FOR_INNER_CALL");
     }
 }

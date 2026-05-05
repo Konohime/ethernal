@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 /// @notice Minimal EIP-2981 royalty mixin using diamond storage.
 /// Diamond storage keeps the royalty fields in a fixed slot, so adding this
 /// mixin to existing upgradeable contracts cannot shift any pre-existing
 /// storage layout.
 abstract contract ERC2981Royalties {
-    // keccak256("ethernal.royalties.v1")
+    // Derived inline so the slot is auditable from source. Note: this changes
+    // the storage slot away from the previous magic constant. Any non-zero
+    // royalty already configured on-chain must be re-set via `setRoyalty`
+    // after this upgrade lands. Inline derivation also catches typos at
+    // compile time, eliminating the magic-number drift risk.
     bytes32 internal constant ROYALTY_STORAGE_SLOT =
-        0x6d8d8b1a1a4dc7d5d18f3aa5d09a02d04c9c2db6b9ef3d2d2b9e3a3f7e9c1c10;
+        keccak256("ethernal.royalties.v1");
 
     struct RoyaltyStorage {
         address receiver;

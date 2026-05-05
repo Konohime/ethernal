@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 abstract contract MetaTransactionReceiver {
     bytes32 constant FORWARDER_STORAGE_POSITION = 0xbda473cae6459373242ba82cd14b3b8493956b600be62b2478f52616c8a283de;

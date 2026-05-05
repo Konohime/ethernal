@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./CharactersDataLayout.sol";
@@ -100,6 +100,10 @@ contract Characters is Proxied, CharactersDataLayout {
     /// @notice Only the dungeon can set character stats. Previously any EOA
     /// holder could rewrite their own stats (class/level/HP) to maxed values
     /// before entering — full godmode exploit.
+    /// @dev L1 (audit): all dungeon facets share the diamond's msg.sender, so
+    /// any facet can call setData. A buggy or compromised facet upgrade can
+    /// therefore wipe HP/class for every character. Per-facet scoping would
+    /// require routing through a selector allowlist — tracked, not yet wired.
     function setData(uint256 id, uint256 data) external onlyDungeon {
         _setDataFor(id, _owners[id], data);
     }

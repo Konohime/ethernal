@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 library PureDungeon {
     uint256 internal constant LOCATION_ZERO = 2**255;
