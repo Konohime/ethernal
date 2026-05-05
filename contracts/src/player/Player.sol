@@ -114,6 +114,11 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint8 class,
         uint256 location
     ) internal {
+        // The holder's `enter` is payable but does not currently spend
+        // msg.value, so any non-zero value forwarded here would be silently
+        // locked in the diamond. Reject it explicitly until a holder-side
+        // flow consumes it.
+        require(value == 0, "value not supported");
         require(msg.value >= value, "msg.value < value");
         if (msg.value > value) {
             _refill(sender, sender, msg.value - value);

@@ -30,10 +30,14 @@ contract ERC721Token is Proxied, ERC721TokenDataLayout {
         emit SubTransfer(0, subOwner, id);
     }
 
-    // TODO make sure that data of gear/room in vault cannot be changed
+    /// @notice Only the minter (dungeon) may rewrite token data. Previously
+    /// any token holder could flip arbitrary bits — durability, level,
+    /// classBits, even skin bits — bypassing the paid `applySkin` flow and
+    /// forging gear stats. Player-initiated mutations must go through
+    /// purpose-built functions (e.g. Gears.applySkin) that mask only the
+    /// fields the player is allowed to change.
     function setData(uint256 id, uint256 data) external {
-        address owner = _owners[id];
-        require(owner == msg.sender || _operatorsForAll[owner][msg.sender], "NOT_AUTHORIZED_SET_DATA");
+        require(msg.sender == _minter, "NOT_AUTHORIZED_SET_DATA");
         _data[id] = data;
         emit DataUpdate(id, data);
     }
