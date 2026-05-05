@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { chatMessages, onlineCharacters } from 'lib/cache';
 import { mapModal } from 'stores/screen';
-import { pluralize, humanizeJoin } from 'utils/text';
+import { escapeHtml, pluralize, humanizeJoin } from 'utils/text';
 
 import BoxButton from 'components/BoxButton';
 
@@ -100,7 +100,7 @@ class Message {
             const sellerOffer = this.generateTradeOffer(seller, deal.seller);
 
             this.addHtml(
-              `Offered <strong>${buyerOffer}</strong> for <strong>${sellerOffer}</strong>. Waiting for response.`,
+              `Offered <strong>${escapeHtml(buyerOffer)}</strong> for <strong>${escapeHtml(sellerOffer)}</strong>. Waiting for response.`,
             );
             break;
           }

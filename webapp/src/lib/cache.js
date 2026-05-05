@@ -19,7 +19,7 @@ import { inflictionText, receivedText, classPortrait, gearImage } from 'utils/da
 import { combatText, statusesText, classes, notifications } from 'data/text';
 import quests from 'data/quests';
 import Message from 'lib/chat';
-import { humanizeJoin, pluralize } from 'utils/text';
+import { escapeHtml, humanizeJoin, pluralize } from 'utils/text';
 import { bfs, encodeDirections, parseCoordinates, aroundCoordinates, identity } from 'utils/utils';
 import Walker from './walker';
 import cacheUrl from './cacheUrl';
@@ -174,7 +174,7 @@ class Cache {
         } else {
           const character = get(_onlineCharacters)[id];
           const [x, y, z = 0] = coordinates.split(',');
-          const text = combatText.help({ player: character.characterName || 'Someone', x, y, z });
+          const text = combatText.help({ player: escapeHtml(character.characterName) || 'Someone', x, y, z });
           notificationOverlay.open('generic', { coordinates, text, timeout: 15000 });
         }
       });
@@ -381,8 +381,10 @@ class Cache {
       });
 
       this.on('room-name', ({ characterInfo, coordinates, room }) => {
-        const { characterName } = characterInfo;
-        const { customName } = room;
+        // characterName and customName are arbitrary on-chain strings —
+        // escape before interpolating into the HTML notification template.
+        const characterName = escapeHtml(characterInfo.characterName);
+        const customName = escapeHtml(room.customName);
         const [x, y, z = 0] = coordinates.split(',');
         const text = notifications.roomRename({ x, y, z, characterName, customName, timeout: 15000 });
         notificationOverlay.open('generic', { text, coordinates });
@@ -416,7 +418,7 @@ class Cache {
       this.on('bounty-added', ({ character, coordinates, characterInfo, room }) => {
         if (character !== this.characterId) {
           notificationOverlay.open('generic', {
-            text: `<em>${characterInfo.characterName}</em> added a bounty on a monster.`,
+            text: `<em>${escapeHtml(characterInfo.characterName)}</em> added a bounty on a monster.`,
             coordinates
           });
         }

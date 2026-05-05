@@ -1,3 +1,18 @@
+// Escape user-controlled strings before they are interpolated into HTML
+// rendered via Svelte's `{@html ...}`. Player names and room custom names
+// are accepted on-chain as arbitrary strings, so they MUST be escaped at
+// the trust boundary or they let any player inject script into other
+// players' notifications.
+const escapeHtml = str => {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 const capitalize = str => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
 
 const titleize = str => str.split(' ').map(capitalize).join(' ');
@@ -76,6 +91,7 @@ const typewriter = (item, opts = {}) => {
 
 module.exports = {
   capitalize,
+  escapeHtml,
   humanizeJoin,
   pluralize,
   titleize,
