@@ -250,8 +250,16 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         }
         if (topUp > 0) {
             (bool topOk, ) = delegate.call{value: topUp}("");
-            require(topOk, "delegate top-up failed");
-            emit DelegateToppedUp(account, delegate, topUp);
+            if (topOk) {
+                emit DelegateToppedUp(account, delegate, topUp);
+            } else {
+                // A delegate set to a contract with a reverting fallback would
+                // otherwise brick every future refill for this player. Treat
+                // the top-up as best-effort: credit the amount back to energy
+                // so neither the player's value nor the refill itself is lost.
+                _players[account].energy += uint128(topUp);
+                emit Refill(account, _players[account].energy);
+            }
         }
         if (refund > 0) {
             (bool refundOk, ) = sender.call{value: refund}("");
