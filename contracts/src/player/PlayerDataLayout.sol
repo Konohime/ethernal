@@ -36,4 +36,8 @@ contract PlayerDataLayout {
     // --- Refill fee (appended at the end to preserve upgradeable storage layout) ---
     address payable _treasury;
     uint16 _refillFeeBps; // basis points, 100 = 1%, hard-capped at 1000 (10%) by the setter
+
+    // --- Reverse delegate lookup, used to auto-top-up the delegate gas balance on refill ---
+    // Populated on _addDelegate; existing pre-upgrade delegates can populate via syncDelegate().
+    mapping(address => address payable) _delegateOf;
 }

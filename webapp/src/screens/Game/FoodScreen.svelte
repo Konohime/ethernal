@@ -125,6 +125,14 @@
       width: 100%;
       padding-top: 15px;
       padding-bottom: 15px;
+
+      .refill-breakdown {
+        font-size: 11px;
+        font-style: italic;
+        padding: 6px 0 10px;
+        color: $color-lightGrey;
+        line-height: 1.4;
+      }
     }
 
     &--ubf {
@@ -191,6 +199,10 @@
           Fill
           {#if refillToMax}to 100%{:else}rest of balance.{/if}
         </h6>
+        <p class="refill-breakdown">
+          Most of this becomes food (energy). If your in-game gas wallet is low, a small
+          portion auto-tops it up so moves keep working. A small fee supports development.
+        </p>
         {#if claimError}
           <p style="color: #ff6b6b; font-size: 12px; padding-bottom: 8px;">{claimError}</p>
         {/if}

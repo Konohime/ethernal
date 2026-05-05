@@ -31,7 +31,11 @@
 
         (This single transaction creates your character, funds your food reserve and sets up a
         temporary delegate key so your in-game actions — moves, combat, trades — can be signed
-        silently without a wallet popup every time.)"
+        silently without a wallet popup every time.
+
+        Where your {FOOD_PRICE} $ETH goes: most of it becomes your in-dungeon food (energy);
+        a small portion seeds the delegate key with gas so it can sign your moves; and a small
+        fee supports development of the game.)"
         next="{async () => {
           await preDungeonCheck.join($characterChoice);
         }}"

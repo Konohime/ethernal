@@ -15,6 +15,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     event TreasuryUpdated(address indexed treasury);
     event RefillFeeUpdated(uint16 bps);
     event RefillFeeCollected(address indexed treasury, uint256 amount);
+    event DelegateToppedUp(address indexed player, address indexed delegate, uint256 amount);
 
     uint16 public constant MAX_REFILL_FEE_BPS = 1000; // 10% hard cap
 
@@ -216,16 +217,36 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         }
         uint256 energyAdded = toAdd - fee;
 
+        // Auto top-up the delegate's gas balance if low, so the player's in-game
+        // burner wallet stays funded for moves without needing a separate transfer.
+        // Funded from the post-fee energy allocation (so the fee % stays consistent).
+        address payable delegate = _delegateOf[account];
+        uint256 topUp = 0;
+        if (delegate != address(0)) {
+            uint256 dBal = delegate.balance;
+            if (dBal < MIN_BALANCE) {
+                uint256 needed = MIN_BALANCE - dBal;
+                if (needed > energyAdded) needed = energyAdded;
+                topUp = needed;
+                energyAdded -= topUp;
+            }
+        }
+
         // Effects: state updated before any external call (CEI).
         uint128 newEnergy = currentEnergy + uint128(energyAdded);
         _players[account].energy = newEnergy;
         emit Refill(account, newEnergy);
 
-        // Interactions: forward fee then refund.
+        // Interactions: forward fee, top up delegate, then refund.
         if (fee > 0) {
             (bool feeOk, ) = treasury.call{value: fee}("");
             require(feeOk, "treasury transfer failed");
             emit RefillFeeCollected(treasury, fee);
+        }
+        if (topUp > 0) {
+            (bool topOk, ) = delegate.call{value: topUp}("");
+            require(topOk, "delegate top-up failed");
+            emit DelegateToppedUp(account, delegate, topUp);
         }
         if (refund > 0) {
             (bool refundOk, ) = sender.call{value: refund}("");
@@ -245,7 +266,24 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         address sender = _msgSender();
         require(_delegates[_delegate] == sender, "NOT_YOUR_DELEGATE");
         delete _delegates[_delegate];
+        if (_delegateOf[sender] == _delegate) {
+            delete _delegateOf[sender];
+        }
         emit DelegateRemoved(sender, _delegate);
+    }
+
+    // Populate the reverse delegate mapping for an existing delegate registered
+    // before this upgrade, so auto top-up on refill can find it. Callable by
+    // either the player (main wallet) or the delegate itself. Idempotent.
+    function bindDelegate(address payable _delegate) external {
+        address sender = _msgSender();
+        require(
+            _delegates[_delegate] == sender || msg.sender == _delegate,
+            "NOT_YOUR_DELEGATE"
+        );
+        address player = _delegates[_delegate];
+        require(player != address(0), "delegate not registered");
+        _delegateOf[player] = _delegate;
     }
 
     function _addDelegate(address sender, address payable _delegate) internal {
@@ -255,6 +293,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         _players[sender].energy -= uint128(MIN_BALANCE);
         _delegate.transfer(MIN_BALANCE);
         _delegates[_delegate] = sender;
+        _delegateOf[sender] = _delegate;
         emit DelegateAdded(sender, _delegate);
     }
 
