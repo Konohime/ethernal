@@ -28,24 +28,38 @@ const store = derived(
       set($data);
     };
 
+    // After tx.wait() the read RPC may briefly return stale state (the tx is
+    // mined but the eth_call may hit a node that hasn't applied the new block
+    // yet, esp. on Base Sepolia public RPC). Retry until the awaited condition
+    // holds, or fall back if too many retries.
+    const waitFor = async (fn, predicate, { tries = 8, delayMs = 400 } = {}) => {
+      let result;
+      for (let i = 0; i < tries; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        result = await fn();
+        if (predicate(result)) return result;
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+      return result;
+    };
+
     if ($wallet.status === 'Ready') {
       if (lastWalletAddress !== $wallet.address) {
         lastWalletAddress = $wallet.address;
         _set({ status: 'Loading' });
         const delegateAccount = getDelegateKey($wallet.address);
 
+        const dungeonAddress = wallet.getContract('Dungeon').target;
         const checkCharacter = async () => {
-          const characterId = await wallet.call('Player', 'getLastCharacterId', $wallet.address);
-          const isDelegateReady = await wallet.call(
-            'Player',
-            'isDelegateFor',
-            delegateAccount.address,
-            $wallet.address,
-          );
+          // Parallelize the independent reads. fullOwnerOf depends on
+          // characterId so it runs in a second wave.
+          const [characterId, isDelegateReady] = await Promise.all([
+            wallet.call('Player', 'getLastCharacterId', $wallet.address),
+            wallet.call('Player', 'isDelegateFor', delegateAccount.address, $wallet.address),
+          ]);
           const result = await wallet.call('Characters', 'fullOwnerOf', characterId);
-          const dungeonAddress = wallet.getContract('Dungeon').target;
           const isCharacterInDungeon = result.owner.toLowerCase() === dungeonAddress.toLowerCase();
-          const balance = await wallet.getProvider().getBalance($wallet.address);
           // TODO should be free
           const insufficientBalance = false;
           return { characterId, isDelegateReady, isCharacterInDungeon, insufficientBalance };
@@ -161,12 +175,13 @@ const store = derived(
               return;
             }
 
-            const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
+            const state = await waitFor(checkCharacter, s => s.isDelegateReady);
             _set({
               status: 'Done',
-              isDelegateReady,
-              isCharacterInDungeon,
-              insufficientBalance,
+              characterId: state.characterId,
+              isDelegateReady: state.isDelegateReady || true,
+              isCharacterInDungeon: state.isCharacterInDungeon,
+              insufficientBalance: state.insufficientBalance,
             });
           } finally {
             checkBackInRunning = false;
@@ -208,12 +223,16 @@ const store = derived(
                 location || coordinatesToLocation('0,0'),
               )
               .then(tx => tx.wait());
-            const { isDelegateReady, isCharacterInDungeon, insufficientBalance } = await checkCharacter();
+            const state = await waitFor(
+              checkCharacter,
+              s => s.isCharacterInDungeon,
+            );
             _set({
               status: 'Done',
-              isDelegateReady,
-              isCharacterInDungeon,
-              insufficientBalance,
+              characterId: state.characterId,
+              isDelegateReady: state.isDelegateReady,
+              isCharacterInDungeon: state.isCharacterInDungeon || true,
+              insufficientBalance: state.insufficientBalance,
             });
           } finally {
             enterRunning = false;
@@ -274,17 +293,26 @@ const store = derived(
             const receipt = await tx.wait();
             console.log('gas used for join', receipt.gasUsed.toString());
 
-            const { isCharacterInDungeon, isDelegateReady } = await checkCharacter();
+            // createAndEnter is atomic: a successful receipt means the
+            // character was minted, transferred to the dungeon, and the
+            // delegate registered. Retry the read until the RPC catches up so
+            // we don't spuriously bounce the user back to the join screen.
+            const state = await waitFor(
+              checkCharacter,
+              s => s.isCharacterInDungeon && s.isDelegateReady && s.characterId !== 0n,
+            );
 
-            if (isCharacterInDungeon) {
+            if (state.isCharacterInDungeon) {
               preDungeon.clear();
               characterChoice.clear();
             }
             _set({
               firstTime: true,
               status: 'Done',
-              isDelegateReady,
-              isCharacterInDungeon,
+              characterId: state.characterId,
+              isDelegateReady: state.isDelegateReady || true,
+              isCharacterInDungeon: state.isCharacterInDungeon || true,
+              insufficientBalance: state.insufficientBalance,
             });
           } finally {
             joinRunning = false;
