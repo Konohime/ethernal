@@ -30,6 +30,14 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         emit RefillFeeUpdated(bps);
     }
 
+    /// @notice Proxy-admin-only: set (or clear) the trusted EIP-2771 meta-tx
+    /// forwarder. Pass address(0) to disable meta-tx routing — _msgSender
+    /// then always returns msg.sender. Until this is set, the meta-tx code
+    /// path is dead, so direct callers always identify themselves.
+    function setTrustedForwarder(address forwarder) external onlyProxyAdmin {
+        _setTrustedForwarder(forwarder);
+    }
+
     function getTreasury() external view returns (address) {
         return _treasury;
     }
@@ -120,6 +128,17 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         // flow consumes it.
         require(value == 0, "value not supported");
         require(msg.value >= value, "msg.value < value");
+
+        // If a delegate is being attached, _addDelegate will burn MIN_BALANCE
+        // from energy after _refill returns. Validate up-front that the
+        // refilled-net-of-fee amount can cover MIN_BALANCE so the user gets
+        // a clear revert instead of a deep "not enough energy" failure.
+        if (newDelegate != address(0)) {
+            uint256 refillAmount = msg.value - value;
+            uint256 maxFee = (refillAmount * _refillFeeBps) / 10000;
+            require(refillAmount >= MIN_BALANCE + maxFee, "msg.value below MIN_BALANCE+fee");
+        }
+
         if (msg.value > value) {
             _refill(sender, sender, msg.value - value);
         }

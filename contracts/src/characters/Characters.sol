@@ -4,6 +4,15 @@ pragma solidity ^0.8.20;
 import "hardhat-deploy/solc_0.8/proxy/Proxied.sol";
 import "./CharactersDataLayout.sol";
 
+interface IERC721Receiver {
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external returns (bytes4);
+}
+
 contract Characters is Proxied, CharactersDataLayout {
     event CharacterUpdate(uint256 indexed id, address indexed owner, uint256 data);
     event Transfer(address indexed from, address indexed to, uint256 indexed id);
@@ -176,10 +185,36 @@ contract Characters is Proxied, CharactersDataLayout {
 
     function safeTransferFrom(address from, address to, uint256 id) external {
         transferFrom(from, to, id);
+        _checkOnERC721Received(from, to, id, "");
     }
 
-    function safeTransferFrom(address from, address to, uint256 id, bytes calldata) external {
+    function safeTransferFrom(address from, address to, uint256 id, bytes calldata data) external {
         transferFrom(from, to, id);
+        _checkOnERC721Received(from, to, id, data);
+    }
+
+    /// @dev Per EIP-721: if `to` is a contract, it must implement
+    /// `onERC721Received` and return the magic selector, otherwise the
+    /// transfer reverts. Skipping this hook (as the previous implementation
+    /// did) silently locks tokens sent to contracts that expect the callback.
+    function _checkOnERC721Received(
+        address from,
+        address to,
+        uint256 id,
+        bytes memory data
+    ) internal {
+        if (to.code.length == 0) return;
+        try IERC721Receiver(to).onERC721Received(msg.sender, from, id, data) returns (bytes4 retval) {
+            require(retval == IERC721Receiver.onERC721Received.selector, "ERC721_NOT_RECEIVER");
+        } catch (bytes memory reason) {
+            if (reason.length == 0) {
+                revert("ERC721_NOT_RECEIVER");
+            }
+            // bubble the original revert
+            assembly {
+                revert(add(32, reason), mload(reason))
+            }
+        }
     }
 
     function supportsInterface(bytes4 id) external pure returns (bool) {

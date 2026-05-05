@@ -12,7 +12,24 @@ import { coordinatesToLocation } from 'utils/utils';
 
 const uint256 = number => zeroPadValue(toBeHex(number), 32);
 
-const gasPrice = toBeHex(BigInt('1000000000'));
+// Dynamic gas price: take max(network feeData.gasPrice, config floor) so we
+// don't under-price on Base mainnet during congestion. Hardcoding 1 gwei
+// (the previous behavior) caused stuck txs once network fees rose above
+// the floor. Falls back to the configured floor on RPC failure.
+const computeGasPrice = async chainId => {
+  const floor = BigInt(config(chainId).gasPrice);
+  try {
+    const provider = wallet.getProvider();
+    if (provider && provider.getFeeData) {
+      const feeData = await provider.getFeeData();
+      const network = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
+      return toBeHex(network > floor ? network : floor);
+    }
+  } catch (e) {
+    // ignore — use floor
+  }
+  return toBeHex(floor);
+};
 
 let lastWalletAddress;
 
@@ -156,6 +173,7 @@ const store = derived(
                 : BigInt(0);
 
               const valueToSend = needed > 0n ? toBeHex(needed) : '0x0';
+              const gasPrice = await computeGasPrice($wallet.chainId);
               const txOpts = { gas: gasEstimate, gasPrice };
               if (BigInt(valueToSend) > BigInt(0)) txOpts.value = valueToSend;
 
@@ -210,6 +228,7 @@ const store = derived(
             }
 
             const { location } = await fetchCache('entry');
+            const gasPrice = await computeGasPrice($wallet.chainId);
             await wallet
               .tx(
                 { gas: toBeHex(BigInt(2000000)), gasPrice },
@@ -280,6 +299,7 @@ const store = derived(
             // Single TX: createAndEnter is payable — _enter() calls _refill() with excess msg.value,
             // then _addDelegate() to set up the delegate. No separate refill() needed.
             console.log('Creating character and entering dungeon (single TX)...');
+            const gasPrice = await computeGasPrice($wallet.chainId);
             const tx = await wallet.tx(
               { gas: gasEstimate, gasPrice, value },
               'Player',

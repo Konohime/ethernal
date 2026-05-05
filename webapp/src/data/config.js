@@ -36,8 +36,8 @@ const settings = Object.freeze({
     default: '1000000000',
     '15001': '100000000',
     '80001': '1000000000',
-    '84532': '1000000',
-    '8453': '1000000',
+    '84532': '50000000', // 0.05 gwei floor (Base Sepolia); network price used if higher
+    '8453': '50000000',  // 0.05 gwei floor (Base mainnet); network price used if higher
   },
   blockExplorerUrl: {
     default: 'https://etherscan.io/block',
