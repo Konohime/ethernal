@@ -9,7 +9,7 @@ let lastWalletAddress;
 let d;
 
 export const loadDungeon = async $wallet => {
-  const delegateAccount = getDelegateKey($wallet.address);
+  const delegateAccount = await getDelegateKey($wallet.address);
   const key = delegateAccount.privateKey;
   const player = $wallet.address.toLowerCase();
   

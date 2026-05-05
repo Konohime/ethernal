@@ -48,7 +48,7 @@ const store = derived(
       if (lastWalletAddress !== $wallet.address) {
         lastWalletAddress = $wallet.address;
         _set({ status: 'Loading' });
-        const delegateAccount = getDelegateKey($wallet.address);
+        const delegateAccount = await getDelegateKey($wallet.address);
 
         const dungeonAddress = wallet.getContract('Dungeon').target;
         const checkCharacter = async () => {
