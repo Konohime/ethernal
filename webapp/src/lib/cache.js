@@ -31,7 +31,12 @@ class Cache {
     this.rooms = {};
     this.moves = new Moves();
     this.subscribed = new Set();
-    _characterId.set(character);
+    // Normalize to Number — the backend serializes character IDs as JSON numbers,
+    // and the many `info.character === this.characterId` checks below rely on
+    // strict equality. dungeon.js passes a string (toString of an ethers BigInt),
+    // so without this, every comparison fails and stores like _characterBalances /
+    // _playerEnergy stay at their initial null state.
+    _characterId.set(Number(character));
   }
 
   async init() {
