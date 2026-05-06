@@ -293,16 +293,22 @@ class Character extends DungeonComponent {
     const stored = info && info.status;
 
     // If status is in a complex in-progress state, trust the stored value
-    if (stored && ['attacking monster', 'just died', 'claiming rewards', 'dead', 'not in dungeon'].includes(stored.status)) {
+    if (stored && ['attacking monster', 'just died', 'claiming rewards', 'dead'].includes(stored.status)) {
       return stored;
     }
 
-    // For 'exploring', verify the room: a reorg may have left the status stale while
-    // the room actually has a monster. Reload from chain so the frontend gets the
-    // correct status on page load without waiting for an unrelated blockchain event.
-    // Skip the re-check if the player intentionally escaped (escaped: true) — they are
-    // allowed to be 'exploring' in a room that still has a monster.
-    if (!stored || (stored.status === 'exploring' && !stored.escaped)) {
+    // For 'exploring', 'not in dungeon', or missing status, verify against the
+    // chain. The persisted value can be stale — e.g. on a fresh DB the enter
+    // event hasn't been replayed yet, so info.status is null and the API
+    // defaults to 'not in dungeon' even when the player is actually inside.
+    // Reload from chain so the frontend gets the correct status on page load.
+    // Skip the re-check if the player intentionally escaped (escaped: true) —
+    // they are allowed to be 'exploring' in a room that still has a monster.
+    const needsRecheck =
+      !stored ||
+      stored.status === 'not in dungeon' ||
+      (stored.status === 'exploring' && !stored.escaped);
+    if (needsRecheck && info && info.coordinates) {
       try {
         const { Dungeon } = this.contracts;
         // Clear memoize cache so we read fresh on-chain data (not a stale replay snapshot)
@@ -311,6 +317,12 @@ class Character extends DungeonComponent {
         const freshRoom = await this.dungeon.map.reloadRoom(info.coordinates);
         if (freshRoom && freshRoom.hasMonster) {
           const corrected = await this.changeStatus(character, { status: 'blocked by monster' }, true);
+          return corrected;
+        }
+        // No monster + character has coordinates and HP → they are exploring.
+        // This recovers from a stale 'not in dungeon' or null persisted status.
+        if (info.stats && info.stats.health > 0) {
+          const corrected = await this.changeStatus(character, { status: 'exploring' }, true);
           return corrected;
         }
       } catch (e) {
