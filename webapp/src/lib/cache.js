@@ -1139,6 +1139,16 @@ class Cache {
       _characterLevelXP.set(stats.levelXp);
 
       this._emitUpdate('characterUpdated', info);
+
+      // The /characters/:id/status endpoint can return null on a fresh load
+      // (e.g. after a backend restart before any status event has replayed).
+      // info.status is always populated by the backend (defaults to
+      // 'not in dungeon'), so use it as a fallback so _characterStatus is
+      // never stuck at null — otherwise calculateReachableRooms locks the
+      // player to their current tile because status !== 'exploring'.
+      if (info.status && get(_characterStatus) == null) {
+        this.applyStatusUpdates({ [this.characterId]: info.status });
+      }
     }
 
     _onlineCharacters.update(characters => {
