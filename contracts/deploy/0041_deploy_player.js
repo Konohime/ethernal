@@ -1,20 +1,26 @@
 // Default config values (fallback if webapp config not available)
-const DEFAULT_MIN_BALANCE = "1000000000000000"; // 0.001 ETH
+const DEFAULT_MIN_BALANCE = "100000000000000"; // 0.0001 ETH
 
-module.exports = async ({deployments, network, getNamedAccounts}) => {
+module.exports = async ({deployments, network, getChainId, getNamedAccounts}) => {
   const {deploy} = deployments;
   const {deployer, dungeonOwner} = await getNamedAccounts();
 
   const charactersDeployment = await deployments.get('Characters');
   const ubfDeployment = await deployments.get('UBF');
 
-  // Try to load webapp config, fallback to defaults
+  // Read Player.sol MIN_BALANCE from the webapp config so the deployed value
+  // and the client-side check stay in sync. We use `contractMinBalance` (not
+  // `minBalance` — the latter is the food-bar warning threshold, a different
+  // concept). On Base, contractMinBalance is 0.0001 ETH; on legacy chains it
+  // remains the historical 0.001-0.0015 ETH range.
   let minBalance = DEFAULT_MIN_BALANCE;
   try {
     const webappConfig = require('../../webapp/src/data/config');
     const chainId = await getChainId();
     const config = webappConfig(chainId);
-    minBalance = config.minBalance;
+    if (config.contractMinBalance) {
+      minBalance = config.contractMinBalance;
+    }
   } catch (e) {
     console.log('Using default minBalance:', minBalance);
   }

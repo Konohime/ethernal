@@ -281,7 +281,32 @@ const store = derived(
             _set({ status: 'Joining' });
             const gasEstimate = toBeHex(BigInt(2000000));
             const { price } = config($wallet.chainId);
-            const value = toBeHex(BigInt(price));
+            const gasPriceBN = BigInt(await computeGasPrice($wallet.chainId));
+            const txGasCost = gasPriceBN * BigInt(2000000);
+
+            // If the user cannot cover (price + gas) from their main wallet,
+            // attempt a sponsored onboarding by sending value=0. The Player
+            // contract will pull the grant from _onboardingPool (or the UBF
+            // reserve) and credit the player's energy + delegate. If neither
+            // source has funds the tx reverts with "not enough energy",
+            // surfacing a clear error instead of silently failing.
+            let value = toBeHex(BigInt(price));
+            try {
+              const provider = wallet.getProvider();
+              const balance = BigInt(
+                (await provider.getBalance($wallet.address)).toString(),
+              );
+              if (balance < BigInt(price) + txGasCost) {
+                console.log('Insufficient balance for full join, attempting sponsored onboarding', {
+                  balance: balance.toString(),
+                  price: price.toString(),
+                  txGasCost: txGasCost.toString(),
+                });
+                value = '0x0';
+              }
+            } catch (e) {
+              console.warn('balance check failed, sending standard value', e);
+            }
 
             let location;
             try {
@@ -297,9 +322,11 @@ const store = derived(
             }
 
             // Single TX: createAndEnter is payable — _enter() calls _refill() with excess msg.value,
-            // then _addDelegate() to set up the delegate. No separate refill() needed.
-            console.log('Creating character and entering dungeon (single TX)...');
-            const gasPrice = await computeGasPrice($wallet.chainId);
+            // then _addDelegate() to set up the delegate. When value=0 the contract
+            // attempts a sponsored onboarding grant before _addDelegate, so a brand
+            // new wallet with zero ETH can still join in one signed tx.
+            console.log('Creating character and entering dungeon (single TX)...', { value });
+            const gasPrice = toBeHex(gasPriceBN);
             const tx = await wallet.tx(
               { gas: gasEstimate, gasPrice, value },
               'Player',

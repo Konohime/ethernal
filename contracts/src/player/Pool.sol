@@ -9,4 +9,6 @@ interface Pool {
         uint256 txCharge,
         uint256 poolFee
     ) external payable;
+
+    function sponsorOnboarding(address payable to, uint256 amount) external;
 }

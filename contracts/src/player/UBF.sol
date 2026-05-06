@@ -15,6 +15,7 @@ contract UBF is Proxied, UBFDataLayout, Pool, Constants {
 
     event Received(address from, uint256 amount);
     event Claimed(address account, uint256 amount, uint256 slot);
+    event OnboardingSponsored(address indexed to, uint256 amount);
 
     function postUpgrade(Characters charactersContract) external proxied {
         // TODO _setTrustedForwarder(...);
@@ -24,7 +25,7 @@ contract UBF is Proxied, UBFDataLayout, Pool, Constants {
     function register() external override {
         if (msg.sender != address(_playerContract)) {
             require(address(_playerContract) == address(0), "ALREADY_REGISTERED");
-            _playerContract = Player(msg.sender);
+            _playerContract = Player(payable(msg.sender));
         }
     }
 
@@ -40,6 +41,14 @@ contract UBF is Proxied, UBFDataLayout, Pool, Constants {
         require(msg.sender == address(_playerContract), "NOT_AUTHORIZED");
         uint256 slot = block.timestamp / SLOT_INTERVAL;
         _timeSlots[account][slot] += txCharge; // keep track if we decided later to use it
+    }
+
+    function sponsorOnboarding(address payable to, uint256 amount) external override {
+        require(msg.sender == address(_playerContract), "NOT_AUTHORIZED");
+        require(address(this).balance >= amount, "INSUFFICIENT_UBF");
+        (bool ok, ) = to.call{value: amount}("");
+        require(ok, "transfer failed");
+        emit OnboardingSponsored(to, amount);
     }
 
     function claimUBF() external {

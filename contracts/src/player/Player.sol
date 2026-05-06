@@ -16,8 +16,18 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     event RefillFeeUpdated(uint16 bps);
     event RefillFeeCollected(address indexed treasury, uint256 amount);
     event DelegateToppedUp(address indexed player, address indexed delegate, uint256 amount);
+    event OnboardingFunded(address indexed from, uint256 amount);
+    event OnboardingGranted(address indexed player, uint256 amount, bool fromUBF);
+    event OnboardingConfigUpdated(uint256 grant, uint32 maxDaily);
 
     uint16 public constant MAX_REFILL_FEE_BPS = 1000; // 10% hard cap
+
+    // Restricted to the Pool (UBF) so sponsorOnboarding can push ETH back here.
+    // Anyone else sending ETH would inflate this contract's balance without
+    // crediting any player's energy, breaking the implicit accounting.
+    receive() external payable {
+        require(msg.sender == address(_pool), "ONLY_POOL");
+    }
 
     function setTreasury(address payable treasury) external onlyProxyAdmin {
         _treasury = treasury;
@@ -28,6 +38,41 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         require(bps <= MAX_REFILL_FEE_BPS, "fee too high");
         _refillFeeBps = bps;
         emit RefillFeeUpdated(bps);
+    }
+
+    function setOnboardingConfig(uint256 grant, uint32 maxDaily) external onlyProxyAdmin {
+        _onboardingGrant = grant;
+        _maxDailyGrants = maxDaily;
+        emit OnboardingConfigUpdated(grant, maxDaily);
+    }
+
+    function fundOnboarding() external payable {
+        require(msg.value > 0, "no value");
+        _onboardingPool += msg.value;
+        emit OnboardingFunded(msg.sender, msg.value);
+    }
+
+    function getOnboardingInfo()
+        external
+        view
+        returns (
+            uint256 pool,
+            uint256 grant,
+            uint32 maxDaily,
+            uint32 usedToday,
+            uint256 ubfBalance
+        )
+    {
+        pool = _onboardingPool;
+        grant = _onboardingGrant;
+        maxDaily = _maxDailyGrants;
+        uint64 today = uint64(block.timestamp / 1 days);
+        usedToday = today == _dailyGrantsDay ? _dailyGrantsUsed : 0;
+        ubfBalance = address(_pool).balance;
+    }
+
+    function isOnboarded(address player) external view returns (bool) {
+        return _onboarded[player];
     }
 
     /// @notice Proxy-admin-only: set (or clear) the trusted EIP-2771 meta-tx
@@ -118,20 +163,18 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         require(value == 0, "value not supported");
         require(msg.value >= value, "msg.value < value");
 
-        // If a delegate is being attached, _addDelegate will burn MIN_BALANCE
-        // from energy after _refill returns. Validate up-front that the
-        // refilled-net-of-fee amount can cover MIN_BALANCE so the user gets
-        // a clear revert instead of a deep "not enough energy" failure.
-        if (newDelegate != address(0)) {
-            uint256 refillAmount = msg.value - value;
-            uint256 maxFee = (refillAmount * _refillFeeBps) / 10000;
-            require(refillAmount >= MIN_BALANCE + maxFee, "msg.value below MIN_BALANCE+fee");
-        }
-
         if (msg.value > value) {
             _refill(sender, sender, msg.value - value);
         }
         if (newDelegate != address(0)) {
+            // If the refilled amount didn't cover MIN_BALANCE (e.g. msg.value=0
+            // for a sponsored onboarding), try to top up the player's energy
+            // from the onboarding pool. _addDelegate will then succeed; if the
+            // grant is unavailable, _addDelegate's own require gives a clear
+            // "not enough energy" revert.
+            if (_players[sender].energy < uint128(MIN_BALANCE)) {
+                _tryGrantOnboarding(sender);
+            }
             _addDelegate(sender, newDelegate);
         }
         _holder.enter{value: value}(sender, characterId, name, class, location);
@@ -311,6 +354,39 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         address player = _delegates[_delegate];
         require(player != address(0), "delegate not registered");
         _delegateOf[player] = _delegate;
+    }
+
+    function _tryGrantOnboarding(address sender) internal returns (bool) {
+        uint256 grant = _onboardingGrant;
+        if (grant == 0) return false;
+        if (_onboarded[sender]) return false;
+
+        // Daily cap, rolling per UTC day. Reset the counter when the day changes.
+        uint64 today = uint64(block.timestamp / 1 days);
+        uint32 used = _dailyGrantsUsed;
+        if (today != _dailyGrantsDay) {
+            _dailyGrantsDay = today;
+            used = 0;
+        }
+        if (used >= _maxDailyGrants) return false;
+
+        // Source funds: dedicated pool first, then UBF reserve. We never
+        // partially fund — if neither source can cover the full grant, abort.
+        bool fromUBF;
+        if (_onboardingPool >= grant) {
+            _onboardingPool -= grant;
+        } else if (address(_pool).balance >= grant) {
+            _pool.sponsorOnboarding(payable(address(this)), grant);
+            fromUBF = true;
+        } else {
+            return false;
+        }
+
+        _onboarded[sender] = true;
+        _dailyGrantsUsed = used + 1;
+        _players[sender].energy += uint128(grant);
+        emit OnboardingGranted(sender, grant, fromUBF);
+        return true;
     }
 
     function _addDelegate(address sender, address payable _delegate) internal {
