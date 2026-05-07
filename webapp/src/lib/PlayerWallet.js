@@ -53,35 +53,34 @@ class PlayerWallet {
     return { innerGasLimit, txGasLimit, gasPrice: resolvedGasPrice };
   }
 
-  // Top up the delegate burner from the main wallet via Player.refillAccount,
-  // when the burner can't cover the next tx's gas. One MetaMask popup, after
-  // which the contract-side refund loop keeps the burner alive on its own.
+  // Top up the delegate burner from the main wallet via a plain ETH transfer.
+  // We deliberately bypass Player.refillAccount: that path routes value through
+  // _refill which is capped at MAX_FOOD energy headroom, so a player whose
+  // energy is already near max would see most of the deposit refunded back
+  // and the burner barely topped up. A direct send is simpler and predictable.
   async _refillBurnerFromMainWallet(neededFee) {
-    if (!this.walletStore || !this.walletStore.tx) {
-      throw new Error(`burner empty and no main wallet available to refill`);
+    if (!this.walletStore || !this.walletStore.getSigner) {
+      throw new Error('burner empty and no main wallet available to refill');
+    }
+    const signer = this.walletStore.getSigner();
+    if (!signer) {
+      throw new Error('main wallet signer unavailable');
     }
     const provider = (this.walletStore.getProvider && this.walletStore.getProvider()) || this.provider;
     const chainId = await provider.send('eth_chainId', []);
     const minBalance = BigInt(config(chainId).contractMinBalance);
-    // Send 4× the min balance so the burner gets a meaningful runway (≈30
-    // moves at current gas prices). The contract will keep it topped up from
-    // there via callAsCharacter's refund branch.
-    const targetTopup = (minBalance * 4n) > neededFee * 4n ? minBalance * 4n : neededFee * 4n;
-    const gasPrice = await this._resolveGasPrice(null);
+    // Send max(4 × MIN_BALANCE, 4 × neededFee) so the burner gets a meaningful
+    // runway (≈30 moves at current gas prices). The contract will keep it
+    // topped up afterwards via callAsCharacter's refund branch.
+    const targetTopup = (minBalance * 4n) > (neededFee * 4n) ? minBalance * 4n : neededFee * 4n;
     log.info('[burner-refill] funding delegate from main wallet', {
       delegate: this.delegateWallet.address,
       targetTopup: targetTopup.toString(),
     });
-    const tx = await this.walletStore.tx(
-      {
-        gas: toBeHex(BigInt(200000)),
-        gasPrice: toBeHex(gasPrice),
-        value: toBeHex(targetTopup),
-      },
-      'Player',
-      'refillAccount',
-      this.playerAddress,
-    );
+    const tx = await signer.sendTransaction({
+      to: this.delegateWallet.address,
+      value: targetTopup,
+    });
     await tx.wait();
     log.info('[burner-refill] done');
   }
