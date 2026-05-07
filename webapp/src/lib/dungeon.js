@@ -68,6 +68,7 @@ class Dungeon {
       destinationContract: this.contract,
       playerAddress: this.player,
       delegateWallet: this.delegateWallet,
+      walletStore: wallet,
     });
 
     this.transferWallet = new PlayerWallet({
@@ -75,6 +76,7 @@ class Dungeon {
       destinationContract: this.transferer,
       playerAddress: this.player,
       delegateWallet: this.delegateWallet,
+      walletStore: wallet,
     });
 
     this.ubfWallet = new PlayerWallet({
@@ -82,6 +84,7 @@ class Dungeon {
       destinationContract: this.ubf,
       playerAddress: this.player,
       delegateWallet: this.delegateWallet,
+      walletStore: wallet,
     });
 
     const network = await this.provider.getNetwork();

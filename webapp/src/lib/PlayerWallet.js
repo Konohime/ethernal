@@ -5,14 +5,24 @@ import config from '../data/config';
 
 const defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
+// As of the "kill the burner" cleanup, every game tx is signed directly by the
+// player's main wallet (one MetaMask popup per action). The on-chain delegate
+// is still registered (cheap, used only for the socket signMessage handshake
+// in cache.js) but no longer holds funds and never signs txs — so it can no
+// longer cause the "not enough balance, needed: ..." lockout. Player.callAsCharacter
+// takes the direct-call branch (msg.sender == sender == player) so the contract
+// path is unchanged otherwise.
 class PlayerWallet {
-  constructor({ playerContract, destinationContract, playerAddress, delegateWallet, characterId }) {
+  constructor({ playerContract, destinationContract, playerAddress, delegateWallet, walletStore, characterId }) {
     this.characterId = characterId;
     this.playerAddress = playerAddress;
     this.destinationContract = destinationContract;
-    this.delegateWallet = delegateWallet;
-    this.provider = delegateWallet.provider;
-    this.playerContract = playerContract.connect(delegateWallet);
+    this.delegateWallet = delegateWallet; // kept for compatibility (signMessage in cache.js)
+    this.walletStore = walletStore;
+    this.provider = (walletStore && walletStore.getProvider && walletStore.getProvider()) || (delegateWallet && delegateWallet.provider);
+    // playerContract is connected to the main wallet's signer so msg.sender == player.
+    const signer = (walletStore && walletStore.getSigner && walletStore.getSigner()) || delegateWallet;
+    this.playerContract = playerContract.connect(signer);
   }
 
   async fetchCharacterId() {
@@ -22,32 +32,19 @@ class PlayerWallet {
     return this.characterId;
   }
 
-  async getBalance() {
-    return this.provider.getBalance(this.delegateWallet.address);
-  }
-
-  // @TODO: better estimation
-  async reserveGas({ limit = 400000, gasPrice = null }) {
+  // Compute gas overrides for the meta-tx style call. We no longer guard on
+  // a delegate balance — the main wallet pays gas directly via MetaMask, so
+  // there's nothing to "reserve" client-side.
+  async computeGasOverrides({ limit = 400000, gasPrice = null }) {
     if (gasPrice === null) {
       const chainId = await this.provider.send('eth_chainId', []);
       const configPrice = BigInt(config(chainId).gasPrice);
       const feeData = await this.provider.getFeeData();
-      // Use whichever is higher: network current price or configured minimum
       const networkPrice = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
       gasPrice = networkPrice > configPrice ? networkPrice : configPrice;
     }
-    // Inner call gas: the gas allocated to the destination contract call inside callAsCharacter
     const innerGasLimit = BigInt(limit);
-    // TX gas: inner call + overhead for callAsCharacter itself (auth, fees, storage, pool charge, event)
     const txGasLimit = innerGasLimit + 200000n;
-
-    const fee = gasPrice * txGasLimit;
-
-    const balance = await this.getBalance();
-    if (fee > balance) {
-      throw new Error(`not enough balance, needed: ${fee}`);
-    }
-
     return { innerGasLimit, txGasLimit, gasPrice };
   }
 
@@ -62,27 +59,31 @@ class PlayerWallet {
       options = {};
     }
 
+    // Re-bind to the latest signer in case the user switched accounts mid-session.
+    if (this.walletStore && this.walletStore.getSigner) {
+      const currentSigner = this.walletStore.getSigner();
+      if (currentSigner) {
+        this.playerContract = this.playerContract.connect(currentSigner);
+      }
+    }
+
     const data = (await this.destinationContract[methodName].populateTransaction(...args)).data;
-    const overrides = await this.reserveGas(options);
+    const overrides = await this.computeGasOverrides(options);
 
     const tx = await this.playerContract.callAsCharacter(
-      this.destinationContract.target, // ethers v6: .target instead of .address
-      overrides.innerGasLimit,         // gas allocated to the inner contract call
+      this.destinationContract.target,
+      overrides.innerGasLimit,
       data,
-      { gasLimit: overrides.txGasLimit, gasPrice: overrides.gasPrice }, // TX overrides
+      { gasLimit: overrides.txGasLimit, gasPrice: overrides.gasPrice },
     );
     const oldWait = tx.wait.bind(tx);
     tx.wait = async () => {
-      // ethers v6 throws CALL_EXCEPTION when receipt.status === 0
-      // We need to catch that to extract the receipt and check the Call event for inner revert reasons
       let receipt;
       try {
         receipt = await oldWait();
       } catch (err) {
-        // ethers v6 attaches receipt via Object.assign in makeError
         receipt = err.receipt || err.info?.receipt;
         if (!receipt) {
-          // Fallback: fetch receipt from provider using the TX hash
           try {
             receipt = await this.provider.getTransactionReceipt(tx.hash);
           } catch (e) {
@@ -94,7 +95,6 @@ class PlayerWallet {
           throw err;
         }
       }
-      // Use plain object to avoid issues with ethers v6 read-only receipt properties
       const result = {
         ...receipt,
         logs: receipt.logs || [],
@@ -116,7 +116,6 @@ class PlayerWallet {
           result.returnData = callEvent.args[1];
         }
       } else if (result.status === 0) {
-        // Outer TX reverted — replay via eth_call at the same block to extract the actual revert reason
         let outerReason = 'transaction reverted';
         let txData;
         try {
@@ -130,11 +129,6 @@ class PlayerWallet {
         } catch (callErr) {
           outerReason = callErr.reason || callErr.revert?.args?.[0] || callErr.shortMessage || callErr.message || outerReason;
         }
-        // The Player contract reverts with a generic "call failed" when the inner
-        // delegated call reverts BEFORE the Call event is emitted. Replay the inner
-        // call directly against the destination contract (impersonating the Player
-        // contract via eth_call's `from`) to surface the true inner revert reason
-        // (e.g. "cant move this way", "not enough fragments", "monster blocking", ...).
         if (outerReason === 'call failed') {
           try {
             await this.provider.call(
@@ -156,25 +150,23 @@ class PlayerWallet {
         }
         // eslint-disable-next-line no-console
         console.warn(
-          'metatx reverted method=', methodName,
+          'tx reverted method=', methodName,
           'reason=', outerReason,
           'hash=', tx.hash,
           'args=', args,
         );
         throw { reason: outerReason, receipt: result };
       } else if (result.logs.length === 0 && result.status !== 0) {
-        // should not reach here
         throw { receipt: result };
       }
-      log.debug('metatransaction receipt received', { tx, receipt: result });
+      log.debug('tx receipt received', { tx, receipt: result });
       return result;
     };
 
-    log.debug('sending metatransaction', {
+    log.debug('sending player tx', {
       tx,
       methodName,
       args,
-      delegate: this.delegateWallet.address,
       player: this.playerAddress,
       character: this.characterId,
     });

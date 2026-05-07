@@ -1,8 +1,5 @@
 import { writable, derived } from 'svelte/store';
 
-import { toBeHex } from 'ethers';
-
-import config from 'data/config';
 import Dungeon from 'lib/dungeon';
 import getDelegateKey from 'lib/delegateKey';
 import preDungeonCheck from 'stores/preDungeonCheck';
@@ -44,65 +41,12 @@ export const dungeon = derived([wallet, preDungeonCheck], async ([$wallet, $preD
       d = await loadDungeon($wallet);
       set(d);
 
-      // Auto-claim UBF if available (fire-and-forget, meta-tx via delegate = no wallet popup).
-      // Must NOT be awaited here: svelte's `derived` async callback cancels its continuation
-      // once `set()` triggers downstream updates, so awaited code after `set(d)` never runs.
+      // Auto-claim UBF if available (fire-and-forget). Each game tx now goes
+      // through the main wallet directly (one MetaMask popup), so there's no
+      // burner balance to keep topped up — the old auto-refill block is gone.
+      // Must NOT be awaited here: svelte's `derived` async callback cancels its
+      // continuation once `set()` triggers downstream updates.
       (async () => {
-        // First, ensure the delegate burner has enough gas to send a metatx.
-        // The metatx UBF claim is itself paid by the delegate, so a delegate
-        // that has run dry can never claim — silent lockout. Auto-refill
-        // from the main wallet (single signature) when below the threshold.
-        try {
-          const provider = wallet.getProvider();
-          const chainId = $wallet.chainId;
-          const minBalance = BigInt(config(chainId).contractMinBalance);
-          const delegateBalance = BigInt(
-            (await provider.getBalance(d.delegateWallet.address)).toString(),
-          );
-          if (delegateBalance < minBalance) {
-            const mainBalance = BigInt(
-              (await provider.getBalance($wallet.address)).toString(),
-            );
-            // refillAccount auto-tops up the delegate to MIN_BALANCE from
-            // the value sent (after fee). Send 2 * MIN_BALANCE so the
-            // delegate is refilled AND the player gets a small energy
-            // buffer for the next move (which then triggers the on-chain
-            // refund loop in callAsCharacter).
-            const refillValue = minBalance * 2n;
-            const gasPriceFloor = BigInt(config(chainId).gasPrice);
-            const feeData = await provider.getFeeData();
-            const network = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
-            const gasPrice = network > gasPriceFloor ? network : gasPriceFloor;
-            const refillTxGasCost = gasPrice * 200000n;
-            if (mainBalance >= refillValue + refillTxGasCost) {
-              console.log('[auto-refill] topping up delegate from main wallet', {
-                delegateBalance: delegateBalance.toString(),
-                refillValue: refillValue.toString(),
-              });
-              const tx = await wallet.tx(
-                {
-                  gas: toBeHex(BigInt(200000)),
-                  gasPrice: toBeHex(gasPrice),
-                  value: toBeHex(refillValue),
-                },
-                'Player',
-                'refillAccount',
-                $wallet.address,
-              );
-              await tx.wait();
-              console.log('[auto-refill] delegate refilled');
-            } else {
-              console.warn('[auto-refill] main wallet balance insufficient to refill delegate', {
-                delegateBalance: delegateBalance.toString(),
-                mainBalance: mainBalance.toString(),
-                needed: (refillValue + refillTxGasCost).toString(),
-              });
-            }
-          }
-        } catch (e) {
-          console.warn('[auto-refill] skipped:', e.reason || e.message || e);
-        }
-
         try {
           console.log('[auto-ubf] checking UBF claim availability...');
           const info = await d.ubfInfo();
