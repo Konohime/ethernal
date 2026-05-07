@@ -1888,11 +1888,36 @@ class MapRenderer {
       // BlockHashRegister at last fetch). Force the backend to drop its cache
       // and re-pull on-chain — the resulting reorg event makes the monster
       // appear on the map and flips status to "blocked by monster".
+      //
+      // Retry: the BlockHashRegister keeper may not have published the seed
+      // for monsterBlockNumber yet. A single fire-and-forget refresh can race
+      // and resolve to hasMonster=false again. Poll the response until we get
+      // hasMonster=true, up to a handful of attempts spaced by a couple
+      // seconds. Avoids the silent "I clicked move but nothing happened" UX.
       if (err.reason === 'monster blocking') {
         const here = global.dungeon.cache.characterCoordinates;
         if (here) {
-          const url = `${global.dungeon.cache.url}/rooms/${encodeURIComponent(here)}/refresh`;
-          fetch(url, { method: 'POST' }).catch((e) => console.warn('room refresh failed', e));
+          (async () => {
+            const url = `${global.dungeon.cache.url}/rooms/${encodeURIComponent(here)}/refresh`;
+            for (let i = 0; i < 6; i += 1) {
+              try {
+                // eslint-disable-next-line no-await-in-loop
+                const res = await fetch(url, { method: 'POST' });
+                // eslint-disable-next-line no-await-in-loop
+                const room = await res.json().catch(() => null);
+                if (room && room.hasMonster) {
+                  // Backend caught up — the reorg event it just emitted will
+                  // flip the UI to "blocked by monster". Done.
+                  return;
+                }
+              } catch (e) {
+                // network glitch — try again
+              }
+              // eslint-disable-next-line no-await-in-loop
+              await new Promise((r) => setTimeout(r, 2000));
+            }
+            console.warn('monster refresh did not surface hasMonster=true after retries');
+          })();
         }
       }
       return; // Don't re-throw; error is displayed via notification
