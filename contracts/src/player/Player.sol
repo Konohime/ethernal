@@ -218,20 +218,23 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         energy -= (freeEnergyFee + poolFee);
         _pool.recordCharge{value: poolFee}(sender, txCharge, poolFee);
 
-        if (msg.sender == sender) {
-            // not metatx : use local private key so need to recharge local balance // TODO remove (once metatx is enabled)
-            if (msg.sender.balance < MIN_BALANCE) {
-                uint256 balanceToGive = MIN_BALANCE - msg.sender.balance;
-                if (balanceToGive >= energy) {
-                    balanceToGive = energy;
-                    energy = 0;
-                } else {
-                    energy -= balanceToGive;
-                }
+        // Refund msg.sender's gas balance from the player's energy when it
+        // dips below MIN_BALANCE — applies to both direct calls (msg.sender ==
+        // player) and meta-tx calls (msg.sender == delegate). Without this,
+        // a delegate slowly burns its initial top-up across moves and ends up
+        // unable to pay gas for the very tx (notably claimUBFAsCharacter)
+        // that would refill it, creating a chicken-and-egg lockout.
+        if (msg.sender.balance < MIN_BALANCE) {
+            uint256 balanceToGive = MIN_BALANCE - msg.sender.balance;
+            if (balanceToGive >= energy) {
+                balanceToGive = energy;
+                energy = 0;
+            } else {
+                energy -= balanceToGive;
+            }
 
-                if (balanceToGive > 0) {
-                    payable(msg.sender).transfer(balanceToGive);
-                }
+            if (balanceToGive > 0) {
+                payable(msg.sender).transfer(balanceToGive);
             }
         }
         player.freeEnergy += uint128(freeEnergyFee);

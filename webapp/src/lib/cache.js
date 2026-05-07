@@ -1093,7 +1093,12 @@ class Cache {
 
   applyCharacterInfo(info) {
     const { character } = info;
-    if (character === this.characterId) {
+    // Normalize: backend sends `character` as a JSON string in some paths
+    // (DB-loaded rows, certain socket events) and as a Number in others.
+    // `this.characterId` is always a Number after construction. Compare on
+    // Number(...) so a string id like '4' doesn't silently skip the body
+    // that populates _characterBalances / _playerEnergy / etc.
+    if (Number(character) === this.characterId) {
       const {
         coins,
         keys,
