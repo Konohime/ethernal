@@ -41,29 +41,12 @@ export const dungeon = derived([wallet, preDungeonCheck], async ([$wallet, $preD
       d = await loadDungeon($wallet);
       set(d);
 
-      // Auto-claim UBF if available (fire-and-forget). Each game tx now goes
-      // through the main wallet directly (one MetaMask popup), so there's no
-      // burner balance to keep topped up — the old auto-refill block is gone.
-      // Must NOT be awaited here: svelte's `derived` async callback cancels its
-      // continuation once `set()` triggers downstream updates.
-      (async () => {
-        try {
-          console.log('[auto-ubf] checking UBF claim availability...');
-          const info = await d.ubfInfo();
-          const amount = info.amount ?? info[0];
-          const claimed = info.claimed ?? info[3];
-          console.log('[auto-ubf] ubfInfo', { amount: amount?.toString(), claimed });
-          if (amount && BigInt(amount) > 0n && !claimed) {
-            console.log('[auto-ubf] claiming...');
-            await d.claimUbf();
-            console.log('[auto-ubf] claimed successfully');
-          } else {
-            console.log('[auto-ubf] nothing to claim');
-          }
-        } catch (e) {
-          console.warn('[auto-ubf] skipped:', e.reason || e.message || e);
-        }
-      })();
+      // (No auto-UBF claim here.) We used to fire claimUBFAsCharacter on dungeon
+      // load to top off the player's energy, but the contract reverts with
+      // NO_ACTIVITY for fresh sessions and the call popped MetaMask before the
+      // player did anything. The contract-side refund in callAsCharacter keeps
+      // the burner funded organically; UBF is now claimed only on explicit user
+      // action (e.g. when the energy bar runs low).
     }
   } else {
     lastWalletAddress = null;

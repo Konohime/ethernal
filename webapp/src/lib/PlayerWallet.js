@@ -1,28 +1,29 @@
 /* eslint-disable no-throw-literal */
-import { getBytes, hexlify, AbiCoder } from 'ethers';
+import { getBytes, hexlify, AbiCoder, toBeHex } from 'ethers';
 import log from '../utils/log';
 import config from '../data/config';
 
 const defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
-// As of the "kill the burner" cleanup, every game tx is signed directly by the
-// player's main wallet (one MetaMask popup per action). The on-chain delegate
-// is still registered (cheap, used only for the socket signMessage handshake
-// in cache.js) but no longer holds funds and never signs txs — so it can no
-// longer cause the "not enough balance, needed: ..." lockout. Player.callAsCharacter
-// takes the direct-call branch (msg.sender == sender == player) so the contract
-// path is unchanged otherwise.
+// Game txs go through the delegate burner (signs without a MetaMask popup).
+// The contract refunds the burner from the player's _playerEnergy on every
+// successful callAsCharacter, so the burner stays funded as long as it had
+// enough gas to land the previous tx.
+//
+// If the burner ever drops below the next-tx fee (e.g. the player let it sit
+// idle, or the previous refund failed), we surface ONE popup: a refillAccount
+// from the main wallet, refilling the burner to a comfortable buffer. Then we
+// retry the original tx (now signed by the burner, no popup). This avoids the
+// silent lockout that plagued the previous burner-only design.
 class PlayerWallet {
   constructor({ playerContract, destinationContract, playerAddress, delegateWallet, walletStore, characterId }) {
     this.characterId = characterId;
     this.playerAddress = playerAddress;
     this.destinationContract = destinationContract;
-    this.delegateWallet = delegateWallet; // kept for compatibility (signMessage in cache.js)
+    this.delegateWallet = delegateWallet;
     this.walletStore = walletStore;
-    this.provider = (walletStore && walletStore.getProvider && walletStore.getProvider()) || (delegateWallet && delegateWallet.provider);
-    // playerContract is connected to the main wallet's signer so msg.sender == player.
-    const signer = (walletStore && walletStore.getSigner && walletStore.getSigner()) || delegateWallet;
-    this.playerContract = playerContract.connect(signer);
+    this.provider = delegateWallet.provider;
+    this.playerContract = playerContract.connect(delegateWallet);
   }
 
   async fetchCharacterId() {
@@ -32,20 +33,57 @@ class PlayerWallet {
     return this.characterId;
   }
 
-  // Compute gas overrides for the meta-tx style call. We no longer guard on
-  // a delegate balance — the main wallet pays gas directly via MetaMask, so
-  // there's nothing to "reserve" client-side.
-  async computeGasOverrides({ limit = 400000, gasPrice = null }) {
-    if (gasPrice === null) {
-      const chainId = await this.provider.send('eth_chainId', []);
-      const configPrice = BigInt(config(chainId).gasPrice);
-      const feeData = await this.provider.getFeeData();
-      const networkPrice = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
-      gasPrice = networkPrice > configPrice ? networkPrice : configPrice;
-    }
+  async getBalance() {
+    return this.provider.getBalance(this.delegateWallet.address);
+  }
+
+  async _resolveGasPrice(opt) {
+    if (opt !== null && opt !== undefined) return BigInt(opt);
+    const chainId = await this.provider.send('eth_chainId', []);
+    const configPrice = BigInt(config(chainId).gasPrice);
+    const feeData = await this.provider.getFeeData();
+    const networkPrice = feeData.gasPrice ?? feeData.maxFeePerGas ?? 0n;
+    return networkPrice > configPrice ? networkPrice : configPrice;
+  }
+
+  async computeOverrides({ limit = 400000, gasPrice = null }) {
     const innerGasLimit = BigInt(limit);
     const txGasLimit = innerGasLimit + 200000n;
-    return { innerGasLimit, txGasLimit, gasPrice };
+    const resolvedGasPrice = await this._resolveGasPrice(gasPrice);
+    return { innerGasLimit, txGasLimit, gasPrice: resolvedGasPrice };
+  }
+
+  // Top up the delegate burner from the main wallet via Player.refillAccount,
+  // when the burner can't cover the next tx's gas. One MetaMask popup, after
+  // which the contract-side refund loop keeps the burner alive on its own.
+  async _refillBurnerFromMainWallet(neededFee) {
+    if (!this.walletStore || !this.walletStore.tx) {
+      throw new Error(`burner empty and no main wallet available to refill`);
+    }
+    const provider = (this.walletStore.getProvider && this.walletStore.getProvider()) || this.provider;
+    const chainId = await provider.send('eth_chainId', []);
+    const minBalance = BigInt(config(chainId).contractMinBalance);
+    // Send 4× the min balance so the burner gets a meaningful runway (≈30
+    // moves at current gas prices). The contract will keep it topped up from
+    // there via callAsCharacter's refund branch.
+    const targetTopup = (minBalance * 4n) > neededFee * 4n ? minBalance * 4n : neededFee * 4n;
+    const gasPrice = await this._resolveGasPrice(null);
+    log.info('[burner-refill] funding delegate from main wallet', {
+      delegate: this.delegateWallet.address,
+      targetTopup: targetTopup.toString(),
+    });
+    const tx = await this.walletStore.tx(
+      {
+        gas: toBeHex(BigInt(200000)),
+        gasPrice: toBeHex(gasPrice),
+        value: toBeHex(targetTopup),
+      },
+      'Player',
+      'refillAccount',
+      this.playerAddress,
+    );
+    await tx.wait();
+    log.info('[burner-refill] done');
   }
 
   async tx(options, methodName, ...args) {
@@ -59,16 +97,25 @@ class PlayerWallet {
       options = {};
     }
 
-    // Re-bind to the latest signer in case the user switched accounts mid-session.
-    if (this.walletStore && this.walletStore.getSigner) {
-      const currentSigner = this.walletStore.getSigner();
-      if (currentSigner) {
-        this.playerContract = this.playerContract.connect(currentSigner);
+    const data = (await this.destinationContract[methodName].populateTransaction(...args)).data;
+    const overrides = await this.computeOverrides(options);
+    const fee = overrides.gasPrice * overrides.txGasLimit;
+
+    // If the burner can't cover this tx, refill from main wallet (1 popup) then continue.
+    let balance = await this.getBalance();
+    if (fee > balance) {
+      try {
+        await this._refillBurnerFromMainWallet(fee);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('burner refill failed', e);
+        throw { reason: `burner refill failed: ${e.reason || e.message || e}`, _refillFailure: true };
+      }
+      balance = await this.getBalance();
+      if (fee > balance) {
+        throw { reason: `not enough balance after refill, needed: ${fee}` };
       }
     }
-
-    const data = (await this.destinationContract[methodName].populateTransaction(...args)).data;
-    const overrides = await this.computeGasOverrides(options);
 
     const tx = await this.playerContract.callAsCharacter(
       this.destinationContract.target,
@@ -150,7 +197,7 @@ class PlayerWallet {
         }
         // eslint-disable-next-line no-console
         console.warn(
-          'tx reverted method=', methodName,
+          'metatx reverted method=', methodName,
           'reason=', outerReason,
           'hash=', tx.hash,
           'args=', args,
@@ -159,14 +206,15 @@ class PlayerWallet {
       } else if (result.logs.length === 0 && result.status !== 0) {
         throw { receipt: result };
       }
-      log.debug('tx receipt received', { tx, receipt: result });
+      log.debug('metatransaction receipt received', { tx, receipt: result });
       return result;
     };
 
-    log.debug('sending player tx', {
+    log.debug('sending metatransaction', {
       tx,
       methodName,
       args,
+      delegate: this.delegateWallet.address,
       player: this.playerAddress,
       character: this.characterId,
     });
