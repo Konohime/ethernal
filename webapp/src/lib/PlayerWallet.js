@@ -46,9 +46,16 @@ class PlayerWallet {
     return networkPrice > configPrice ? networkPrice : configPrice;
   }
 
-  async computeOverrides({ limit = 400000, gasPrice = null }) {
+  async computeOverrides({ limit = 800000, gasPrice = null }) {
+    // Inner call needs headroom: a single move() can chain _actualiseRoom on
+    // both source and destination, _blockHashRegister.request() for monster
+    // commit-reveal, area generation on first visit, and external calls to
+    // Rooms/Characters/Elements. 400k was tight enough that destination-actualise
+    // moves on Base Sepolia hit the cap and reverted with the opaque
+    // "missing revert data" (require(success, "call failed") inside
+    // callAsCharacter, with revert data dropped by the RPC).
     const innerGasLimit = BigInt(limit);
-    const txGasLimit = innerGasLimit + 200000n;
+    const txGasLimit = innerGasLimit + 300000n;
     const resolvedGasPrice = await this._resolveGasPrice(gasPrice);
     return { innerGasLimit, txGasLimit, gasPrice: resolvedGasPrice };
   }
@@ -116,6 +123,47 @@ class PlayerWallet {
       }
     }
 
+    // Pre-flight: simulate the full callAsCharacter to surface revert reasons
+    // before spending gas on-chain.  Catches inner-call errors (monster
+    // blocking, can't move, etc.) AND outer errors (energy, delegate, ETH
+    // balance) that would otherwise appear as opaque "missing revert data".
+    try {
+      const outerData = this.playerContract.interface.encodeFunctionData(
+        'callAsCharacter',
+        [this.destinationContract.target, overrides.innerGasLimit, data],
+      );
+      await this.provider.call({
+        to: this.playerContract.target,
+        data: outerData,
+        from: this.delegateWallet.address,
+        gasLimit: overrides.txGasLimit,
+      });
+    } catch (simErr) {
+      let simReason =
+        simErr.reason || simErr.revert?.args?.[0] || simErr.shortMessage || simErr.message;
+      // If the outer simulation only says "call failed", replay the inner
+      // call directly to get the underlying revert reason.
+      if (simReason === 'call failed' || (simReason && simReason.includes('missing revert data'))) {
+        try {
+          await this.provider.call({
+            to: this.destinationContract.target,
+            data,
+            from: this.playerContract.target,
+            gasLimit: overrides.innerGasLimit,
+          });
+        } catch (innerSimErr) {
+          const innerReason =
+            innerSimErr.reason || innerSimErr.revert?.args?.[0] || innerSimErr.shortMessage || innerSimErr.message;
+          if (innerReason && innerReason !== 'call failed' && !innerReason.includes('missing revert data')) {
+            simReason = innerReason;
+          }
+        }
+      }
+      // eslint-disable-next-line no-console
+      console.warn('metatx pre-flight reverted method=', methodName, 'reason=', simReason, 'args=', args);
+      throw { reason: simReason || 'pre-flight simulation failed', _preflight: true };
+    }
+
     const tx = await this.playerContract.callAsCharacter(
       this.destinationContract.target,
       overrides.innerGasLimit,
@@ -175,7 +223,12 @@ class PlayerWallet {
         } catch (callErr) {
           outerReason = callErr.reason || callErr.revert?.args?.[0] || callErr.shortMessage || callErr.message || outerReason;
         }
-        if (outerReason === 'call failed') {
+        // Try to replay the inner call directly to surface the real revert
+        // reason. Previously this only ran when outerReason was exactly
+        // "call failed", but RPC nodes (especially on L2s) often return
+        // empty revert data, producing "missing revert data" from ethers.
+        if (outerReason === 'call failed' || outerReason === 'transaction reverted'
+            || (outerReason && outerReason.includes('missing revert data'))) {
           try {
             await this.provider.call(
               {
@@ -189,10 +242,34 @@ class PlayerWallet {
           } catch (innerErr) {
             const innerReason =
               innerErr.reason || innerErr.revert?.args?.[0] || innerErr.shortMessage || innerErr.message;
-            if (innerReason && innerReason !== 'call failed') {
+            if (innerReason && innerReason !== 'call failed' && !innerReason.includes('missing revert data')) {
               outerReason = innerReason;
             }
           }
+        }
+        // Dump on-chain state to identify silent value-transfer reverts.
+        // If outerReason is "missing revert data" but the tx used ~450k gas
+        // and emitted no logs, the most likely cause is the
+        // _pool.recordCharge{value: poolFee} call failing because the Player
+        // contract's actual ETH balance is below poolFee.
+        let diag = {};
+        try {
+          const [contractBalance, energyResult, delegateBalance] = await Promise.all([
+            this.provider.getBalance(this.playerContract.target),
+            this.playerContract.getEnergy(this.playerAddress).catch(() => null),
+            this.provider.getBalance(this.delegateWallet.address),
+          ]);
+          diag = {
+            playerContractAddress: this.playerContract.target,
+            playerContractEthBalance: contractBalance.toString(),
+            playerEnergy: energyResult ? energyResult.toString() : '(unavailable)',
+            delegateAddress: this.delegateWallet.address,
+            delegateEthBalance: delegateBalance.toString(),
+            txGasPrice: result.gasPrice ? result.gasPrice.toString() : null,
+            txGasUsed: result.gasUsed ? result.gasUsed.toString() : null,
+          };
+        } catch (e) {
+          diag = { diagFailed: e.message };
         }
         // eslint-disable-next-line no-console
         console.warn(
@@ -200,6 +277,8 @@ class PlayerWallet {
           'reason=', outerReason,
           'hash=', tx.hash,
           'args=', args,
+          'diag=', diag,
+          'basescan=', `https://sepolia.basescan.org/tx/${tx.hash}`,
         );
         throw { reason: outerReason, receipt: result };
       } else if (result.logs.length === 0 && result.status !== 0) {

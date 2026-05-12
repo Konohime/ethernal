@@ -97,11 +97,6 @@ class UIDeck extends PIXI.Container {
   }
 
   reset() {
-    console.log('[BUG3] UIDeck.reset', {
-      type: this.deck.type,
-      side: this.deck.side,
-      cardCount: this.cards.length,
-    });
     this.visible = false;
     this.alpha = 0;
     this.selected = -1;
@@ -140,25 +135,19 @@ class UIDeck extends PIXI.Container {
   }
 
   show(callback) {
-    // [BUG3-DEBUG] trace deck show() calls
-    console.log('[BUG3] UIDeck.show', {
-      type: this.deck.type,
-      side: this.deck.side,
-      deckVisible: this.visible,
-      deckAlpha: this.alpha,
-      cardCount: this.cards.length,
-      cardsState: this.cards.map(c => ({
-        visible: c.visible, alpha: c.alpha, used: c.card && c.card.isUsed(),
-        contentChildren: c.content && c.content.children.length,
-        contentNormalChildren: c.contentNormal && c.contentNormal.children.length,
-      })),
-    });
     this._hideRequested = false;
 
-    // Cancel any pending hide animation to prevent it from overriding our show
+    // Cancel any pending hide animation to prevent it from overriding our show.
+    // Fire the previous callback synchronously — pixi-ease's remove() suppresses
+    // the 'complete' event, which would otherwise leak waiting promises.
     if (this._currentEase) {
       this._currentEase.remove();
       this._currentEase = null;
+      if (this._currentEaseCallback) {
+        const prev = this._currentEaseCallback;
+        this._currentEaseCallback = null;
+        prev();
+      }
     }
 
     this.deck.updateFromCache();
@@ -185,39 +174,44 @@ class UIDeck extends PIXI.Container {
     });
 
     this._currentEase = ease.add(this, { alpha: 1 }, { duration: 600 });
+    this._currentEaseCallback = callback ? () => callback.call() : null;
     this._currentEase.on('complete', () => {
       this._currentEase = null;
-      if (callback) {
-        callback.call();
-      }
+      const cb = this._currentEaseCallback;
+      this._currentEaseCallback = null;
+      if (cb) cb();
     });
     this.emit('show');
   }
 
   hide(callback) {
-    console.log('[BUG3] UIDeck.hide', {
-      type: this.deck.type,
-      side: this.deck.side,
-      deckVisible: this.visible,
-      deckAlpha: this.alpha,
-    });
     this._hideRequested = true;
 
-    // Cancel any pending show animation
+    // Cancel any pending show animation, draining its callback synchronously.
     if (this._currentEase) {
       this._currentEase.remove();
       this._currentEase = null;
+      if (this._currentEaseCallback) {
+        const prev = this._currentEaseCallback;
+        this._currentEaseCallback = null;
+        prev();
+      }
     }
 
     this._currentEase = ease.add(this, { alpha: 0 }, { duration: 200 });
-    this._currentEase.on('complete', () => {
-      this._currentEase = null;
+    this._currentEaseCallback = () => {
       if (this._hideRequested) {
         this.visible = false;
       }
       if (callback) {
         callback.call();
       }
+    };
+    this._currentEase.on('complete', () => {
+      this._currentEase = null;
+      const cb = this._currentEaseCallback;
+      this._currentEaseCallback = null;
+      if (cb) cb();
     });
     this.emit('hide');
   }

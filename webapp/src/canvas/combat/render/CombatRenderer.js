@@ -19,6 +19,24 @@ import AttackType from '../AttackType';
 window.PIXI = PIXI;
 require('@pixi/layers');
 
+// Resolves when the ease animation completes, or after a safety timeout if the
+// 'complete' event never fires (e.g. the easing was removed mid-flight). Prevents
+// the combat turn promise chain from hanging silently.
+function awaitEase(easeAnim, durationMs) {
+  return new Promise(resolve => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+    if (easeAnim && typeof easeAnim.on === 'function') {
+      easeAnim.on('complete', finish);
+    }
+    setTimeout(finish, (durationMs || 600) + 500);
+  });
+}
+
 /**
  * TODO: (Passive Task) Write checker method for app width and resizing of elements as well as text options.
  */
@@ -384,22 +402,22 @@ class CombatRenderer {
     // Start waiting time animations for the monster sprite.
     this.monster.animationGroup.animating = true;
 
-    await new Promise(resolve => {
+    {
       ease.add(charAttackCard, { y: -50 }, { duration: 600 });
       const move = ease.add(charDefenseCard, { y: -50 }, { duration: 600 });
-      move.on('complete', resolve);
-    });
+      await awaitEase(move, 600);
+    }
 
     this.monsterAttackPlaceholder.visible = true;
     this.monsterDefensePlaceholder.visible = true;
 
     const yStop = this.centerY - 122;
 
-    await new Promise(resolve => {
+    {
       ease.add(this.monsterAttackPlaceholder, { alpha: 1, y: yStop }, { duration: 600 });
       const move = ease.add(this.monsterDefensePlaceholder, { alpha: 1, y: yStop }, { duration: 600 });
-      move.on('complete', resolve);
-    });
+      await awaitEase(move, 600);
+    }
   }
 
   async finishAttack(lastTurn) {
@@ -445,17 +463,15 @@ class CombatRenderer {
       this._monsterDefenseCard.position.x = placeholderSlot1X;
     }
 
-    await new Promise(resolve => {
+    {
       if (this._monsterAttackCard) {
         ease.add(this._monsterAttackCard, { alpha: 1 }, { duration: 600 });
       }
       if (this._monsterDefenseCard) {
         const move = ease.add(this._monsterDefenseCard, { alpha: 1 }, { duration: 600 });
-        move.on('complete', resolve);
-      } else {
-        resolve();
+        await awaitEase(move, 600);
       }
-    });
+    }
 
     this.monsterAttackPlaceholder.alpha = 0;
     this.monsterAttackPlaceholder.tint = 0x000000;
@@ -470,23 +486,19 @@ class CombatRenderer {
     // Stop idle animation for the monster sprite.
     this.monster.animationGroup.reset();
 
-    return new Promise(resolve => {
-      if (this._charAttackCard && lastTurn.inflictions.attacker.missed) {
-        this._charAttackCard.animateUse();
-      }
-      if (this._charDefenseCard && !lastTurn.inflictions.defender.missed) {
-        this._charDefenseCard.animateUse();
-      }
-      if (this._monsterAttackCard && lastTurn.inflictions.defender.missed) {
-        this._monsterAttackCard.animateUse();
-      }
-      if (this._monsterDefenseCard && !lastTurn.inflictions.attacker.missed) {
-        const move = this._monsterDefenseCard.animateUse();
-        move.on('complete', resolve);
-      } else {
-        resolve();
-      }
-    });
+    if (this._charAttackCard && lastTurn.inflictions.attacker.missed) {
+      this._charAttackCard.animateUse();
+    }
+    if (this._charDefenseCard && !lastTurn.inflictions.defender.missed) {
+      this._charDefenseCard.animateUse();
+    }
+    if (this._monsterAttackCard && lastTurn.inflictions.defender.missed) {
+      this._monsterAttackCard.animateUse();
+    }
+    if (this._monsterDefenseCard && !lastTurn.inflictions.attacker.missed) {
+      const move = this._monsterDefenseCard.animateUse();
+      await awaitEase(move, 400);
+    }
   }
 
   async revealTurn() {
@@ -625,7 +637,6 @@ class CombatRenderer {
   }
 
   reset() {
-    console.log('[BUG3] CombatRenderer.reset START');
     if (this._charAttackCard) {
       this._charAttackCard.animateUnused(0);
       this._charAttackCard.update();
@@ -732,7 +743,6 @@ class CombatRenderer {
    * @param type {string}
    */
   selectFromDeck(type) {
-    console.log('[BUG3] CombatRenderer.selectFromDeck', { type });
     try {
       // Disable deck and attack buttons.
       [this.uiAttackSelectButton, this.uiDefenseSelectButton, this.uiAttackButton].forEach(button => {

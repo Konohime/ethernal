@@ -71,7 +71,6 @@ class OtherPanel extends PIXI.Container {
    * @param characterId {string}
    */
   leave(characterId, immediate) {
-    console.log(`leave(${characterId})`);
     const info = this.others[characterId];
     if (info == null) {
       return;

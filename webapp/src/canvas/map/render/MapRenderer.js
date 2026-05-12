@@ -1923,6 +1923,17 @@ class MapRenderer {
       return; // Don't re-throw; error is displayed via notification
     }
     moving = false;
+    // Mirror the cleanup the error path performs. The path.play() "finished"
+    // callback (above) normally clears myCharacter.moving and the visual path,
+    // but it doesn't fire when createPath() returned no path (adjacent/no-op
+    // moves), nor reliably if the path was finish()'d early. Without resetting
+    // here the walking sprite animates forever and the click-to-move handler
+    // stays gated on the stale flag — exactly the "can't move anymore" symptom.
+    this.myCharacter.moving = false;
+    if (this.myCharacter.path) {
+      this.myCharacter.path.finish();
+      this.myCharacter.path = undefined;
+    }
     // Defensively force a fresh reachable-rooms recomputation. The 'move' event
     // handler that normally triggers this is scheduled via setTimeout, and there
     // have been races where the handler hadn't completed (or the store update
@@ -1939,6 +1950,9 @@ class MapRenderer {
       this.refocus(newCoords, 500);
     }
     this.updateAllFog();
+    // updateAllFog() only calls placeArrows() when activeChunks is non-empty.
+    // Call it explicitly so discovery arrows reappear even on the cold path.
+    this.placeArrows();
   }
 
   hideFurthestChunks() {
