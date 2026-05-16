@@ -948,6 +948,40 @@ class Cache {
     this.applyCharacterInfo(info);
   }
 
+  // Fallback used when the 'move' socket event is missed: re-fetch character
+  // info and, if the on-chain coordinates differ from our cached currentRoom,
+  // synthesize an applyMove so currentRoom, reachableRooms and arrows reflect
+  // the new position. Mirrors the reorg recovery path in applyUpdate().
+  async resyncAfterMove() {
+    const info = await this.fetch(`characters/${this.characterId}`);
+    this.applyCharacterInfo(info);
+    const from = this.currentRoom && this.currentRoom.coordinates;
+    if (info.coordinates && from && info.coordinates !== from) {
+      // Make sure the destination room is in the local rooms map before
+      // applyMove reads it — without this the synthesized move falls back to
+      // an undefined `to` and currentRoom doesn't update.
+      if (!this.rooms[info.coordinates]) {
+        try {
+          const room = await this.fetchRoom(info.coordinates);
+          if (room && room.coordinates) {
+            this.rooms[room.coordinates] = { ...this.rooms[room.coordinates], ...room };
+          }
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn('resyncAfterMove: failed to fetch destination room', e);
+        }
+      }
+      this.applyMove({
+        character: this.characterId,
+        from,
+        to: info.coordinates,
+        mode: 1,
+        received: {},
+      });
+    }
+    this.calculateReachableRooms(true);
+  }
+
   async fetchHallOfFame() {
     return this.fetch('leaderboards');
   }

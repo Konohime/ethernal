@@ -76,10 +76,17 @@ class PlayerWallet {
     const provider = (this.walletStore.getProvider && this.walletStore.getProvider()) || this.provider;
     const chainId = await provider.send('eth_chainId', []);
     const minBalance = BigInt(config(chainId).contractMinBalance);
-    // Send max(4 × MIN_BALANCE, 4 × neededFee) so the burner gets a meaningful
-    // runway (≈30 moves at current gas prices). The contract will keep it
-    // topped up afterwards via callAsCharacter's refund branch.
-    const targetTopup = (minBalance * 4n) > (neededFee * 4n) ? minBalance * 4n : neededFee * 4n;
+    // Aim for ~50 moves of headroom per refill. neededFee already reflects
+    // current gas (gasPrice × txGasLimit), so neededFee × 50 scales with
+    // network conditions. Keep a minBalance × 10 floor in case neededFee is
+    // unusually low (e.g. gas floor not yet hit on cold start). The previous
+    // 4× multiplier only bought ~7 moves on Base Sepolia, which surfaced a
+    // main-wallet popup every few moves and broke the "burner is invisible"
+    // promise. The contract's callAsCharacter refund branch still tops the
+    // burner up between refills, so this is purely a fallback runway.
+    const feeBased = neededFee * 50n;
+    const floor = minBalance * 10n;
+    const targetTopup = feeBased > floor ? feeBased : floor;
     log.info('[burner-refill] funding delegate from main wallet', {
       delegate: this.delegateWallet.address,
       targetTopup: targetTopup.toString(),

@@ -173,28 +173,52 @@ class Dungeon {
   async move(direction) {
     const txPromise = this.notifyOnError(this.playerWallet.tx('move', this.character, direction));
     const movedPromise = this.cache.onceMoved();
-    return new Promise((resolve, reject) => {
-      movedPromise.then(resolve).catch(reject);
-      txPromise.catch(reject);
-    });
+    return this._waitForMove(txPromise, movedPromise);
   }
 
   async movePath(path) {
     const txPromise = this.notifyOnError(this.playerWallet.tx('movePath', this.character, path));
     const movedPromise = this.cache.onceMoved();
-    return new Promise((resolve, reject) => {
-      movedPromise.then(resolve).catch(reject);
-      txPromise.catch(reject);
-    });
+    return this._waitForMove(txPromise, movedPromise);
   }
 
   async teleport(location) {
     console.log(`teleporting to ${location}`);
     const txPromise = this.notifyOnError(this.playerWallet.tx('teleport', this.character, coordinatesToLocation(location)));
     const movedPromise = this.cache.onceMoved();
+    return this._waitForMove(txPromise, movedPromise);
+  }
+
+  // The 'move' socket event is the fast path: backend emits roomUpdates,
+  // statusUpdates, characterInfo in one shot and the cache reactively
+  // re-renders. But it can be missed — socket reconnect, indexer lag, event
+  // dispatched before our listener attached — and awaiting onceMoved alone
+  // hangs the caller forever in that case. MapRenderer._move does
+  // `await cache.move(...)` and leaves `myCharacter.moving = true` until it
+  // resolves, so a missed event produces exactly the symptom we're chasing:
+  // walking animation looping + room clicks ignored until full reload.
+  //
+  // Once the tx confirms on-chain we know the move happened, so we give the
+  // socket a short grace window for the event; if it still hasn't arrived,
+  // resync state from the backend and resolve manually.
+  _waitForMove(txPromise, movedPromise, fallbackMs = 4000) {
     return new Promise((resolve, reject) => {
-      movedPromise.then(resolve).catch(reject);
-      txPromise.catch(reject);
+      let settled = false;
+      const ok = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const ko = (e) => { if (!settled) { settled = true; reject(e); } };
+      movedPromise.then(ok);
+      txPromise.then(() => {
+        const t = setTimeout(async () => {
+          try {
+            await this.cache.resyncAfterMove();
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('move fallback resync failed', e);
+          }
+          ok({ fallback: true });
+        }, fallbackMs);
+        movedPromise.finally(() => clearTimeout(t));
+      }).catch(ko);
     });
   }
 
