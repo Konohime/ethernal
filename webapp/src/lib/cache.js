@@ -198,8 +198,12 @@ class Cache {
           // @TODO: this should be root event property, it shouldn't be necessary to dive down to get it
           const turnAction = duel && duel.log.length > 0 ? duel.log[duel.log.length - 1] : null;
 
+          // Socket-auth character IDs arrive as strings (idelegate split); this.characterId
+          // is always a Number — normalize or the strict check misroutes every turn.
+          const isMe = Number(character) === this.characterId;
+
           // If current player, start combat reveal before we update currentCombat
-          if (character === this.characterId) {
+          if (isMe) {
             log.info('myDuelTurn', {
               combat,
               characterStatus: this.characterStatus,
@@ -219,7 +223,7 @@ class Cache {
           this.applyStatusUpdates(statusUpdates);
 
           // Update other player's turn
-          if (character !== this.characterId) {
+          if (!isMe) {
             log.info('otherDuelTurn', {
               character,
               characterData: duel.attacker,
@@ -247,13 +251,15 @@ class Cache {
 
       this.on('character-escaped', ({ character, coordinates, statusUpdates }) => {
         this.applyStatusUpdates(statusUpdates);
-        if (character === this.characterId) {
+        // character arrives as a string from socket auth; this.characterId is a Number.
+        const isMe = Number(character) === this.characterId;
+        if (isMe) {
           // Clear stale combat reference so the map/UI don't show old combat data
           _currentCombat.set(null);
           this.calculateReachableRooms();
         }
         if (coordinates === this.characterCoordinates) {
-          if (character === this.characterId) {
+          if (isMe) {
             this._emitUpdate('characterEscaped', character);
           } else {
             this._emitUpdate('otherCharacterEscaped', character);
@@ -270,7 +276,7 @@ class Cache {
         }
         log.info(`character defeated at ${e.coordinates}`, e.statusUpdates);
         if (e.coordinates === this.currentRoom.coordinates && this.currentDuel) {
-          if (e.character === this.characterId) {
+          if (Number(e.character) === this.characterId) {
             this._emitUpdate('characterDefeated');
           } else {
             this._emitUpdate('otherCharacterDefeated', e.character);
