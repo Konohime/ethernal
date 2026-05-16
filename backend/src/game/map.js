@@ -137,7 +137,7 @@ class DungeonMap extends DungeonComponent {
     const { Dungeon, pureCall } = this.contracts;
     const location = coordinatesToLocation(coordinates);
     const roomData = await Dungeon.cached.getRoomInfo(location);
-    const { direction, areaAtDiscovery, lastRoomIndex, index, actualised, randomEvent } = roomData;
+    const { direction, areaAtDiscovery, lastRoomIndex, index, actualised, randomEvent, kind: storedKind } = roomData;
     const blockNumber = roomData.blockNumber.toNumber();
     const monsterBlockNumber = roomData.monsterBlockNumber.toNumber();
 
@@ -212,12 +212,18 @@ class DungeonMap extends DungeonComponent {
       // contract's `_checkMonster` and would either show phantom monsters
       // or hide real ones.
       if (monsterBlockHash && monsterBlockHash !== zeroHash) {
+        // Use the on-chain stored `kind`, exactly as the contract's
+        // _checkMonsterBlockNumber does (`_rooms[location].kind`). The locally
+        // recomputed `kind` is 0 whenever the room seed isn't available, and
+        // _generateMonsterIndex short-circuits to 0 for any non-NORMAL kind —
+        // so passing the recomputed value hides real monsters and the move
+        // reverts with "monster blocking" while the map shows no monster.
         const [monsterIndex] = await pureCall('generateMonsterIndex(uint256,bytes32,uint256,bool,uint8):(uint256)', [
           location,
           monsterBlockHash,
           1,
           blockNumber === monsterBlockNumber,
-          kind,
+          storedKind,
         ]);
         hasMonster = monsterIndex.toNumber() !== 0;
       }
