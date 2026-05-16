@@ -46,9 +46,10 @@
   }
 
   $: brokenGear =
-    [$characterSlots.attackGear, $characterSlots.defenseGear].filter(
-      ({ maxDurability, durability }) => maxDurability !== 0 && !durability,
-    ).length > 0;
+    $characterSlots &&
+    [$characterSlots.attackGear, $characterSlots.defenseGear]
+      .filter(Boolean)
+      .filter(({ maxDurability, durability }) => maxDurability !== 0 && !durability).length > 0;
 
   let isDisabled = false;
 
@@ -162,7 +163,7 @@
   <div class="{hidden ? 'canvas-hidden' : ''}">
     <Duel {toggleMonsterOverlayForEscape} />
   </div>
-{:else if ['blocked by monster'].includes($characterStatus)}
+{:else if ['blocked by monster'].includes($characterStatus) && monster}
   <div class="{hidden ? 'canvas-hidden' : ''}">
     <div class="box">
       <div class="inner">
