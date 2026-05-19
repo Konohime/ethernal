@@ -52,4 +52,11 @@ contract PlayerDataLayout {
     uint32 _dailyGrantsUsed;
     uint64 _dailyGrantsDay;
     mapping(address => bool) _onboarded;
+
+    // --- Configurable UBF fee multiplier (appended to preserve upgradeable storage layout) ---
+    // callAsCharacter computes poolFee = txCharge * _poolFeeMultiplier. A stored
+    // value of 0 is a sentinel meaning "use DEFAULT_POOL_FEE_MULTIPLIER", so a
+    // proxy upgrade that leaves this slot zero keeps the intended default with
+    // no migration step. Tunable by the proxy admin via setPoolFeeMultiplier.
+    uint256 _poolFeeMultiplier;
 }

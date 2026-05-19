@@ -14,6 +14,7 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     event DelegateRemoved(address indexed player, address indexed delegate);
     event TreasuryUpdated(address indexed treasury);
     event RefillFeeUpdated(uint16 bps);
+    event PoolFeeMultiplierUpdated(uint256 multiplier);
     event RefillFeeCollected(address indexed treasury, uint256 amount);
     event DelegateToppedUp(address indexed player, address indexed delegate, uint256 amount);
     event OnboardingFunded(address indexed from, uint256 amount);
@@ -21,6 +22,13 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
     event OnboardingConfigUpdated(uint256 grant, uint32 maxDaily);
 
     uint16 public constant MAX_REFILL_FEE_BPS = 1000; // 10% hard cap
+
+    // UBF fee multiplier: callAsCharacter charges poolFee = txCharge * multiplier.
+    // DEFAULT is used whenever _poolFeeMultiplier storage is 0 (e.g. right after
+    // a proxy upgrade). MAX hard-caps the setter so a misconfigured value can't
+    // brick movement by pushing the per-move energy burn past a player's bar.
+    uint256 public constant DEFAULT_POOL_FEE_MULTIPLIER = 2;
+    uint256 public constant MAX_POOL_FEE_MULTIPLIER = 20;
 
     // Restricted to the Pool (UBF) so sponsorOnboarding can push ETH back here.
     // Anyone else sending ETH would inflate this contract's balance without
@@ -38,6 +46,22 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         require(bps <= MAX_REFILL_FEE_BPS, "fee too high");
         _refillFeeBps = bps;
         emit RefillFeeUpdated(bps);
+    }
+
+    /// @notice Proxy-admin-only: tune the UBF fee multiplier. A lower value
+    /// gives players more moves per food refill but proportionally less UBF
+    /// (free-food) funding. Passing 0 resets to DEFAULT_POOL_FEE_MULTIPLIER.
+    function setPoolFeeMultiplier(uint256 multiplier) external onlyProxyAdmin {
+        require(multiplier <= MAX_POOL_FEE_MULTIPLIER, "multiplier too high");
+        _poolFeeMultiplier = multiplier;
+        emit PoolFeeMultiplierUpdated(multiplier);
+    }
+
+    /// @notice The effective UBF fee multiplier — resolves the 0 storage
+    /// sentinel to DEFAULT_POOL_FEE_MULTIPLIER.
+    function getPoolFeeMultiplier() external view returns (uint256) {
+        uint256 m = _poolFeeMultiplier;
+        return m == 0 ? DEFAULT_POOL_FEE_MULTIPLIER : m;
     }
 
     function setOnboardingConfig(uint256 grant, uint32 maxDaily) external onlyProxyAdmin {
@@ -206,13 +230,18 @@ contract Player is Proxied, PlayerDataLayout, MetaTransactionReceiver, Constants
         uint256 txCharge = ((initialGas - gasleft()) + 10000) * tx.gasprice;
         uint256 freeEnergyFee = (txCharge * 10) / 100; // 10% extra is used for free energy
 
-        // L8 (audit, NOT a fix): each player action burns ~11x its gas cost in
-        // energy (10x to UBF + 10% to freeEnergy). This is an intentional
-        // tokenomic decision per the original comment ("1000% is used for UBF")
-        // — sustainability of the UBF distribution depends on this multiplier.
-        // Verify the magnitude is still desired before any future tokenomics
-        // change; see audit report for context.
-        uint256 poolFee = txCharge * 10; // 1000% is used for UBF
+        // Per-move energy burn ~3.1x its gas cost at the default multiplier:
+        // poolFee to the UBF pool (below) + 10% to freeEnergy + ~1x to refund
+        // the burner's spent gas. The UBF multiplier is admin-tunable via
+        // setPoolFeeMultiplier — default 2x gives ~25 moves per full MAX_FOOD
+        // bar (down from the original hardcoded 10x / ~7 moves). Lower = more
+        // moves per refill but proportionally less UBF (free-food) funding;
+        // see audit note L8, MAX_POOL_FEE_MULTIPLIER bounds the worst case.
+        uint256 multiplier = _poolFeeMultiplier;
+        if (multiplier == 0) {
+            multiplier = DEFAULT_POOL_FEE_MULTIPLIER;
+        }
+        uint256 poolFee = txCharge * multiplier; // % of txCharge sent to UBF
 
         require(energy >= freeEnergyFee + poolFee, "not enough energy");
         energy -= (freeEnergyFee + poolFee);
