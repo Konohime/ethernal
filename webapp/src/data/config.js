@@ -29,12 +29,15 @@ const settings = Object.freeze({
     '80001': '1500000000000000',
     '77': '1000000000000000',
     '100': '100000000000000000',
-    // Lowered from 0.001 to 0.0001 ETH: on Base, ~250k gas at 0.05 gwei costs
-    // ~1.25e13 wei per move, so 1e14 still buffers ~8 moves between auto-top-ups.
-    // Drives onboarding sponsor cost down ~10x without affecting per-move math.
+    // 0.0003 ETH: a callAsCharacter move now budgets 1.1M gas, costing ~5.5e13
+    // wei to send at the 0.05 gwei floor. The on-chain refund in callAsCharacter
+    // only restores the burner to MIN_BALANCE, so this value sets the per-move
+    // buffer: 3e14 covers ~5 moves and absorbs gas spikes above the floor before
+    // a main-wallet refill popup is needed. The previous 1e14 (sized for a stale
+    // ~250k-gas move budget) only buffered ~1.8 moves, leaving no headroom.
     // Requires Player to be redeployed/upgraded (postUpgrade re-applies MIN_BALANCE).
-    '84532': '100000000000000', // 0.0001 ETH - Base Sepolia
-    '8453': '100000000000000',  // 0.0001 ETH - Base Mainnet
+    '84532': '300000000000000', // 0.0003 ETH - Base Sepolia
+    '8453': '300000000000000',  // 0.0003 ETH - Base Mainnet
   },
   gasPrice: {
     default: '1000000000',

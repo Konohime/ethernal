@@ -164,10 +164,40 @@ class Dungeon {
 
   async refill(value) {
     // @TODO: gas price
-    return nprogress.observe(
-      this.wallet.tx({ ...this.defaultOpts, value }, 'Player', 'refill').then(tx => tx.wait()),
-      this.cache.onceRefill(),
-    );
+    const txPromise = this.wallet
+      .tx({ ...this.defaultOpts, value }, 'Player', 'refill')
+      .then(tx => tx.wait());
+    return nprogress.observe(this._waitForRefill(txPromise, this.cache.onceRefill()));
+  }
+
+  // FoodScreen.refill awaits this through nprogress.observe, and the Refill
+  // button stays on its "Refilling..." loading state until it settles. The
+  // backend's 'refill' socket event (carrying fresh character info) is the
+  // normal completion signal, but it can be missed — socket reconnect,
+  // indexer lag — and then `onceRefill` never resolves, freezing the button
+  // forever. Same failure mode as the move hang fixed in _waitForMove: once
+  // the refill tx confirms on-chain the energy has landed, so give the event
+  // a short grace window then fall back to re-fetching character info.
+  _waitForRefill(txPromise, refilledPromise, fallbackMs = 4000) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const ok = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const ko = (e) => { if (!settled) { settled = true; reject(e); } };
+      refilledPromise.then(ok);
+      txPromise.then(() => {
+        const t = setTimeout(async () => {
+          try {
+            await this.cache.fetchAndApplyCharacterInfo();
+            this.cache.calculateReachableRooms();
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('refill fallback resync failed', e);
+          }
+          ok({ fallback: true });
+        }, fallbackMs);
+        refilledPromise.finally(() => clearTimeout(t));
+      }).catch(ko);
+    });
   }
 
   async move(direction) {
