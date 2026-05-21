@@ -19,7 +19,7 @@ const {
   balanceToAmounts,
   normalizeMonster,
 } = require('../data/utils');
-const { generateXp, generateCoins, generateKeys, share } = require('./utils');
+const { generateXp, generateCoins, generateKeys, share, coordinatesToLocation } = require('./utils');
 const DungeonComponent = require('./dungeonComponent.js');
 
 const opts = { gasLimit: 700000 };
@@ -403,6 +403,15 @@ class Combat extends DungeonComponent {
         } else {
           const {DungeonAdmin} = this.contracts;
           const hpChange = health - previousHealth;
+          // Movement is off-chain, so on-chain location/direction lag behind.
+          // characterEscaped derives the retreat room from both, so resync them
+          // to this fight room (and the recorded entry direction) first.
+          await DungeonAdmin.setCharacterPosition(
+            character,
+            coordinatesToLocation(coordinates),
+            Number(characterInfo.direction) || 0,
+            opts,
+          ).then(tx => tx.wait());
           const tx = await DungeonAdmin.characterEscaped(character, monster.id, hpChange, 0, opts);
           console.log('character escape tx ' + tx.hash);
           await tx.wait();

@@ -212,6 +212,57 @@ class Dungeon {
     return this._waitForMove(txPromise, movedPromise);
   }
 
+  // Off-chain movement between already-discovered rooms. No transaction is
+  // signed: the backend validates the path, updates position and emits the
+  // 'move' event the cache already listens for. Used for plain exploration;
+  // discovery and locked doors still go on-chain (see cache.move).
+  async walk(directions) {
+    // Register the move listener before emitting so a fast off-chain reply
+    // can't dispatch the 'move' broadcast before we're listening for it.
+    const movedPromise = this.cache.onceMoved();
+    const replyPromise = this.cache.action('walk', { path: directions });
+    return this._waitForWalk(replyPromise, movedPromise);
+  }
+
+  _waitForWalk(replyPromise, movedPromise, fallbackMs = 4000) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const ok = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const ko = (e) => { if (!settled) { settled = true; reject(e); } };
+      movedPromise.then(ok);
+      replyPromise.then(reply => {
+        if (reply && reply.error) {
+          ko(new Error(reply.error));
+          return;
+        }
+        // The backend acknowledged; if the 'move' broadcast was missed (socket
+        // reconnect, listener race) resync after a short grace window so the
+        // caller never hangs — same failure mode handled in _waitForMove.
+        const t = setTimeout(async () => {
+          try {
+            await this.cache.resyncAfterMove();
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('walk fallback resync failed', e);
+          }
+          ok({ fallback: true });
+        }, fallbackMs);
+        movedPromise.finally(() => clearTimeout(t));
+      }).catch(ko);
+    });
+  }
+
+  // On-chain discovery of an undiscovered room, decoupled from movement. The
+  // character is treated as standing in the already-discovered `fromCoordinates`
+  // (the backend has walked them there off-chain); the contract validates the
+  // exit, burns fragments, mints the Room NFT and arms the monster seed.
+  async discoverAt(fromCoordinates, direction) {
+    const fromLocation = coordinatesToLocation(fromCoordinates);
+    const txPromise = this.notifyOnError(this.playerWallet.tx('discoverAt', this.character, fromLocation, direction));
+    const movedPromise = this.cache.onceMoved();
+    return this._waitForMove(txPromise, movedPromise);
+  }
+
   async teleport(location) {
     console.log(`teleporting to ${location}`);
     const txPromise = this.notifyOnError(this.playerWallet.tx('teleport', this.character, coordinatesToLocation(location)));

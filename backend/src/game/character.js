@@ -23,7 +23,7 @@ class Character extends DungeonComponent {
 
   async prefetchEnter(characterId, playerAddress) {
     const { Player } = this.contracts;
-    await Player.cached.getPlayerInfo(playerAddress, characterId);
+    await Player.cached.getEnergy(playerAddress);
   }
 
   async handleEnter(characterId, playerAddress, name) {
@@ -243,7 +243,7 @@ class Character extends DungeonComponent {
   async reloadPlayerInfo(character, preloaded = null) {
     const { Player } = this.contracts;
     const info = preloaded || await this._info(character);
-    const { energy } = await Player.cached.getPlayerInfo(info.player, character);
+    const { energy } = await Player.cached.getEnergy(info.player);
     info.energy = energy.toString();
     await this.storeCharacter(info);
     return info;
@@ -254,13 +254,16 @@ class Character extends DungeonComponent {
     const characterInfo = await Dungeon.cached.getCharacterInfo(character);
     const stats = await this.decodeCharacterData(data || characterInfo.data);
     stats.levelXp = stats.level === 0 ? 0 : (await this.levelInfo(stats.level)).xpRequired;
-    const coordinates = locationToCoordinates(characterInfo.location);
     const [nextLevel, attackGear, defenseGear, info] = await Promise.all([
       this.levelInfo(stats.level + 1),
       this.dungeon.gear.info(characterInfo.attackGear),
       this.dungeon.gear.info(characterInfo.defenseGear),
       this._info(character),
     ]);
+    // On-chain `location` only advances at discovery / combat sync points now
+    // that movement is off-chain. The stored coordinates are the authoritative
+    // position, so preserve them and fall back to chain only for initialization.
+    const coordinates = (info && info.coordinates) || locationToCoordinates(characterInfo.location);
     const newInfo = {
       character,
       characterId: character,
@@ -362,7 +365,7 @@ class Character extends DungeonComponent {
     const characterInfo = await Dungeon.cached.getCharacterInfo(character);
     const [initialInfo, playerInfo, characterName, gear, stats, attackGear, defenseGear] = await Promise.all([
       this._info(character),
-      Player.cached.getPlayerInfo(player, character),
+      Player.cached.getEnergy(player),
       name || this.fetchCharacterName(character),
       this.dungeon.gear.balanceOf(character),
       this.decodeCharacterData(characterInfo.data),
@@ -375,7 +378,9 @@ class Character extends DungeonComponent {
       character,
       player,
       energy: playerInfo.energy.toString(),
-      coordinates: locationToCoordinates(characterInfo.location),
+      // Prefer the authoritative off-chain position; on-chain `location` lags
+      // behind real position now that movement is off-chain.
+      coordinates: (initialInfo && initialInfo.coordinates) || locationToCoordinates(characterInfo.location),
       characterId: character,
       characterName,
       stats,

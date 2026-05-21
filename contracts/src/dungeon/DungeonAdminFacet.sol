@@ -113,6 +113,19 @@ contract DungeonAdminFacet is DungeonFacetBase {
         _move(characterId, location, PureDungeon.DOWN);
     }
 
+    /// @dev With movement off-chain, `character.location` / `direction` only
+    /// advance at discovery points (discoverAt). Combat settlement functions
+    /// read both — characterEscaped derives the retreat room from
+    /// `character.location` and `character.direction`, updateCharacter
+    /// actualises `character.location` — so the backend resyncs them to the
+    /// room (and entry direction) where the fight actually happens before
+    /// settling.
+    function setCharacterPosition(uint256 characterId, uint256 location, uint8 direction) external onlyAdmin {
+        Character storage character = _characters[characterId];
+        character.location = location;
+        character.direction = direction;
+    }
+
     function monsterDefeated(uint256 location) external onlyAdmin {
         _blockHashRegister.save();
         Room storage room = _rooms[location];

@@ -20,7 +20,7 @@ import { combatText, statusesText, classes, notifications } from 'data/text';
 import quests from 'data/quests';
 import Message from 'lib/chat';
 import { escapeHtml, humanizeJoin, pluralize } from 'utils/text';
-import { bfs, encodeDirections, parseCoordinates, aroundCoordinates, identity } from 'utils/utils';
+import { bfs, encodeDirections, coordinatesInDirection, parseCoordinates, aroundCoordinates, identity } from 'utils/utils';
 import Walker from './walker';
 import cacheUrl from './cacheUrl';
 
@@ -580,11 +580,52 @@ class Cache {
     log.info('movement triggered to', coordinates, destination.parent.path, destination, this.characterCoordinates);
     if (directions.length === 0) {
       throw new Error('you are already there');
-    } else if (directions.length === 1) {
-      return this.dungeon.move(directions[0]);
-    } else {
-      return this.dungeon.movePath(directions);
     }
+
+    const labels = destination.parent.path;
+
+    // Entering an undiscovered room mints the Room NFT and burns fragments, so
+    // the final step is an on-chain discovery (discoverAt also burns the key if
+    // that door is locked). Only the off-chain walk up to the discovered
+    // neighbour must avoid a not-yet-unlocked locked door.
+    if (destination.status === 'undiscovered') {
+      const walkLabels = labels.slice(0, -1);
+      const discoverDirection = directions[directions.length - 1];
+      if (this._pathNeedsKey(walkLabels)) {
+        return directions.length === 1 ? this.dungeon.move(directions[0]) : this.dungeon.movePath(directions);
+      }
+      if (walkLabels.length > 0) {
+        await this.dungeon.walk(encodeDirections(walkLabels));
+      }
+      return this.dungeon.discoverAt(destination.parent.coordinates, discoverDirection);
+    }
+
+    // Crossing a locked door that this character hasn't unlocked yet burns a
+    // KEY (an item), so the first such crossing stays on-chain. Once unlocked,
+    // re-crossing is free and goes off-chain like any other move.
+    if (this._pathNeedsKey(labels)) {
+      return directions.length === 1 ? this.dungeon.move(directions[0]) : this.dungeon.movePath(directions);
+    }
+
+    // Plain exploration between already-discovered rooms: fully off-chain.
+    return this.dungeon.walk(directions);
+  }
+
+  // True if walking `pathLabels` from the current room crosses a locked door
+  // the character has not unlocked yet (would burn a key). Already-unlocked
+  // doors are tracked in `this.moves` (populated from on-chain move history),
+  // so re-crossing them does not require a transaction.
+  _pathNeedsKey(pathLabels = []) {
+    let current = this.characterCoordinates;
+    for (const direction of pathLabels) {
+      const room = this.rooms[current];
+      const locked = room && room.locks && room.locks[direction];
+      if (locked && !this.moves.isExitVisited(current, direction)) {
+        return true;
+      }
+      current = coordinatesInDirection(current, direction);
+    }
+    return false;
   }
 
   onMove(callback) {

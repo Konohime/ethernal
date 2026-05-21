@@ -456,7 +456,7 @@ class Character extends PIXI.Container {
     // this.current = this.nameTag;
 
     const info = this.ui.cache.onlineCharacters[this.charId];
-    let text = info ? info.characterName : '';
+    let text = (info && info.characterName) || '';
     if (text.length > 19) {
       text = `${text.substr(0, 16)}${ELLIPSIS}`;
     }

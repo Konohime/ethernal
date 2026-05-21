@@ -8,11 +8,13 @@ const jsonDiff = require('json-diff');
 const { cleanRoom, monsterLevel, toMap, identity, randomItem } = require('../data/utils');
 const {
   coordinatesAt,
+  coordinatesInDirection,
   locationToCoordinates,
   locationToBounty,
   coordinatesToLocation,
   decodeDirections,
   decodeExits,
+  order,
   bfs,
 } = require('./utils');
 const DungeonComponent = require('./dungeonComponent.js');
@@ -29,6 +31,78 @@ class DungeonMap extends DungeonComponent {
   constructor(dungeon) {
     super(dungeon);
     this.sockets.onCharacter('subscribe-rooms', this.handleSubscribeRooms.bind(this));
+    this.sockets.onCharacter('walk', this.handleWalk.bind(this));
+  }
+
+  // Off-chain movement between already-discovered rooms. No transaction is
+  // sent: the backend is the authority on the character's position. The two
+  // things that still carry an on-chain consequence are rejected here so the
+  // webapp falls back to a transaction for them:
+  //   - entering an undiscovered room (discovery mints the Room NFT / burns
+  //     fragments -> use discoverAt)
+  //   - crossing a locked exit (traversal burns a KEY -> use move/movePath)
+  // Everything else is validated with the same exit logic the contract uses
+  // (Exits.validExit mirrors _moveTo) and applied directly to the DB.
+  async handleWalk(character, { path = [] } = {}) {
+    if (!Array.isArray(path) || path.length === 0 || path.length > 25) {
+      throw new Error('invalid number of directions');
+    }
+    const characterMod = this.dungeon.character;
+    const info = await characterMod._info(character);
+    if (!info || !info.coordinates) {
+      throw new Error('character not in dungeon');
+    }
+    if (info.stats && info.stats.health === 0) {
+      throw new Error('your character is dead');
+    }
+    const from = info.coordinates;
+    let current = from;
+    const labels = [];
+    for (const raw of path) {
+      const direction = Number(raw);
+      const room = await this._room(current);
+      if (!room || !room.blockNumber) {
+        throw new Error('cant move this way');
+      }
+      if (room.hasMonster) {
+        throw new Error('monster blocking');
+      }
+      const [exit, lock] = await this.exits.validExit(room, direction);
+      if (!exit) {
+        throw new Error('cant move this way');
+      }
+      const next = coordinatesInDirection(current, direction);
+      const nextRoom = await this._room(next);
+      if (!nextRoom || !nextRoom.blockNumber) {
+        throw new Error('room not discovered');
+      }
+      // Crossing a locked door burns a KEY (an item). The first traversal must
+      // be on-chain; once the contract has recorded the unlock for this
+      // character, subsequent crossings are free and allowed off-chain.
+      if (lock && !(await this._isExitUnlocked(character, current, next))) {
+        throw new Error('locked exit requires on-chain move');
+      }
+      current = next;
+      labels.push(order[direction]);
+    }
+    if (current === from) {
+      throw new Error('you are already there');
+    }
+    info.coordinates = current;
+    await characterMod.storeCharacter(info);
+    await this.move(character, from, current, path.length > 1 ? 2 : 0, labels, null);
+    return { from, to: current };
+  }
+
+  // Reads the on-chain per-character unlock flag for the door between two
+  // adjacent rooms. Locations are ordered (min, max) to match how the contract
+  // stores `_unlockedExits` in _handleKey.
+  async _isExitUnlocked(character, fromCoords, toCoords) {
+    const { Dungeon } = this.contracts;
+    const a = BigInt(String(coordinatesToLocation(fromCoords)));
+    const b = BigInt(String(coordinatesToLocation(toCoords)));
+    const [loc1, loc2] = a < b ? [a, b] : [b, a];
+    return Dungeon.isUnlocked(character, loc1.toString(), loc2.toString());
   }
 
   registerEventHandlers() {
@@ -304,6 +378,15 @@ class DungeonMap extends DungeonComponent {
       }
       const characterInfo = await this.dungeon.character._info(character);
       characterInfo.coordinates = to;
+      // Record the entry direction into the destination room. With movement
+      // off-chain, on-chain `character.direction` is stale, so the backend
+      // keeps the authoritative value here and syncs it before combat escape.
+      if (Array.isArray(path) && path.length > 0) {
+        const entry = order.indexOf(path[path.length - 1]);
+        if (entry >= 0) {
+          characterInfo.direction = entry;
+        }
+      }
       await this.dungeon.character.storeCharacter(characterInfo);
       this.sockets.emit('move', {
         character,

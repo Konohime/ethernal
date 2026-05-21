@@ -16,12 +16,12 @@
   $: classNames = [boxClassName, $$props.class, mode && `mode-${mode}`].filter(Boolean).join(' ');
 
   $: info = character || $characterInfo;
-  $: isMe = info.character == $characterId;
+  $: isMe = info && info.character == $characterId;
 
-  $: canLevelUp = info.nextLevel && info.stats && info.stats.xp >= info.nextLevel.xpRequired && info.stats.level < 9;
-  $: isDead = ['just died', 'dead'].includes(info.status.status);
+  $: canLevelUp = info && info.nextLevel && info.stats && info.stats.xp >= info.nextLevel.xpRequired && info.stats.level < 9;
+  $: isDead = info && info.status && ['just died', 'dead'].includes(info.status.status);
   $: isDisabled = isMe && isDead;
-  $: isOnline = !!$onlineCharacters[info.character] && !isDead;
+  $: isOnline = info && !!$onlineCharacters[info.character] && !isDead;
   $: isBagLayout = $$props.class === 'as-bag-layout';
 </script>
 
@@ -149,6 +149,7 @@
   }
 </style>
 
+{#if info && info.stats}
 <div class="box {classNames}">
   <div>
     <div class="avatar">
@@ -222,10 +223,11 @@
       </div>
     </div>
 
-    {#if mode === 'profile' && !isDead}
+    {#if mode === 'profile' && !isDead && info.status}
       <div class="status-wrap">
         <p>Status: {info.status.status}</p>
       </div>
     {/if}
   </div>
 </div>
+{/if}

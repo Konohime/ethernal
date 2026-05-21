@@ -6,8 +6,9 @@ const {
   decodeDirections,
   coordinatesInDirection,
   coordinatesToLocation,
+  order,
 } = require('../../backend/src/game/utils');
-const {setupContracts, walk, expectError, giveKeys, moveTo, roomInfo, waitFor} = require('../lib');
+const {setupContracts, walk, expectError, giveKeys, moveTo, roomInfo, waitFor, characterCoordinates} = require('../lib');
 
 describe('Movement', function () {
   it('cannot path from not actualized room', async function () {
@@ -120,6 +121,67 @@ describe('Movement', function () {
       await expectError(playerWallet.tx('movePath', setup.characterId, directions));
       assert.equal(await blockNumber(destination), 0);
       assert.equal(await blockNumber(undiscovered2), 0);
+    });
+  });
+
+  describe('discoverAt', function () {
+    let setup, rooms, playerWallet;
+
+    const blockNumber = async destination =>
+      roomInfo(destination.coordinates).then(({blockNumber}) => Number(blockNumber));
+
+    const closestUndiscovered = () =>
+      Object.values(rooms)
+        .filter(({status}) => status === 'undiscovered')
+        .sort((a, b) => a.parent.distance - b.parent.distance)[0];
+
+    beforeEach(async function () {
+      setup = await setupContracts();
+      playerWallet = setup.playerWallet;
+      rooms = bfs(await walk(setup, 1));
+    });
+
+    it('discovers an adjacent undiscovered room from a discovered neighbor', async function () {
+      const destination = closestUndiscovered();
+      const fromLocation = coordinatesToLocation(destination.parent.coordinates);
+      const direction = order.indexOf(destination.parent.exit);
+      assert.equal(await blockNumber(destination), 0);
+      await waitFor(playerWallet.tx('discoverAt', setup.characterId, fromLocation, direction));
+      assert.notEqual(await blockNumber(destination), 0);
+      assert.equal(await characterCoordinates(setup.characterId), destination.coordinates);
+    });
+
+    it('reverts when the from room is not discovered', async function () {
+      const destination = closestUndiscovered();
+      const direction = order.indexOf(destination.parent.exit);
+      const fromLocation = coordinatesToLocation(destination.coordinates);
+      await expectError(
+        playerWallet.tx('discoverAt', setup.characterId, fromLocation, direction),
+        'from room not discovered',
+      );
+    });
+
+    it('reverts when the target room is already discovered', async function () {
+      const destination = closestUndiscovered();
+      const fromLocation = coordinatesToLocation(destination.parent.coordinates);
+      const direction = order.indexOf(destination.parent.exit);
+      await waitFor(playerWallet.tx('discoverAt', setup.characterId, fromLocation, direction));
+      await expectError(
+        playerWallet.tx('discoverAt', setup.characterId, fromLocation, direction),
+        'room already discovered',
+      );
+    });
+
+    it('reverts when the from room has no exit toward the direction', async function () {
+      const from = rooms['0,0'];
+      const direction = [0, 1, 2, 3].find(d => !from.allExits.includes(order[d]));
+      if (direction === undefined) {
+        this.skip();
+      }
+      await expectError(
+        playerWallet.tx('discoverAt', setup.characterId, coordinatesToLocation('0,0'), direction),
+        'cant move this way',
+      );
     });
   });
 });

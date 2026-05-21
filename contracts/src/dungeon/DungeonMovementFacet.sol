@@ -105,6 +105,35 @@ contract DungeonMovementFacet is DungeonFacetBase {
         _move(characterId, newLocation, direction);
     }
 
+    /// @dev Discovery decoupled from on-chain movement. Off-chain the backend
+    /// is the authority on the character's position; movement between
+    /// already-discovered rooms emits no transaction. Only crossing into an
+    /// undiscovered room hits the chain, because that is where items live:
+    /// _discoverRoom burns FRAGMENTS, mints the Room NFT and arms the
+    /// commit-reveal monster seed.
+    ///
+    /// The spatial anti-cheat invariant is preserved at the contract level:
+    /// `fromLocation` must be a discovered room with an open exit toward
+    /// `direction` (validated by _moveTo), and the target must still be
+    /// undiscovered. The only relaxation versus `move` is that we trust the
+    /// caller (the player's wallet, gated by the off-chain backend) about
+    /// which discovered room the character currently stands in, instead of
+    /// reading a stale on-chain `character.location`. We re-sync the on-chain
+    /// location to `fromLocation` before discovering so the numActiveCharacters
+    /// bookkeeping in _move stays coherent across discovery points.
+    function discoverAt(uint256 characterId, uint256 fromLocation, uint8 direction) external onlyPlayer {
+        _blockHashRegister.save();
+        Character storage character = _characters[characterId];
+        require(_getCharacterData(characterId).hp > 0, "your character is dead");
+        require(_rooms[fromLocation].blockNumber > 0, "from room not discovered");
+        _actualiseRoom(fromLocation);
+        character.location = fromLocation;
+        uint256 newLocation = _moveTo(characterId, fromLocation, direction);
+        require(_rooms[newLocation].blockNumber == 0, "room already discovered");
+        emit CharacterMoved(characterId, fromLocation, newLocation, 0, direction);
+        _move(characterId, newLocation, direction);
+    }
+
     function movePath(uint256 characterId, uint8[] calldata directions) external onlyPlayer {
         require(directions.length > 0 && directions.length <= 5, "invalid number of directions");
         _blockHashRegister.save();

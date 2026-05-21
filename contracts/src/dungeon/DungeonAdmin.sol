@@ -129,6 +129,10 @@ contract DungeonAdmin {
         }
     }
 
+    function setCharacterPosition(uint256 characterId, uint256 location, uint8 direction) external onlyBackend {
+        _dungeon.setCharacterPosition(characterId, location, direction);
+    }
+
     function generateRoomIncome(uint256 location, address benefactor, uint16[8] calldata income) external onlyBackend {
         _dungeon.generateRoomIncome(location, benefactor, income);
     }
