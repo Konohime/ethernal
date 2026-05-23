@@ -561,7 +561,7 @@ class MapRenderer {
 
     if (!old && newest.onlineCharacters?.length) {
       newest.onlineCharacters.forEach(character => {
-        if (character === cache.characterId) {
+        if (Number(character) === cache.characterId) {
           // Skip adding my character if a move is in progress — the path animation
           // and characterMoved event handle this. Adding here with from=null causes
           // moveMyCharacter to teleport (fade out) the character unexpectedly.
@@ -943,7 +943,7 @@ class MapRenderer {
     }
     chunk.contentUpper.addChild(character);
 
-    if (charId === this.myCharacter.charId) {
+    if (this.myCharacter && Number(charId) === Number(this.myCharacter.charId)) {
       this.moveMyCharacter(from, to);
       return;
     }
@@ -1779,6 +1779,9 @@ class MapRenderer {
    * @private
    */
   async _move(to) {
+    if (!this.myCharacter) {
+      return;
+    }
     const from = global.dungeon.cache.currentRoom.coordinates;
     moving = true;
 
