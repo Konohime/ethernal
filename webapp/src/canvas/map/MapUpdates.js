@@ -47,7 +47,7 @@ class MapUpdates {
           // Update room actions for player only if they are in that room
           if (
             newest.coordinates === this.cache.characterCoordinates &&
-            newest.onlineCharacters?.includes(this.cache.characterId)
+            newest.onlineCharacters?.some(id => Number(id) === this.cache.characterId)
           ) {
             this.map.displayRoomActions(newest.coordinates);
           }
@@ -57,7 +57,7 @@ class MapUpdates {
 
     cache.onUpdate('characterUpdated', ({ character, coordinates }) => {
       // Update room actions for current player if character update matches known coordinates
-      if (character === cache.characterId && coordinates === cache.characterCoordinates) {
+      if (Number(character) === cache.characterId && coordinates === cache.characterCoordinates) {
         this.map.displayRoomActions(cache.characterCoordinates);
       }
     });
@@ -75,7 +75,7 @@ class MapUpdates {
         } else if (!fromActive && toActive) {
           this.map.addCharacter(character, to);
         }
-        if (character === this.cache.characterId && mode === 1) {
+        if (Number(character) === this.cache.characterId && mode === 1) {
           setTimeout(() => this.map.refocus(to), 500);
         }
       } else {
@@ -111,19 +111,19 @@ class MapUpdates {
     });
 
     cache.onUpdate('onlineCharacterAdded', ({ character, coordinates, status: { status: characterStatus } }) => {
-      if (cache.characterId !== character && this.map.isRoomActive(coordinates)) {
+      if (cache.characterId !== Number(character) && this.map.isRoomActive(coordinates)) {
         this.map.addCharacter(character, coordinates, characterStatus);
       }
     });
 
     cache.onUpdate('onlineCharacterRemoved', character => {
-      if (cache.characterId !== character) {
+      if (cache.characterId !== Number(character)) {
         this.map.removeCharacter(character);
       }
     });
 
     cache.onUpdate('characterStatus', ({ character, status }) => {
-      const isMe = character === cache.characterId;
+      const isMe = Number(character) === cache.characterId;
       const coordinates = isMe
         ? cache.characterCoordinates
         : cache.onlineCharacters[character] && cache.onlineCharacters[character].coordinates;

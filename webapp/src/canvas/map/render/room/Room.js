@@ -909,7 +909,7 @@ class Room extends Dirtable {
     let offset = 0;
     /** {Array} */
     const chars = [...Object.values(global.dungeon.cache.onlineCharacters)].sort((a, b) => {
-      return a.charId - b.charId;
+      return Number(a.character) - Number(b.character);
     });
 
     const isCharacterAt = (_charId, x, y) => {
@@ -944,7 +944,7 @@ class Room extends Dirtable {
           }
         } while (isACharAt(position.x, position.y));
 
-        if (char.characterId === charId) {
+        if (Number(char.character) === Number(charId)) {
           return this.positions[offset];
         }
         if (char.coordinates === this.coordinates) {

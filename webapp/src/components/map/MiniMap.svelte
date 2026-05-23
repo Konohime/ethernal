@@ -149,7 +149,7 @@
   const displayOnlineCharacters = () => {
     const prev = Object.keys(markers.players);
     Object.values($onlineCharacters).forEach(({ character, coordinates: coords }) => {
-      if (!coords || $characterId === character) {
+      if (!coords || $characterId === Number(character)) {
         return;
       }
       const latLng = coordsToLatLng(coords);

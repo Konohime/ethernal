@@ -93,7 +93,7 @@ class Cache {
 
       this.on('character-joined', ({ characterInfo: info }) => {
         // I DONT THINK THIS GETS CALLED AS JOINED CALLS BEFORE THE AWAITS BEFORE
-        if (info.character === this.characterId) {
+        if (Number(info.character) === this.characterId) {
           log.info('my character joined', info);
           if (info.status && !info.status.newCharacter && this.currentRoom) {
             this.pushHistory(this.currentRoom.entry, 1);
@@ -109,7 +109,7 @@ class Cache {
       this.on(
         'left',
         ({ character }) => this.characterLeft(character),
-        ({ character }) => character !== this.characterId,
+        ({ character }) => Number(character) !== this.characterId,
       );
 
       this.on('move', e => {
@@ -287,7 +287,7 @@ class Cache {
       this.on(
         'levelup',
         _ => this.fetchAndApplyCharacterInfo(),
-        ({ character }) => character === this.characterId,
+        ({ character }) => Number(character) === this.characterId,
       );
 
       this.on('heal', ({ characterInfo }) => this.applyCharacterInfo(characterInfo));
@@ -299,13 +299,13 @@ class Cache {
           await tick();
           this.calculateReachableRooms();
         },
-        ({ character }) => character === this.characterId,
+        ({ character }) => Number(character) === this.characterId,
       );
 
       this.on(
         'equip',
         _ => this.fetchAndApplyCharacterInfo(),
-        ({ character }) => character === this.characterId,
+        ({ character }) => Number(character) === this.characterId,
       );
 
       this.on(
@@ -316,7 +316,7 @@ class Cache {
           this.pushHistory(text, 0);
           notificationOverlay.open('generic', { text, image: gearImage(gear) });
         },
-        ({ character }) => character === this.characterId,
+        ({ character }) => Number(character) === this.characterId,
       );
 
       this.on(
@@ -331,7 +331,7 @@ class Cache {
       this.on('unique-gear-minted', e => {
         this.fetchUniqueGearAvailable();
 
-        if (e.character === this.characterId) {
+        if (Number(e.character) === this.characterId) {
           this.pushHistory(statusesText.rareArtFound);
         } else {
           // how to mock, run in console:
@@ -427,7 +427,7 @@ class Cache {
       });
 
       this.on('bounty-added', ({ character, coordinates, characterInfo, room }) => {
-        if (character !== this.characterId) {
+        if (Number(character) !== this.characterId) {
           notificationOverlay.open('generic', {
             text: `<em>${escapeHtml(characterInfo.characterName)}</em> added a bounty on a monster.`,
             coordinates
@@ -470,14 +470,14 @@ class Cache {
           mapModal.close();
           await this.fetchQuests();
           questUpdate.set({ id, quest });
-          if (character === this.characterId) {
+          if (Number(character) === this.characterId) {
             this._emitUpdate('characterUpdated', { character, coordinates: this.characterCoordinates });
           }
           if (quests[id] && quests[id].notification && quest.status === 'claiming') {
             notificationOverlay.open('questFinish', { questId: id });
           }
         },
-        ({ character }) => character === this.characterId,
+        ({ character }) => Number(character) === this.characterId,
       );
 
       // Debug 'transfer' and 'exchange' listeners removed: each cache.on() call
@@ -629,7 +629,7 @@ class Cache {
   }
 
   onMove(callback) {
-    this.on('move', callback, e => e.character === this.characterId, 2);
+    this.on('move', callback, e => Number(e.character) === this.characterId, 2);
   }
 
   onAnyMove(callback) {
@@ -653,7 +653,7 @@ class Cache {
   }
 
   async onceMoved() {
-    const result = await this.once('move', e => e.character === this.characterId);
+    const result = await this.once('move', e => Number(e.character) === this.characterId);
     // `cache.on('move', ...)` wraps its handler in setTimeout(cb, priority), so
     // `applyMove`/`calculateReachableRooms` are scheduled as macrotasks. Our
     // `once` listener, registered via socket.on directly, resolves synchronously
@@ -665,15 +665,15 @@ class Cache {
   }
 
   async onceEquipped(gear) {
-    return this.once('equip', e => e.character === this.characterId && e.gear.id === gear.id);
+    return this.once('equip', e => Number(e.character) === this.characterId && e.gear.id === gear.id);
   }
 
   async onceLevelUp(newLevel) {
-    return this.once('levelup', e => e.character === this.characterId && e.newLevel === newLevel);
+    return this.once('levelup', e => Number(e.character) === this.characterId && e.newLevel === newLevel);
   }
 
   async onceRefill() {
-    return this.once('refill', e => e.character === this.characterId);
+    return this.once('refill', e => Number(e.character) === this.characterId);
   }
 
   async fetchAll() {
@@ -769,7 +769,7 @@ class Cache {
     if (characterInfos) {
       characterInfos.map(info => {
         this.applyCharacterInfo(info);
-        if (reorg && info.character === this.characterId && info.coordinates !== this.currentRoom.coordinates) {
+        if (reorg && Number(info.character) === this.characterId && info.coordinates !== this.currentRoom.coordinates) {
           this.applyMove({
             character: this.characterId,
             from: this.currentRoom.coordinates,
@@ -863,7 +863,7 @@ class Cache {
   }
 
   applyMove(move, init = false) {
-    if (move.character === this.characterId) {
+    if (Number(move.character) === this.characterId) {
       this.moves.useExits(move);
       const from = this.rooms[move.from];
       const to = this.rooms[move.to];
@@ -902,7 +902,7 @@ class Cache {
           this.rooms,
           this.moves,
           move.from,
-          move.character === this.characterId ? get(_characterBalances).keys : move.characterInfo.keys,
+          Number(move.character) === this.characterId ? get(_characterBalances).keys : move.characterInfo.keys,
         )[move.to].parent.path;
       } catch (_) {
         move.path = bfs(this.rooms, this.moves, move.from, null, 5, true, true)[move.to].parent.path;
@@ -1144,7 +1144,7 @@ class Cache {
 
   scavengeEventToText({ character, coins, keys, gear, elements }) {
     // @TODO - MOVE TO I18N, SUPPORT PLURALIZATION, SMART "AND" PHRASE JOINING.
-    const text = `${character === this.characterId ? 'You' : 'Someone else'} scavenged`;
+    const text = `${Number(character) === this.characterId ? 'You' : 'Someone else'} scavenged`;
     const items = [];
     if (gear) {
       items.push(gear.name);
