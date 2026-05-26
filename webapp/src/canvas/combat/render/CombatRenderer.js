@@ -712,6 +712,10 @@ class CombatRenderer {
     [this.uiAttackSelectButton, this.uiDefenseSelectButton].forEach(button => {
       button.visible = true;
       button.enable();
+      // Re-attach the normal-state graphics. A button left in a stale pressed/hover
+      // render from the click that ended the previous turn could otherwise stay
+      // interactive (clickable) without drawing its visible frame.
+      button.renderNormal();
       button.updateTransform();
     });
 

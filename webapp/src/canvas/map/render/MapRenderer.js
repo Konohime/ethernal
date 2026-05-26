@@ -89,6 +89,7 @@ class MapRenderer {
     this.rooms = {};
     this.floor = 0;
     this.previousReachable = [];
+    this.destroyed = false;
 
     this.root = new PIXI.Container();
 
@@ -432,13 +433,10 @@ class MapRenderer {
     this.container.addChild(this.arrowContainer);
     this.container.addChild(this.charMenu);
 
-    subscribe(reachableRooms, reachable => {
-      // eslint-disable-next-line no-console
-      console.log('[MapRenderer] reachableRooms subscribe', {
-        count: Object.keys(reachable || {}).length,
-        keys: Object.keys(reachable || {}),
-        activeChunks: this.activeChunks?.length,
-      });
+    this._unsubReachable = subscribe(reachableRooms, reachable => {
+      if (this.destroyed) {
+        return;
+      }
       Object.keys(reachable).forEach(coordinates => {
         this.createChunk(coordinatesChunkId(coordinates));
       });
@@ -490,8 +488,14 @@ class MapRenderer {
     this.camera.onPostUpdate();
   }
 
+  destroy() {
+    this.destroyed = true;
+    this._unsubReachable?.();
+    this._unsubReachable = null;
+  }
+
   doCull(force = false) {
-    if (!this.chunks.size) {
+    if (!this.chunks.size || this.destroyed || !this.app?.screen) {
       return;
     }
 
@@ -873,6 +877,13 @@ class MapRenderer {
     const roomTo = this.rooms[to];
 
     const character = this.myCharacter;
+    // eslint-disable-next-line no-console
+    console.log(`[diag move] from=${from} to=${to}`
+      + ` charXY=${character && character.x.toFixed(1)},${character && character.y.toFixed(1)}`
+      + ` centerXY=${roomTo && roomTo.center.x},${roomTo && roomTo.center.y}`
+      + ` dY=${character && roomTo ? (character.y - roomTo.center.y).toFixed(1) : '?'}`
+      + ` parentY=${character && character.parent ? character.parent.position.y : '?'}`
+      + ` chunkPosY=${roomTo ? roomTo.chunk.position.y : '?'}`);
     this.rooms[to].updateTeleporter();
 
     if (roomTo.isMyCharacterInRoom()) {
@@ -1835,6 +1846,15 @@ class MapRenderer {
           this.myCharacter.moving = false;
           if (toRoom) {
             toRoom.setLight(0x0);
+          }
+          // eslint-disable-next-line no-console
+          {
+            const r = this.rooms[to];
+            console.log(`[diag finished] to=${to}`
+              + ` charXY=${this.myCharacter.x.toFixed(1)},${this.myCharacter.y.toFixed(1)}`
+              + ` centerXY=${r ? r.center.x : '?'},${r ? r.center.y : '?'}`
+              + ` dY=${r ? (this.myCharacter.y - r.center.y).toFixed(1) : '?'}`
+              + ` currentRoom=${global.dungeon.cache.currentRoom && global.dungeon.cache.currentRoom.coordinates}`);
           }
         },
       );

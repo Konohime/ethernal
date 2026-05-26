@@ -173,14 +173,16 @@ class UIDeck extends PIXI.Container {
       }
     });
 
-    this._currentEase = ease.add(this, { alpha: 1 }, { duration: 600 });
-    this._currentEaseCallback = callback ? () => callback.call() : null;
-    this._currentEase.on('complete', () => {
-      this._currentEase = null;
-      const cb = this._currentEaseCallback;
-      this._currentEaseCallback = null;
-      if (cb) cb();
-    });
+    // Show the deck fully opaque immediately rather than tweening alpha 0->1.
+    // The cards are made interactive (enable()) above, and alpha does NOT block
+    // PIXI hit-testing — only `visible` does. If the fade-in tween was ever
+    // interrupted or failed to complete across a turn cycle, the deck was left at
+    // alpha 0: invisible yet still clickable, which is exactly the "the squares
+    // disappear after the first round but I can still click them" bug. Setting
+    // alpha directly makes the visible state independent of any async animation.
+    this._currentEaseCallback = null;
+    this.alpha = 1;
+    if (callback) callback.call();
     this.emit('show');
   }
 

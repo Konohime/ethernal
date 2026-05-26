@@ -729,6 +729,29 @@
               "internalType": "uint256",
               "name": "location",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "direction",
+              "type": "uint8"
+            }
+          ],
+          "name": "setCharacterPosition",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "characterId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "location",
+              "type": "uint256"
             }
           ],
           "name": "teleportCharacter",
@@ -1284,6 +1307,29 @@
             }
           ],
           "name": "actualiseRoom",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "characterId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fromLocation",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "direction",
+              "type": "uint8"
+            }
+          ],
+          "name": "discoverAt",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -5627,7 +5673,7 @@
       ]
     },
     "DungeonAdmin": {
-      "address": "0xB5B0596bcD541671486e4a5acAa90136CbCb53E9",
+      "address": "0xf666f266756E09752154739927F9770a0421D06D",
       "abi": [
         {
           "inputs": [
@@ -5919,6 +5965,29 @@
             }
           ],
           "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "characterId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "location",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "direction",
+              "type": "uint8"
+            }
+          ],
+          "name": "setCharacterPosition",
+          "outputs": [],
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {

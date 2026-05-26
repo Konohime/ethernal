@@ -19,7 +19,27 @@
       "Read(//c/Users/korok/Documents/GitHub/ethernal/**)",
       "Bash(find webapp/src -name \"MapUpdates.js\")",
       "Bash(git commit -m ' *)",
-      "Bash(git -C C:/Users/korok/Documents/GitHub/ethernal merge --ff-only claude/jovial-sinoussi-445503)"
+      "Bash(git -C C:/Users/korok/Documents/GitHub/ethernal merge --ff-only claude/jovial-sinoussi-445503)",
+      "Bash(npx hardhat *)",
+      "Bash(cd /c/Users/korok/Documents/GitHub/ethernal/backend && grep -nE \"storeCharacter|_info|coordinates|info\\\\\\(|reloadCharacterStats|location\" src/game/character.js | head -50)",
+      "Bash(node -e \"require\\('./src/game/map.js'\\); console.log\\('map.js OK'\\)\")",
+      "Bash(node -e \"require\\('./src/game/character.js'\\); console.log\\('character.js OK'\\)\")",
+      "Bash(node --check src/game/map.js)",
+      "Bash(node --check src/game/character.js)",
+      "Bash(awk 'NR>=326 && NR<=400' src/game/map.js)",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"require\\('./src\")",
+      "Bash(xargs grep -lE \"monsterDefeated|characterEscaped|characterDefeated|updateCharacter\")",
+      "Bash(node --check src/game/combat.js)",
+      "Bash(cd /c/Users/korok/Documents/GitHub/ethernal/webapp && grep -nE \"calculateReachableRooms|reachableRooms|\\\\.emit\\\\\\(|socket\\\\.emit|this\\\\.socket|subscribe-rooms|status.*undiscovered|undiscovered\" src/lib/cache.js | head -40)",
+      "Bash(cd /c/Users/korok/Documents/GitHub/ethernal/contracts && grep -nE \"isUnlocked|_unlockedExits|function .*[Uu]nlock|getRoomInfo|getCharacterInfo\" src/dungeon/DungeonInfoFacet.sol src/dungeon/ReadOnlyDungeon.sol | head)",
+      "Bash(cd /c/Users/korok/Documents/GitHub/ethernal/webapp && grep -nE \"coordinatesInDirection\" src/utils/utils.js | tail -5; echo \"=== exports block ===\"; sed -n '199,230p' src/utils/utils.js)",
+      "Bash(awk 'NR>=320 && NR<=410 && /event/' src/game/map.js)",
+      "Bash(node -e ' *)",
+      "Bash(git reset *)",
+      "Bash(git push *)",
+      "Bash(node -e \"require\\('@babel/core'\\).transformFileSync\\('src/canvas/combat/render/ui/deck/UIDeck.js'\\); require\\('@babel/core'\\).transformFileSync\\('src/canvas/combat/render/CombatRenderer.js'\\); console.log\\('OK: both files parse'\\);\")",
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies['pixi.js'] || require\\('./package.json'\\).devDependencies['pixi.js']\\)\")"
     ]
   }
 }

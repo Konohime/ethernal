@@ -308,6 +308,10 @@
 
   onDestroy(() => {
     window.removeEventListener('resize', resize);
+    if (map) {
+      map.destroy();
+      map = null;
+    }
     if (app) {
       app.destroy(true, { children: true, texture: true, baseTexture: true });
     }
