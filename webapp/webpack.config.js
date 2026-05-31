@@ -26,8 +26,9 @@ const environments = {
   staging: {
     assetEnv: 'dev',
     contracts: './contracts/staging.json',
-    serverList: 'https://181boa3ktb.execute-api.us-east-1.amazonaws.com/default/serverList-dev',
-    cache: 'https://ethernal-be-alpha.herokuapp.com',
+    serverList: '',
+    // URL publique du backend (Railway/Render). Surchargeable au build via la variable CACHE_API.
+    cache: process.env.CACHE_API || 'https://REMPLACE-MOI.up.railway.app',
     ethUrl: 'https://sepolia.base.org',
     blockExplorerUrl: 'https://sepolia.basescan.org',
   },
