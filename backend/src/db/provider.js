@@ -26,7 +26,6 @@ const retryConfig = { retries: 3 };
 const concurrency = process.env.CONCURRENCY || 20;
 const url = process.env.ETH_URL || 'http://localhost:8545';
 const mnemonic = process.env.MNEMONIC;
-const oldMnemonic = process.env.OLD_MNEMONIC;
 const cacheConfig = { length: false, primitive: true, max: 10000 };
 
 console.log('connecting to provider ' + url);
@@ -43,26 +42,29 @@ let _contracts = null;
 const db = new Postgres();
 
 const setupAuthorization = async ({ DungeonAdmin }) => {
-  const [dungeonAddress, backendAddress] = await DungeonAdmin.getDungeonAndBackendAddress();
-  if (backendAddress.toLowerCase() !== wallet.address.toLowerCase()) {
-    console.log('current backend address is not authorized!');
-    console.log('only ' + backendAddress + ' is authorized in dungeon');
-    if (oldMnemonic) {
-      const oldWallet = BackendWallet.fromMnemonic(oldMnemonic).connect(provider);
-      console.log('changing backend wallet from ' + backendAddress);
-      const tx = await new ethers.Contract(
-        DungeonAdmin.address,
-        DungeonAdmin.interface,
-        oldWallet,
-      ).setDungeonAndBackend(dungeonAddress, wallet.address);
-      await tx.wait();
-      console.log('admin wallet changed to ' + wallet.address);
-    } else {
-      console.log('you can set current address by providing OLD_MNEMONIC env variable');
-    }
-  } else {
+  const [, backendAddress] = await DungeonAdmin.getDungeonAndBackendAddress();
+  if (backendAddress.toLowerCase() === wallet.address.toLowerCase()) {
     console.log('backend is authorized in dungeon');
+    return;
   }
+  console.log('current backend address is not authorized!');
+  console.log('only ' + backendAddress + ' is authorized in dungeon');
+
+  // Two-step rotation: owner calls nominateBackend(us), then we call acceptBackend().
+  // We can only do the second step. If we're not pending, the owner must nominate us first
+  // (run contracts/scripts/nominate-backend.js with the owner key).
+  const pending = await DungeonAdmin.pendingBackend();
+  if (pending.toLowerCase() !== wallet.address.toLowerCase()) {
+    console.log('not nominated yet. pending backend = ' + pending);
+    console.log('the contract OWNER must call nominateBackend(' + wallet.address + ') first.');
+    console.log('see contracts/scripts/nominate-backend.js');
+    return;
+  }
+
+  console.log('we are the pending backend, calling acceptBackend()...');
+  const tx = await DungeonAdmin.acceptBackend();
+  await tx.wait();
+  console.log('admin wallet changed to ' + wallet.address);
 };
 
 const setupPureContract = async deploymentBytecode => {
