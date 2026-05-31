@@ -52,7 +52,7 @@ const setupAuthorization = async ({ DungeonAdmin }) => {
       console.log('changing backend wallet from ' + backendAddress);
       const tx = await new ethers.Contract(
         DungeonAdmin.address,
-        DungeonAdmin.interface.abi,
+        DungeonAdmin.interface,
         oldWallet,
       ).setDungeonAndBackend(dungeonAddress, wallet.address);
       await tx.wait();
