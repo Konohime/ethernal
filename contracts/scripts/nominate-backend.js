@@ -13,7 +13,7 @@ const { ethers, deployments, getNamedAccounts } = require("hardhat");
 
 async function main() {
   const newBackend = process.env.NEW_BACKEND;
-  if (!newBackend || !ethers.utils.isAddress(newBackend)) {
+  if (!newBackend || !ethers.isAddress(newBackend)) {
     throw new Error("Set NEW_BACKEND=0x... to the new backend address before running this script.");
   }
 
