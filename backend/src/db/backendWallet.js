@@ -34,7 +34,11 @@ class BackendWallet extends Wallet {
 
       return retry(async attempt => {
         try {
-          this.provider.clearCache();
+          // Some wrapped providers expose clearCache(); the standard ethers v5
+          // JsonRpcProvider does not. No-op when absent.
+          if (typeof this.provider.clearCache === 'function') {
+            this.provider.clearCache();
+          }
           const tx = await super.sendTransaction(transaction);
           this._nextNonce = transaction.nonce + 1;
           return tx;
