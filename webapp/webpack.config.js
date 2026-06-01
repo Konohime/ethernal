@@ -28,7 +28,7 @@ const environments = {
     contracts: './contracts/staging.json',
     serverList: '',
     // URL publique du backend (Railway/Render). Surchargeable au build via la variable CACHE_API.
-    cache: process.env.CACHE_API || 'https://REMPLACE-MOI.up.railway.app',
+    cache: process.env.CACHE_API || 'https://ethernal-test.up.railway.app',
     ethUrl: 'https://sepolia.base.org',
     blockExplorerUrl: 'https://sepolia.basescan.org',
   },
@@ -141,14 +141,22 @@ module.exports = (webpackEnv, argv) => {
           test: /\.css$/,
           use: [
             isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
-            'css-loader',
+            {
+              loader: 'css-loader',
+              // Leave absolute URLs (e.g. /fonts/foo.ttf) untouched — they are
+              // served at runtime from static/, not bundled.
+              options: { url: { filter: (url) => !url.startsWith('/') } },
+            },
           ],
         },
         {
           test: /\.scss$/,
           use: [
             isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
-            'css-loader',
+            {
+              loader: 'css-loader',
+              options: { url: { filter: (url) => !url.startsWith('/') } },
+            },
             {
               loader: 'sass-loader',
               options: {
