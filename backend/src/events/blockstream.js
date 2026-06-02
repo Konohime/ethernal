@@ -11,6 +11,7 @@ class Blockstream extends Events {
     start: true,
   };
   contracts = {};
+  filteredAddresses = new Set();
 
   constructor(provider, db, configuration = {}) {
     super(provider, db);
@@ -22,7 +23,9 @@ class Blockstream extends Events {
       error => console.log('event processing error: ' + error, error),
       this.configuration,
     );
-    this.blockAndLogStreamer.addLogFilter({});
+    // No global `{}` filter: that would fetch *every* log of *every* contract on
+    // each block (huge eth_getLogs payloads, quota burn, connection resets).
+    // Instead we add one address-scoped filter per contract in `on()`.
     this.blockAndLogStreamer.subscribeToOnLogsAdded((blockHash, logs) => this.emitLogs(blockHash, logs));
     this.blockAndLogStreamer.subscribeToOnLogsRemoved((blockHash, logs) => this.emitLogs(blockHash, logs, true));
     if (this.configuration.start) {
@@ -47,7 +50,14 @@ class Blockstream extends Events {
   }
 
   on(contract, eventName, addedCallback, prefetch, confirmed = false) {
-    this.contracts[contract.address.toLowerCase()] = contract;
+    const address = contract.address.toLowerCase();
+    this.contracts[address] = contract;
+    // Register an address-scoped log filter once per contract so eth_getLogs only
+    // pulls logs for the contracts we actually listen to (deduped by the streamer).
+    if (!this.filteredAddresses.has(address)) {
+      this.filteredAddresses.add(address);
+      this.blockAndLogStreamer.addLogFilter({ address: contract.address });
+    }
     return super.on(contract, eventName, addedCallback, prefetch, confirmed);
   }
 

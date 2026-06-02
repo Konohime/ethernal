@@ -29,7 +29,14 @@ const mnemonic = process.env.MNEMONIC;
 const cacheConfig = { length: false, primitive: true, max: 10000 };
 
 console.log('connecting to provider ' + url);
-const provider = new ethers.providers.JsonRpcProvider(url);
+// Force `Connection: close` so Node (keepAlive=true by default since Node 19)
+// doesn't reuse a pooled socket that the RPC endpoint already closed, which
+// surfaces as `write EPIPE` on the next request. StaticJsonRpcProvider also
+// avoids re-detecting the network on every call.
+const provider = new ethers.providers.StaticJsonRpcProvider({
+  url,
+  headers: { Connection: 'close' },
+});
 let wallet;
 let hashBotWallet;
 if (mnemonic) {
