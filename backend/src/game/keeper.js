@@ -249,8 +249,8 @@ class Keeper extends DungeonComponent {
   }
 
   async data(coordinates) {
-    const { roomData } = await this.room(coordinates);
-    return roomData;
+    const { customData } = await this.room(coordinates);
+    return customData;
   }
 
   async income(benefactor) {

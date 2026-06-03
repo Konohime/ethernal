@@ -59,7 +59,10 @@ function generateXp(level, type = 'trash', exact = false) {
   return Math.max(1, !exact ? range(xp) : xp);
 }
 
-function generateKeys(level, exact = false) {
+// Flat 40% chance of dropping a single key. This intentionally does NOT scale
+// with level — the previous `(level, exact)` parameters were never used and the
+// signature was misleading. Kept parameterless to reflect actual behaviour.
+function generateKeys() {
   const keys = 0.4;
   return Math.random() < keys ? 1 : 0;
 }
@@ -100,9 +103,6 @@ const decodeDirections = bytes => {
   while (bytes !== 8 && path.length < 5) {
     path.push(bytes % 4);
     bytes >>= 4;
-    if (path.length > 5) {
-      return [order[bytes]];
-    }
   }
   return path.reverse().map(n => order[n]);
 };

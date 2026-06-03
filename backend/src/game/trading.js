@@ -271,7 +271,7 @@ class Trading extends DungeonComponent {
     } catch (e) {
       console.log('sell gear tx failed', e);
       Sentry.withScope(scope => {
-        scope.setExtras({ ...event, tx });
+        scope.setExtras({ seller, buyer, deal, tx });
         Sentry.captureException(e);
       });
       throw e;

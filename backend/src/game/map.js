@@ -464,10 +464,13 @@ class DungeonMap extends DungeonComponent {
   }
 
   static exitsToCoordinates(coordinates, exits) {
+    // Use the canonical `directions` convention (north: y-1, south: y+1) shared
+    // with coordinatesInDirection / the rest of movement. Previously north/south
+    // were flipped here, contradicting every other neighbour computation.
     let coords = [];
-    if (exits.north) coords.push(coordinatesAt(coordinates, 0, 1));
+    if (exits.north) coords.push(coordinatesAt(coordinates, 0, -1));
     if (exits.east) coords.push(coordinatesAt(coordinates, 1, 0));
-    if (exits.south) coords.push(coordinatesAt(coordinates, 0, -1));
+    if (exits.south) coords.push(coordinatesAt(coordinates, 0, 1));
     if (exits.west) coords.push(coordinatesAt(coordinates, -1, 0));
     return coords;
   }

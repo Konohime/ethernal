@@ -190,17 +190,22 @@ class Combat extends DungeonComponent {
     const monsterId = combat.monster.id;
     const { level } = combat.monster.stats;
     const { type } = combat.monster;
+    // Duel keys are always strings (object keys); room.characters / sponsors may
+    // hold numbers depending on the code path. Normalize to strings so an id type
+    // mismatch can't silently zero out everyone's rewards.
+    const presentCharacters = new Set((characters || []).map(String));
+    const sponsors = new Set((bounty.sponsors || []).map(String));
     const ratios = mapValues(combat.duels, ({ attacker, defender }, characterId) => {
-      const escaped = !characters.includes(characterId);
+      const escaped = !presentCharacters.has(String(characterId));
       return escaped ? 0 : Math.min(1, attacker.stats.totalInflicted / defender.full.health);
     });
-    const bountyRatios = mapValues({...ratios}, (ratio, characterId) => bounty.sponsors && bounty.sponsors.includes(characterId) ? 0 : ratio);
+    const bountyRatios = mapValues({...ratios}, (ratio, characterId) => sponsors.has(String(characterId)) ? 0 : ratio);
     const bountyPortion = distributeBalance(bountyRatios, bounty);
     let rewards =
       combat.rewards ||
       mapValues(combat.duels, ({ attacker, defender }, characterId) => {
         const { stats } = attacker;
-        const escaped = !characters.includes(characterId);
+        const escaped = !presentCharacters.has(String(characterId));
         const ratio = ratios[characterId];
         return {
           characterId,
@@ -210,7 +215,7 @@ class Combat extends DungeonComponent {
           durabilityChange: escaped ? 0 : -1,
           balanceChange: balanceToAmounts(createBalance({
             coins: share(ratio, generateCoins(level, type)),
-            keys: share(ratio, generateKeys(level)),
+            keys: share(ratio, generateKeys()),
           })),
           bounty: balanceToAmounts(bountyPortion[characterId]),
         };

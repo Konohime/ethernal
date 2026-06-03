@@ -68,6 +68,8 @@ function monsterLevel(coordinates) {
   return z;
 }
 
+// Flat 7% big-boss chance. `level` is accepted (exported API / future scaling
+// hook) but intentionally unused for now — the rate does not vary by floor.
 function bossChance(level) {
   return 7;
 }

@@ -238,7 +238,7 @@ class RandomEvents extends DungeonComponent {
               { sameLevel: 10, levelPlusOne: 20 },
               'chest',
             );
-            const keys = generateKeys(monsterLevel) * 2 + 1;
+            const keys = generateKeys() * 2 + 1;
             const coins = generateCoins(monsterLevel);
             reward = createReward({
               characterId,

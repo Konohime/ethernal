@@ -196,8 +196,11 @@ class Elements extends DungeonComponent {
   }
 
   async balances(benefactors) {
-    const { rows } = await db.query(`SELECT * FROM ${db.tableName('elements')} WHERE benefactor in ($1)`, [benefactors.map(v => v.toString())]);
-    return rows.reduce((res, [benefactor, ...amounts]) => ({...res, [benefactor]: createBalanceFromAmounts(amounts)}), {});
+    const { rows } = await db.query(`SELECT * FROM ${db.tableName('elements')} WHERE benefactor = ANY ($1)`, [benefactors.map(v => v.toString())]);
+    return rows.reduce((res, row) => {
+      const [benefactor, ...amounts] = Object.values(row);
+      return { ...res, [benefactor]: createBalanceFromAmounts(amounts.map(Number)) };
+    }, {});
   }
 }
 
