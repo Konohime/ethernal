@@ -31,6 +31,7 @@ class Combat extends DungeonComponent {
       .onCharacter('attack', this.attack.bind(this))
       .onCharacter('turn', this.turn.bind(this))
       .onCharacter('finish', this.finish.bind(this))
+      .onCharacter('retry-defeat', this.retryDefeat.bind(this))
       .onCharacter('escape', this.escape.bind(this));
   }
 
@@ -296,7 +297,47 @@ class Combat extends DungeonComponent {
         scope.setExtras({ coordinates, room, tx, replayedReason: reason });
         Sentry.captureException(err);
       });
+      // Don't leave the players silently frozen in 'attacking monster'. Signal
+      // the failure so the client can surface it and offer a retry. room.combat
+      // is intentionally NOT cleared, so the cached rewards survive and a later
+      // 'retry-defeat' (or privileged kill-monster) re-runs _monsterDefeated
+      // idempotently — once it finally lands, room.combat is cleared and any
+      // further retry no-ops.
+      this.sockets.emit('monster-defeat-failed', {
+        coordinates,
+        characters,
+        reason: String(reason),
+      });
     }
+  }
+
+  // Player-triggered, non-privileged re-finalisation of a defeated monster.
+  // Safe because:
+  //   - it only proceeds when the room still has an un-cleared combat whose
+  //     monster is actually dead (health <= 0), so it can't be used to fake a
+  //     kill;
+  //   - it delegates to monsterDefeated(), guarded by room.combat: if the
+  //     original tx had in fact landed, room.combat is already null and this
+  //     no-ops, so no double rewards.
+  // This replaces the previous client retry path that called the privileged
+  // 'kill-monster' cheat — which silently failed for ordinary players, leaving
+  // them stuck whenever the finalisation tx reverted.
+  async retryDefeat(character, coordinates) {
+    const target = coordinates || (await this.dungeon.character.coordinates(character));
+    if (!target) {
+      return { error: 'unknown room' };
+    }
+    const room = await this.dungeon.room(target);
+    if (!room || !room.combat) {
+      // Nothing to finalise — the kill already settled (or never happened).
+      return { alreadyResolved: true };
+    }
+    const monster = room.combat.monster;
+    if (!monster || !(monster.stats && monster.stats.health <= 0)) {
+      return { error: 'monster still alive' };
+    }
+    await this.monsterDefeated(target);
+    return { success: true };
   }
 
   async characterDefeated(character) {

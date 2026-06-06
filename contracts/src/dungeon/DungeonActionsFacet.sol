@@ -31,6 +31,7 @@ contract DungeonActionsFacet is DungeonFacetBase {
         _elementsContract.subBurnFrom(characterId, PureDungeon.COINS, 2);
         uint256 buyer = _charactersContract.getSubOwner(characterId);
         _initializeTaxDueDate(buyer);
+        _clearRoomListing(location, address(uint160(owner)));
         _roomsContract.subTransferFrom(address(this), owner, buyer, location);
         if (_roomsContract.subBalanceOf(owner) == 0) {
             delete _taxDueDate[address(uint160(owner))];
@@ -41,6 +42,7 @@ contract DungeonActionsFacet is DungeonFacetBase {
         uint256 owner = _roomsContract.subOwnerOf(location);
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
+        _clearRoomListing(location, address(uint160(owner)));
         _roomsContract.subTransferFrom(address(this), owner, uint256(uint160(address(this))), location);
         if (_roomsContract.subBalanceOf(owner) == 0) {
             delete _taxDueDate[address(uint160(owner))];
@@ -51,6 +53,7 @@ contract DungeonActionsFacet is DungeonFacetBase {
         uint256 owner = _roomsContract.subOwnerOf(location);
         uint256 player = _charactersContract.getSubOwner(characterId);
         require(owner == player, "not owner");
+        _clearRoomListing(location, address(uint160(owner)));
         _elementsContract.transferFrom(address(uint160(owner)), address(0), PureDungeon.COINS, 100);
         _roomsContract.transferFrom(address(this), address(uint160(owner)), location);
     }

@@ -487,6 +487,18 @@ abstract contract DungeonFacetBase is DungeonDataLayout, DungeonEvents, DiamondS
         emit RoomDiscovered(location, targetBlock, nextRoom.direction);
     }
 
+    /// @dev Clear a marketplace listing when a room changes hands (or leaves the
+    /// active state) through a non-marketplace path. Without this, `_roomPrice`
+    /// survives buyRoom/abandonRoom/deactivateRoom and a later owner can have the
+    /// room silently re-listed at a price they never set once it becomes active
+    /// again. No-op (and no event) when the room was not listed.
+    function _clearRoomListing(uint256 location, address seller) internal {
+        if (_roomPrice[location] > 0) {
+            delete _roomPrice[location];
+            emit RoomUnlisted(location, seller);
+        }
+    }
+
     function _initializeTaxDueDate(uint256 owner) internal {
         address ownerAddr = address(uint160(owner));
         if (owner != 0 && _taxDueDate[ownerAddr] == 0) {

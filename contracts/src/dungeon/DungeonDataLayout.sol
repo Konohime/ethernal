@@ -78,4 +78,13 @@ contract DungeonDataLayout {
     // Per-target selector whitelist — appended to preserve storage layout.
     // Even if a target is whitelisted, only explicit selectors may be invoked.
     mapping(address => mapping(bytes4 => bool)) _allowedForwardSelectors;
+
+    // --- Room marketplace (appended to preserve existing storage layout) ---
+    // Native ETH marketplace for active (in-game) rooms. See
+    // DungeonMarketplaceFacet for the flow and the popup/UX rationale.
+    mapping(uint256 => uint256) _roomPrice;          // location => sale price in wei (0 = not listed)
+    mapping(address => uint256) _pendingWithdrawals; // ETH owed when a push payout failed; pulled via withdraw()
+    address payable _marketplaceTreasury;            // receives the sale commission, in ETH (the dev)
+    uint16 _marketplaceFeeBps;                       // commission in basis points, hard-capped by the setter
+    uint256 _marketplaceLock;                        // reentrancy guard (0 = unlocked)
 }

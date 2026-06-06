@@ -47,37 +47,51 @@ async function main() {
     console.log('  >> FATAL: _dungeon is zero — setDungeonAndBackend was never called on this deployment');
   }
 
-  // Also sanity-check _adminContract on the diamond (the value onlyAdmin checks).
-  // _adminContract is a storage var (DungeonDataLayout slot 56). There is no public getter,
-  // but any onlyAdmin call from a non-admin address will revert with "NOT_AUTHORIZED_ADMIN".
-  // We probe by simulating a call *from the DungeonAdmin contract* using eth_call override — if it
-  // succeeds (revert reason != NOT_AUTHORIZED_ADMIN) we know wiring is at least consistent.
-  console.log('\n=== Diamond admin probe ===');
-  const diamondAbi = [
-    'function monsterDefeated(uint256 location) external',
-  ];
-  const diamond = new ethers.Contract(diamondDep.address, diamondAbi, signer);
+  // Definitive check: read _adminContract directly from diamond storage.
+  // _adminContract is the value onlyAdmin compares msg.sender against. In the
+  // DungeonDataLayout it sits at slot 4 (mappings _characters/_rooms/_areas
+  // occupy slots 0-2, the packed AreaCounter struct slot 3, then _adminContract
+  // at slot 4). There is no public getter, so a raw storage read is the only
+  // reliable, side-effect-free way to confirm wiring.
+  console.log('\n=== Diamond admin wiring (storage slot 4) ===');
+  const adminRaw = await ethers.provider.getStorage(diamondDep.address, 4);
+  const wiredAdmin = '0x' + adminRaw.slice(26);
+  console.log('  _adminContract:', wiredAdmin);
+  const adminWiringOK = wiredAdmin.toLowerCase() === adminDep.address.toLowerCase();
+  console.log('  _adminContract == DungeonAdmin ?', adminWiringOK);
+  if (!adminWiringOK) {
+    console.log('  >> FATAL: diamond._adminContract is', wiredAdmin, 'but DungeonAdmin is', adminDep.address);
+    console.log('  >> Backend-driven calls (monsterDefeated/characterDefeated/...) will revert with NOT_AUTHORIZED_ADMIN.');
+    console.log('  >> Fix: run the post-deploy sync (deploy/1995_post_deploy_sync.js) or call postUpgrade to repoint it.');
+  }
+
+  // Behavioural confirmation via a raw eth_call with an arbitrary `from`
+  // override (provider.call accepts `from`; a signer-connected contract does
+  // not in ethers v6 — it throws "transaction from mismatch"). A call FROM the
+  // DungeonAdmin address must NOT revert with NOT_AUTHORIZED_ADMIN.
+  console.log('\n=== Behavioural probe (eth_call from DungeonAdmin) ===');
+  const iface = new ethers.Interface(['function monsterDefeated(uint256 location) external']);
+  const data = iface.encodeFunctionData('monsterDefeated', [0]);
   try {
-    // Use a known valid location (0 = entry). This will revert, but the REASON tells us why.
-    await diamond.monsterDefeated.staticCall(0, { from: adminDep.address });
-    console.log('  staticCall succeeded from DungeonAdmin — admin wiring OK');
+    await ethers.provider.call({ to: diamondDep.address, data, from: adminDep.address });
+    console.log('  call succeeded from DungeonAdmin — admin wiring OK');
   } catch (e) {
-    const reason = e.reason || (e.error && e.error.message) || e.message || String(e);
-    if (reason.includes('NOT_AUTHORIZED_ADMIN')) {
-      console.log('  >> FATAL: diamond._adminContract is NOT DungeonAdmin. Got NOT_AUTHORIZED_ADMIN when calling from', adminDep.address);
+    const reason = e.reason || (e.error && e.error.message) || e.shortMessage || e.message || String(e);
+    if (String(reason).includes('NOT_AUTHORIZED_ADMIN')) {
+      console.log('  >> FATAL: got NOT_AUTHORIZED_ADMIN calling from', adminDep.address, '— admin wiring is broken');
     } else {
       console.log('  reverted (expected, with reason):', reason);
       console.log('  (if the reason is not NOT_AUTHORIZED_ADMIN, admin wiring is OK)');
     }
   }
 
-  // Also probe from the signer (NOT the admin) to confirm it blocks us
-  console.log('\n=== Sanity: calling directly (should fail with NOT_AUTHORIZED_ADMIN) ===');
+  // Sanity: a call from a NON-admin address must be blocked.
+  console.log('\n=== Sanity: eth_call from non-admin (should fail with NOT_AUTHORIZED_ADMIN) ===');
   try {
-    await diamond.monsterDefeated.staticCall(0);
+    await ethers.provider.call({ to: diamondDep.address, data, from: signer.address });
     console.log('  >> UNEXPECTED: direct call succeeded');
   } catch (e) {
-    const reason = e.reason || (e.error && e.error.message) || e.message || String(e);
+    const reason = e.reason || (e.error && e.error.message) || e.shortMessage || e.message || String(e);
     console.log('  reverted with:', reason);
   }
 }

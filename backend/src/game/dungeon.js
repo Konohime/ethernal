@@ -112,6 +112,7 @@ class Dungeon {
     this.sockets.on('left', this.handleCharacterLeft.bind(this));
     this.sockets.onCharacter('metatx-error', this.handleMetaTxError.bind(this));
     this.sockets.onCharacter('chat-message', this.handleChatMessage.bind(this));
+    this.sockets.onCharacter('set-sprite', this.character.setSprite.bind(this.character));
 
     this.initialized = true;
   }

@@ -412,6 +412,36 @@ class Character extends DungeonComponent {
     return info;
   }
 
+  // Persist the player's chosen PixelBroker sprite id (a visual preference,
+  // 0-9999, or null for the default class sprite). Stored server-side per
+  // character — previously it lived only in browser localStorage, so it was
+  // lost on a different device, on a cache clear, or on any client version bump
+  // (init.js wipes it), and other players never saw it. Storing it in the
+  // character `info` makes it durable and broadcasts it to everyone via the
+  // standard characterInfo payload.
+  async setSprite(character, spriteId) {
+    let normalized = null;
+    if (spriteId !== null && spriteId !== undefined && spriteId !== '') {
+      const id = parseInt(spriteId, 10);
+      if (!Number.isInteger(id) || id < 0 || id > 9999) {
+        return { error: 'invalid spriteId' };
+      }
+      normalized = id;
+    }
+    const info = await this._info(character);
+    if (!info || info.characterId === undefined) {
+      return { error: 'unknown character' };
+    }
+    if (info.spriteId === normalized) {
+      return { spriteId: normalized };
+    }
+    info.spriteId = normalized;
+    await this.storeCharacter(info);
+    const characterInfo = await this.info(character, info);
+    this.sockets.emit('update', { characterInfos: [characterInfo] });
+    return { spriteId: normalized };
+  }
+
   toRow(info) {
     const { characterId, player } = info;
     return [characterId.toString(), player && player.toString(), info];

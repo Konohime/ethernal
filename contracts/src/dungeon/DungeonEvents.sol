@@ -23,4 +23,18 @@ contract DungeonEvents {
     event RoomTaxPay(address indexed owner, uint256 tax, uint256 newDueDate);
     event RoomIncome(uint256 indexed location, address indexed owner, uint256 id, uint256 amount);
     event RoomName(uint256 indexed location, string name, uint256 characterId);
+
+    // --- Room marketplace lifecycle (shared so non-marketplace facets that
+    // change room ownership — buyRoom/abandonRoom/deactivateRoom — can clear a
+    // stale listing and emit the unlist). Marketplace-internal plumbing events
+    // (treasury/fee/withdrawal) stay local to DungeonMarketplaceFacet.
+    event RoomListed(uint256 indexed location, address indexed seller, uint256 price);
+    event RoomUnlisted(uint256 indexed location, address indexed seller);
+    event RoomSold(
+        uint256 indexed location,
+        address indexed seller,
+        address indexed buyer,
+        uint256 price,
+        uint256 fee
+    );
 }

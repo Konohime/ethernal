@@ -20,6 +20,7 @@ module.exports = async ({deployments, network, getNamedAccounts}) => {
       'DungeonCharacterFacet',
       'DungeonInfoFacet',
       'DungeonMovementFacet',
+      'DungeonMarketplaceFacet',
     ],
     log: true,
     waitConfirmations: 1,

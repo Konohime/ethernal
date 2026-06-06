@@ -8,5 +8,6 @@ public/*.js*
 public/index.html
 src/dev_contractsInfo.json
 contracts/development.json
+.claude/
 .env*
 *.log
