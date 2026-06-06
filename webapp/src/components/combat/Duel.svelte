@@ -87,12 +87,15 @@
             mapOverlay.open('loot');
           } else {
             // Monster is dead locally but monsterDefeated TX hasn't confirmed yet.
-            // Trigger a retry via kill-monster so the backend re-sends the TX.
+            // Trigger a retry via the non-privileged 'retry-defeat' action so the
+            // backend re-sends the TX. (The old 'kill-monster' path was a
+            // privileged cheat and silently no-op'd for ordinary players, leaving
+            // them stuck whenever the finalisation tx had reverted.)
             const coords = $dungeon.cache.currentRoom && $dungeon.cache.currentRoom.coordinates;
             if (coords) {
               // eslint-disable-next-line no-console
               console.log('Monster already dead on load, triggering monsterDefeated retry at', coords);
-              $dungeon.cache.action('kill-monster', coords);
+              $dungeon.cache.action('retry-defeat', coords);
             }
           }
         } else if ($dungeon.cache.characterStatus === 'just died' || duel.combat.character.isDead()) {

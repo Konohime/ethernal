@@ -14,6 +14,7 @@ import ReadOnly from 'lib/readOnly';
 import roomGenerator from 'lib/roomGenerator';
 import Moves from './moves';
 import wallet from 'stores/wallet';
+import characterChoice from 'stores/characterChoice';
 import { mapModal, notificationOverlay } from 'stores/screen';
 import { inflictionText, receivedText, classPortrait, gearImage } from 'utils/data';
 import { combatText, statusesText, classes, notifications } from 'data/text';
@@ -73,6 +74,20 @@ class Cache {
 
       this.on('room-actualised', ({ roomUpdates }) => {
         this.applyRoomUpdates(roomUpdates);
+        // A freshly discovered room is committed to a future block, so its
+        // layout (exits/kind) is unknown until that block is mined and the room
+        // is actualised. Until then it renders empty ("the void"). If we are
+        // waiting on the room the player just discovered, clear the "discovering"
+        // indicator only once it actually reaches 'actualised'.
+        if (this._actualisingRoom && Array.isArray(roomUpdates)) {
+          const done = roomUpdates.some(
+            r => r && r.coordinates === this._actualisingRoom && r.status === 'actualised',
+          );
+          if (done) {
+            this._actualisingRoom = null;
+            notificationOverlay.close();
+          }
+        }
       });
 
       await this.fetchAll();
@@ -247,6 +262,30 @@ class Cache {
         if (e.coordinates === this.currentRoom.coordinates) {
           this._emitUpdate('monsterDefeated');
         }
+        // Clear any retry backoff for this room once the kill finally settles.
+        if (this._defeatRetries) {
+          delete this._defeatRetries[e.coordinates];
+        }
+      });
+
+      // The finalisation tx reverted on the backend. The player would otherwise
+      // be silently frozen in 'attacking monster', so auto-retry a bounded
+      // number of times with a short backoff (room.combat on the backend is the
+      // idempotency guard — once the kill lands, retry-defeat no-ops).
+      this.on('monster-defeat-failed', ({ coordinates, characters, reason }) => {
+        log.warn(`monster defeat finalisation failed in ${coordinates}: ${reason}`);
+        const affectsMe =
+          Array.isArray(characters) && characters.map(Number).includes(this.characterId);
+        if (!affectsMe) return;
+        this._defeatRetries = this._defeatRetries || {};
+        const attempts = this._defeatRetries[coordinates] || 0;
+        if (attempts >= 5) {
+          log.error(`giving up auto-retrying monster defeat in ${coordinates} after ${attempts} attempts`);
+          return;
+        }
+        this._defeatRetries[coordinates] = attempts + 1;
+        const delayMs = Math.min(15000, 2000 * (attempts + 1));
+        setTimeout(() => this.action('retry-defeat', coordinates), delayMs);
       });
 
       this.on('character-escaped', ({ character, coordinates, statusUpdates }) => {
@@ -597,6 +636,15 @@ class Cache {
       if (walkLabels.length > 0) {
         await this.dungeon.walk(encodeDirections(walkLabels));
       }
+      // Show a non-blocking "discovering…" indicator until the room is
+      // actualised (cleared in the 'room-actualised' handler). The room layout
+      // can't be known before its commit block is mined, so this is the honest
+      // UX: tell the player to wait instead of flashing them into an empty room.
+      this._actualisingRoom = coordinates;
+      notificationOverlay.open('generic', {
+        text: 'Discovering room… hold on while it materialises.',
+        timeout: 30000, // safety net: auto-clear if the actualise event is missed
+      });
       return this.dungeon.discoverAt(destination.parent.coordinates, discoverDirection);
     }
 
@@ -1225,6 +1273,17 @@ class Cache {
       _characterLevelXP.set(stats.levelXp);
 
       this._emitUpdate('characterUpdated', info);
+
+      // One-time upload of the locally chosen PixelBroker sprite. The choice is
+      // made pre-dungeon and kept in localStorage (characterChoice), but that is
+      // fragile (lost on another device / cache clear / client version bump), so
+      // we persist it server-side the first time we see our character whose
+      // stored spriteId doesn't yet match. setSprite is idempotent and only
+      // emits when the value actually changes, so this can't loop.
+      const localSpriteId = get(characterChoice).spriteId;
+      if (localSpriteId != null && info.spriteId !== localSpriteId) {
+        this.action('set-sprite', localSpriteId);
+      }
 
       // info.status defaults to 'not in dungeon' on the backend when the DB
       // has no persisted status. Only seed _characterStatus from it as a last

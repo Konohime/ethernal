@@ -724,7 +724,8 @@ class MapRenderer {
       return;
     }
     const { cache } = global.dungeon;
-    const { stats } = cache.onlineCharacters[charId] || {};
+    const onlineChar = cache.onlineCharacters[charId] || {};
+    const { stats } = onlineChar;
     if (!stats) {
       // Very rarely I'll get the character without a stats object to grab the characterClass. -Josh
       log.debug(
@@ -733,7 +734,14 @@ class MapRenderer {
       return;
     }
     const { characterClass } = stats;
-    const spriteId = (type === 'my') ? get(characterChoice).spriteId : null;
+    // Prefer the server-persisted spriteId (set via 'set-sprite'), which is
+    // durable and available for ALL characters so other players see the chosen
+    // PixelBroker too. Fall back to the local choice for my own character so it
+    // shows instantly, before the backend round-trip completes.
+    let spriteId = onlineChar.spriteId != null ? onlineChar.spriteId : null;
+    if (spriteId == null && type === 'my') {
+      spriteId = get(characterChoice).spriteId;
+    }
     character = this.addObjectAtCoords(new Character(type, this.container, to, this.ui, charId, characterClass, spriteId), to, {
       noCull: true,
       animate,
