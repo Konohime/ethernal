@@ -6,7 +6,9 @@ const retryConfig = { retries: 3 };
 
 class Blockstream extends Events {
   defaultConfig = {
-    poolingInterval: 1000,
+    // Base produit ~1 bloc/2s : poller chaque seconde triplait la facture RPC
+    // pour rien. Configurable via POOLING_INTERVAL (ms), défaut 3000.
+    poolingInterval: parseInt(process.env.POOLING_INTERVAL, 10) || 3000,
     blockRetention: 1000,
     start: true,
   };
