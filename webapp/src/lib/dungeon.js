@@ -303,8 +303,22 @@ class Dungeon {
     });
   }
 
+  // Movement is off-chain, so the on-chain character location lags behind the
+  // real room until a discovery / locked-door / teleport. Item transactions
+  // (scavenge, pick, drop) sent straight from the player wallet read the
+  // on-chain location to find the player's room, so they revert with "need to
+  // be in same room" after a plain off-chain walk. Ask the backend to resync the
+  // on-chain position first — idempotent, no transaction when already in sync.
+  async _syncPosition() {
+    const reply = await this.cache.action('sync-position');
+    if (reply && reply.error) {
+      throw new Error(reply.error);
+    }
+  }
+
   async scavengeGear(character, id) {
     try {
+      await this._syncPosition();
       await nprogress.observe(
         this.transferWallet.tx('scavengeGear', this.character, character, id).then(tx => tx.wait()),
       );
@@ -318,6 +332,7 @@ class Dungeon {
 
   async scavengeElements(character, type, amount) {
     try {
+      await this._syncPosition();
       await nprogress.observe(
         this.transferWallet.tx('scavengeElements', this.character, character, type, amount).then(tx => tx.wait()),
       );
@@ -522,6 +537,7 @@ class Dungeon {
   }
 
   async drop(gear) {
+    await this._syncPosition();
     return nprogress.observe(
       this.transferWallet.tx('drop', this.character, gear.id).then(tx => tx.wait()),
       this.cache.once(
@@ -532,6 +548,7 @@ class Dungeon {
   }
 
   async pick(gearId) {
+    await this._syncPosition();
     return nprogress.observe(this.transferWallet.tx('pick', this.character, gearId).then(tx => tx.wait()));
   }
 
@@ -560,6 +577,7 @@ class Dungeon {
       return;
     }
     console.log('dropping', elements);
+    await this._syncPosition();
     return nprogress.observe(this.transferWallet.tx('dropElements', this.character, elements).then(tx => tx.wait()));
   }
 
@@ -573,6 +591,7 @@ class Dungeon {
    * @returns {Promise<void>}
    */
   async pickElement(id, amount) {
+    await this._syncPosition();
     return nprogress.observe(this.transferWallet.tx('pickElement', this.character, id, amount).then(tx => tx.wait()));
   }
 

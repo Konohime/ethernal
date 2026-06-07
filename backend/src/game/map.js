@@ -32,6 +32,48 @@ class DungeonMap extends DungeonComponent {
     super(dungeon);
     this.sockets.onCharacter('subscribe-rooms', this.handleSubscribeRooms.bind(this));
     this.sockets.onCharacter('walk', this.handleWalk.bind(this));
+    this.sockets.onCharacter('sync-position', this.handleSyncPosition.bind(this));
+  }
+
+  // Movement is off-chain, so a character's on-chain location only advances at
+  // discovery / locked-door / teleport. Item transactions sent straight from the
+  // player wallet (scavenge, pick, drop) read the on-chain location to locate the
+  // player's room, so they revert with "need to be in same room" after a plain
+  // off-chain walk. The webapp calls this right before such a transaction to
+  // resync the on-chain position to the authoritative off-chain coordinates.
+  // Mirrors the combat.escape() resync. Idempotent: sends no tx when already in
+  // sync, so repeated takes in the same room only pay for one resync.
+  async handleSyncPosition(character) {
+    try {
+      await this.ensureOnChainPosition(character);
+      return { ok: true };
+    } catch (err) {
+      console.log('sync-position failed', err.message);
+      return { error: err.message };
+    }
+  }
+
+  async ensureOnChainPosition(character) {
+    const info = await this.dungeon.character._info(character);
+    if (!info || !info.coordinates) {
+      throw new Error('character not in dungeon');
+    }
+    const { Dungeon, DungeonAdmin } = this.contracts;
+    const targetLocation = coordinatesToLocation(info.coordinates).toString();
+    const onChainLocation = (await Dungeon.getCharacterLocation(character)).toString();
+    if (onChainLocation === targetLocation) {
+      return false; // already in sync, no transaction needed
+    }
+    const direction = Number(info.direction) || 0;
+    const tx = await DungeonAdmin.setCharacterPosition(
+      character,
+      targetLocation,
+      direction,
+      { gasLimit: 700000 },
+    );
+    await tx.wait();
+    console.log(`synced on-chain position of character ${character} to ${info.coordinates}`);
+    return true;
   }
 
   // Off-chain movement between already-discovered rooms. No transaction is
