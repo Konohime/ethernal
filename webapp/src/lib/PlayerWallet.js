@@ -122,11 +122,38 @@ class PlayerWallet {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error('burner refill failed', e);
-        throw { reason: `burner refill failed: ${e.reason || e.message || e}`, _refillFailure: true };
+        const detail = e.reason || e.shortMessage || e.message || e;
+        const insufficient = /insufficient funds/i.test(String(detail));
+        throw {
+          reason: insufficient
+            ? 'your main wallet is out of ETH to fund game actions — please top it up and try again'
+            : `could not fund the game wallet: ${detail}`,
+          _refillFailure: true,
+        };
       }
-      balance = await this.getBalance();
+      // The refill tx is mined, but on Base Sepolia (and other public RPCs) an
+      // immediate eth_getBalance can still hit a node that hasn't applied the
+      // new block yet, returning the *pre-refill* (empty) balance. A single read
+      // here would then abort a move that is actually fully funded. Retry a few
+      // times — same mitigation as waitFor() in stores/preDungeonCheck.js — and
+      // only give up if the balance is still short after the RPC caught up.
+      for (let i = 0; i < 8 && fee > balance; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => setTimeout(r, 400));
+        // eslint-disable-next-line no-await-in-loop
+        balance = await this.getBalance();
+      }
       if (fee > balance) {
-        throw { reason: `not enough balance after refill, needed: ${fee}` };
+        // Reaching here means the top-up tx succeeded (otherwise _refillBurner…
+        // would have thrown above) yet the burner still looks underfunded after
+        // several retries — almost always a lagging RPC rather than a real
+        // shortfall. Surface a message the player can act on.
+        throw {
+          reason:
+            'wallet sync delay: your action funded the game wallet but the network '
+            + 'is slow to confirm the balance. Please wait a few seconds and try again.',
+          _refillStale: true,
+        };
       }
     }
 
