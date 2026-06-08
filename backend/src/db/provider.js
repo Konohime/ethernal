@@ -20,6 +20,7 @@ const retryable = require('../utils/retryable.js');
 const BackendWallet = require('./backendWallet.js');
 const Blockstream = require('../events/blockstream.js');
 const DaggerEvents = require('../events/dagger.js');
+const WebSocketEvents = require('../events/websocket.js');
 const { bn } = require('../game/utils.js');
 
 const retryConfig = { retries: 3 };
@@ -234,8 +235,12 @@ const pastEvents = async (
   ).then(chunks => chunks.flat());
 };
 
-const events =
-  url.includes('rpc-mumbai.matic.today') && process.env.DAGGER !== 'disabled'
+// WS_URL (wss://) => souscriptions push, plus de polling ni de getLogs par bloc.
+// Sans WS_URL on garde le comportement actuel (Dagger sur Mumbai, sinon polling).
+const wsUrl = process.env.WS_URL;
+const events = wsUrl
+  ? new WebSocketEvents(provider, db, wsUrl)
+  : url.includes('rpc-mumbai.matic.today') && process.env.DAGGER !== 'disabled'
     ? new DaggerEvents(provider, db, process.env.DAGGER || 'wss://mumbai-dagger.matic.today')
     : new Blockstream(provider, db);
 
