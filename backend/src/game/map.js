@@ -24,6 +24,26 @@ const Exits = require('./room/exits.js');
 const retryConfig = { retries: 5 };
 const checkBackIn = 10 * 1000;
 
+// Transient RPC failures worth retrying — chiefly Alchemy rate-limiting / CU
+// exhaustion (HTTP 429, JSON-RPC -32005), plus network blips. Deterministic
+// errors (reverts, bad args) must NOT match here or we'd retry a sure failure.
+const isTransientRpcError = err => {
+  if (!err) return false;
+  if (err.code === 'SERVER_ERROR' || err.code === 'TIMEOUT' || err.code === -32005) return true;
+  const msg = `${err.message || ''} ${err.info && err.info.error ? err.info.error.code : ''}`.toLowerCase();
+  return (
+    msg.includes('429') ||
+    msg.includes('rate limit') ||
+    msg.includes('compute unit') ||
+    msg.includes('exceeded') ||
+    msg.includes('timeout') ||
+    msg.includes('timed out') ||
+    msg.includes('etimedout') ||
+    msg.includes('econnreset') ||
+    msg.includes('socket hang up')
+  );
+};
+
 class DungeonMap extends DungeonComponent {
   roomShape = new RoomShape(this);
   exits = new Exits(this);
@@ -53,6 +73,27 @@ class DungeonMap extends DungeonComponent {
     }
   }
 
+  // Retry a transient-failing RPC op with exponential backoff. Aborts (no retry)
+  // on deterministic errors. Only wrap operations that are safe to repeat — a
+  // read, or a tx *submission* (the nonce isn't consumed until broadcast
+  // succeeds, so a throttled submit can be retried). Never wrap across tx.wait().
+  async _withRpcRetry(fn, label) {
+    return retry(
+      async () => {
+        try {
+          return await fn();
+        } catch (err) {
+          if (isTransientRpcError(err)) {
+            console.log(`transient RPC error during ${label}, retrying:`, err.message);
+            throw err; // let p-retry back off and retry
+          }
+          throw new retry.AbortError(err); // deterministic failure — surface immediately
+        }
+      },
+      { retries: 4, minTimeout: 500, factor: 2 },
+    );
+  }
+
   async ensureOnChainPosition(character) {
     const info = await this.dungeon.character._info(character);
     if (!info || !info.coordinates) {
@@ -60,16 +101,16 @@ class DungeonMap extends DungeonComponent {
     }
     const { Dungeon, DungeonAdmin } = this.contracts;
     const targetLocation = coordinatesToLocation(info.coordinates).toString();
-    const onChainLocation = (await Dungeon.getCharacterLocation(character)).toString();
+    const onChainLocation = (
+      await this._withRpcRetry(() => Dungeon.getCharacterLocation(character), 'getCharacterLocation')
+    ).toString();
     if (onChainLocation === targetLocation) {
       return false; // already in sync, no transaction needed
     }
     const direction = Number(info.direction) || 0;
-    const tx = await DungeonAdmin.setCharacterPosition(
-      character,
-      targetLocation,
-      direction,
-      { gasLimit: 700000 },
+    const tx = await this._withRpcRetry(
+      () => DungeonAdmin.setCharacterPosition(character, targetLocation, direction, { gasLimit: 700000 }),
+      'setCharacterPosition',
     );
     await tx.wait();
     console.log(`synced on-chain position of character ${character} to ${info.coordinates}`);

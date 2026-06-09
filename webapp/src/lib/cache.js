@@ -569,13 +569,15 @@ class Cache {
     });
   }
 
-  async action(type, actionData) {
+  async action(type, actionData, { timeoutMs } = {}) {
     this.socket.emit(type, actionData);
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // @TODO: make this more modular (handling related to the specific action should be where the action is triggered)
       // @TODO: consider moving to lang file
-      this.socket.once(`${type}-reply`, data => {
+      let timer;
+      const handler = data => {
+        if (timer) clearTimeout(timer);
         switch (type) {
           case 'attack': {
             this.pushHistory(combatText.attack);
@@ -606,7 +608,17 @@ class Cache {
           }
         }
         resolve(data);
-      });
+      };
+      this.socket.once(`${type}-reply`, handler);
+      // Optional guard so callers awaiting a reply (e.g. _syncPosition before a
+      // scavenge/pick tx) don't hang forever when the backend never answers —
+      // typically because an RPC call there stalled on Alchemy rate-limiting.
+      if (timeoutMs) {
+        timer = setTimeout(() => {
+          this.socket.off(`${type}-reply`, handler);
+          reject(new Error(`'${type}' timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      }
     });
   }
 

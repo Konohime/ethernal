@@ -6,6 +6,8 @@ import Cache from 'lib/cache';
 import log from 'utils/log';
 import PlayerWallet from 'lib/PlayerWallet';
 import { locationToCoordinates, coordinatesToLocation } from 'utils/utils';
+import { escapeHtml } from 'utils/text';
+import { notificationOverlay } from 'stores/screen';
 import cacheUrl from 'lib/cacheUrl';
 import { get } from 'svelte/store';
 
@@ -310,10 +312,22 @@ class Dungeon {
   // be in same room" after a plain off-chain walk. Ask the backend to resync the
   // on-chain position first — idempotent, no transaction when already in sync.
   async _syncPosition() {
-    const reply = await this.cache.action('sync-position');
+    // Bounded wait: the backend may need to mine a setCharacterPosition tx, but
+    // if its RPC is being throttled (Alchemy CU limit) the reply can never come.
+    // Time out instead of leaving the scavenge/pick button hung forever.
+    const reply = await this.cache.action('sync-position', undefined, { timeoutMs: 30000 });
     if (reply && reply.error) {
       throw new Error(reply.error);
     }
+  }
+
+  // Surface an otherwise-swallowed action failure to the player. Without this a
+  // failed scavenge (e.g. position resync stalled on RPC rate-limiting) looked
+  // like "I clicked but nothing happened".
+  _notifyActionError(title, err) {
+    const reason =
+      err?.reason || err?.shortMessage || (err?.message && err.message.slice(0, 120)) || 'Unknown error';
+    notificationOverlay.open('generic', { text: `<em>${title}:</em> ${escapeHtml(reason)}`, timeout: 8000 });
   }
 
   async scavengeGear(character, id) {
@@ -326,6 +340,7 @@ class Dungeon {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log('scavenging gear failed', err);
+      this._notifyActionError('Scavenge failed', err);
       return false;
     }
   }
@@ -340,6 +355,7 @@ class Dungeon {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log('scavenging elements failed', err);
+      this._notifyActionError('Scavenge failed', err);
       return false;
     }
   }
