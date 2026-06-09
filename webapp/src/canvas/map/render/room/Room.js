@@ -913,8 +913,13 @@ class Room extends Dirtable {
     });
 
     const isCharacterAt = (_charId, x, y) => {
+      // Resolve the sprite for THIS specific id. Previously the ternary only
+      // checked that myCharacter existed (which is almost always true) and so
+      // always tested my own character regardless of _charId — meaning the
+      // collision test below never saw other players and they piled onto the
+      // same slot.
       const char =
-        this.chunk.map.myCharacter && this.chunk.map.myCharacter.charId
+        this.chunk.map.myCharacter && Number(this.chunk.map.myCharacter.charId) === Number(_charId)
           ? this.chunk.map.myCharacter
           : this.chunk.map.characters[_charId];
       return char && Math.round(char.position.x) === Math.round(x) && Math.round(char.position.y) === Math.round(y);
@@ -935,20 +940,30 @@ class Room extends Dirtable {
       const char = chars[index];
       // console.log(`\tnext: [${index}] => ${char}`);
       if (char) {
-        let position;
-        do {
-          position = this.positions[offset];
+        // Advance to the next slot that isn't already physically occupied by a
+        // placed sprite. Only increment when the slot is taken — the previous
+        // code incremented unconditionally, so it (a) returned positions[offset]
+        // while the slot it had actually validated as free was positions[offset-1]
+        // (off-by-one), and (b) consumed two slots per in-room character (this
+        // increment + the reserve one below), capping the room at ~2 placed
+        // players before everyone fell back to the room center.
+        let position = this.positions[offset];
+        while (isACharAt(position.x, position.y)) {
           offset += 1;
           if (offset >= 4) {
             return this.center;
           }
-        } while (isACharAt(position.x, position.y));
+          position = this.positions[offset];
+        }
 
         if (Number(char.character) === Number(charId)) {
-          return this.positions[offset];
+          return position;
         }
         if (char.coordinates === this.coordinates) {
           offset += 1;
+          if (offset >= 4) {
+            return this.center;
+          }
         }
       }
     }
