@@ -87,10 +87,8 @@
             mapOverlay.open('loot');
           } else {
             // Monster is dead locally but monsterDefeated TX hasn't confirmed yet.
-            // Trigger a retry via the non-privileged 'retry-defeat' action so the
-            // backend re-sends the TX. (The old 'kill-monster' path was a
-            // privileged cheat and silently no-op'd for ordinary players, leaving
-            // them stuck whenever the finalisation tx had reverted.)
+            // Trigger a retry via the 'retry-defeat' action so the backend
+            // re-sends the TX (idempotent, guarded by room.combat on the server).
             const coords = $dungeon.cache.currentRoom && $dungeon.cache.currentRoom.coordinates;
             if (coords) {
               // eslint-disable-next-line no-console

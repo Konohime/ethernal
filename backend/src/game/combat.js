@@ -300,9 +300,8 @@ class Combat extends DungeonComponent {
       // Don't leave the players silently frozen in 'attacking monster'. Signal
       // the failure so the client can surface it and offer a retry. room.combat
       // is intentionally NOT cleared, so the cached rewards survive and a later
-      // 'retry-defeat' (or privileged kill-monster) re-runs _monsterDefeated
-      // idempotently — once it finally lands, room.combat is cleared and any
-      // further retry no-ops.
+      // 'retry-defeat' re-runs _monsterDefeated idempotently — once it finally
+      // lands, room.combat is cleared and any further retry no-ops.
       this.sockets.emit('monster-defeat-failed', {
         coordinates,
         characters,
@@ -311,17 +310,13 @@ class Combat extends DungeonComponent {
     }
   }
 
-  // Player-triggered, non-privileged re-finalisation of a defeated monster.
-  // Safe because:
+  // Player-triggered re-finalisation of a defeated monster. Safe because:
   //   - it only proceeds when the room still has an un-cleared combat whose
   //     monster is actually dead (health <= 0), so it can't be used to fake a
   //     kill;
   //   - it delegates to monsterDefeated(), guarded by room.combat: if the
   //     original tx had in fact landed, room.combat is already null and this
   //     no-ops, so no double rewards.
-  // This replaces the previous client retry path that called the privileged
-  // 'kill-monster' cheat — which silently failed for ordinary players, leaving
-  // them stuck whenever the finalisation tx reverted.
   async retryDefeat(character, coordinates) {
     const target = coordinates || (await this.dungeon.character.coordinates(character));
     if (!target) {

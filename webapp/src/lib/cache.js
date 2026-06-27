@@ -22,7 +22,6 @@ import quests from 'data/quests';
 import Message from 'lib/chat';
 import { escapeHtml, humanizeJoin, pluralize } from 'utils/text';
 import { bfs, encodeDirections, coordinatesInDirection, parseCoordinates, aroundCoordinates, identity } from 'utils/utils';
-import Walker from './walker';
 import cacheUrl from './cacheUrl';
 
 class Cache {
@@ -49,11 +48,9 @@ class Cache {
     async function initialize() {
       log.info('initializing cache');
       this.callbacks = {};
-      this.privileged = false;
 
       this.socket = io(this.url)
         .on('connect', () => log.info('socket connected'))
-        .on('privileged', () => (this.privileged = true))
         .on('hello', () => {
           this.dungeon.delegateWallet.signMessage(this.socket.id).then(signature => {
             this.socket.emit('idelegate', `${this.characterId}:${signature}`);
@@ -554,7 +551,6 @@ class Cache {
         2,
       );
 
-      this.walker = new Walker(this);
       log.info('cache initialized');
     }
   }

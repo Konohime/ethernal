@@ -7,14 +7,10 @@ const { contracts } = require('../db/provider');
 class Sockets {
   constructor(server) {
     this.characters = {};
-    this.ownerOfCharacter = {};
     this.characterHandlers = [];
     this.sockets = new Map();
     this.internal = new EventEmitter();
 
-    const privileged = process.env.PRIVILEGED_ADDRESSES;
-    this.privilegedAddresses = new Set(privileged ? privileged.split(',').map(s => s.trim().toLowerCase()) : []);
-    console.log('privileged addresses', Array.from(this.privilegedAddresses));
     this.io = socketio(server, {
       cors: {
         origin: "*",
@@ -44,12 +40,11 @@ class Sockets {
           const { Characters, Player } = await contracts();
           const subOwner = await Characters.getSubOwner(characterId);
           const playerAddress = subOwner.toHexString();
-          this.ownerOfCharacter[characterId] = playerAddress.toLowerCase();
           const isDelegate = await Player.isDelegateFor(delegate, playerAddress);
           if (!isDelegate) {
             throw new Error('not valid delegate');
           }
-          this.acceptCharacter(characterId, socket, playerAddress);
+          this.acceptCharacter(characterId, socket);
         } catch (err) {
           console.log('delegate authorization failed', socket.id, err);
           Sentry.withScope(scope => {
@@ -61,12 +56,9 @@ class Sockets {
     });
   }
 
-  acceptCharacter(character, socket, playerAddress) {
+  acceptCharacter(character, socket) {
     this.join(character, socket);
     this.characterHandlers.forEach(({ event, callback }) => {
-      if (this.isPrivileged(playerAddress)) {
-        this.emitTo(character, 'privileged');
-      }
       socket.on(event, async data => {
         const reply = await callback(character, data);
         this.emitTo(character, event + '-reply', reply);
@@ -91,35 +83,6 @@ class Sockets {
             Sentry.captureException(e);
           });
           return { error: event + ' failed: ' + e.message };
-        }
-      },
-    });
-    return this;
-  }
-
-  isPrivileged(address) {
-    return this.privilegedAddresses.has('everyone') || this.privilegedAddresses.has(address.toLowerCase());
-  }
-
-  onPrivilegedCharacter(event, callback) {
-    this.characterHandlers.push({
-      event,
-      callback: async (...args) => {
-        const character = args[0];
-        const address = this.ownerOfCharacter[character];
-        if (this.isPrivileged(address)) {
-          try {
-            return await callback(...args);
-          } catch (e) {
-            console.log(e);
-            Sentry.withScope(scope => {
-              scope.setExtras({ event, args });
-              Sentry.captureException(e);
-            });
-            return { error: event + ' failed: ' + e.message, args };
-          }
-        } else {
-          return { error: event + ' unauthorized' };
         }
       },
     });
