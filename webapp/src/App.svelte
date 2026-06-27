@@ -9,6 +9,7 @@
 
   import GameScreen from 'screens/GameScreen';
   import DefaultScreen from 'screens/DefaultScreen';
+  import LandingScreen from 'screens/LandingScreen';
   import LoadingScreen from 'screens/LoadingScreen';
   import StyleScreen from 'screens/Internal/StyleScreen';
 
@@ -130,11 +131,7 @@
   {:else if $wallet.status === 'NoWallet'}
     <DefaultScreen text="You need a wallet" />
   {:else if $wallet.status === 'Locked' || $wallet.status === 'Unlocking'}
-    <DefaultScreen>
-      <button disabled="{$wallet.status === 'Unlocking'}" on:click="{() => wallet.unlock()}">
-        Connect Your Wallet
-      </button>
-    </DefaultScreen>
+    <LandingScreen />
   {:else if $wallet.status === 'SettingUpWallet'}
     {#if $wallet.walletTakingTimeToReply}
       <DefaultScreen text="Please be patient, your wallet is getting set up..." />

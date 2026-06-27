@@ -18,7 +18,6 @@
   import BagScreen from 'screens/Game/BagScreen';
   import CharacterProfileScreen from 'screens/Game/CharacterProfileScreen';
   import CharacterStatsScreen from 'screens/Game/CharacterStatsScreen';
-  import CheatsScreen from 'screens/Game/CheatsScreen';
   import DefenseSlotScreen from 'screens/Game/DefenseSlotScreen';
   import DungeonKeeperScreen from 'screens/Game/DungeonKeeperScreen';
   import DungeonKeeperShopScreen from 'screens/Game/DungeonKeeperShopScreen';
@@ -90,7 +89,6 @@
   $: menuOverlayScreens = {
     bag: { this: BagScreen },
     character: { this: CharacterStatsScreen },
-    cheats: { this: CheatsScreen },
     defenseSlot: { this: DefenseSlotScreen },
     dungeonKeeper: { this: DungeonKeeperScreen },
     dungeonKeeperShop: { this: DungeonKeeperShopScreen },

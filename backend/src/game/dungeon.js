@@ -11,7 +11,6 @@ const RandomEvents = require('./randomEvents.js');
 const Trading = require('./trading.js');
 const Quests = require('./quests.js');
 const Keeper = require('./keeper.js');
-const Cheats = require('./cheats.js');
 const { uint256 } = require('../data/utils');
 const drawMap = require('../utils/drawMap.js');
 const { coordinatesToLocation } = require('./utils');
@@ -33,7 +32,6 @@ class Dungeon {
     this.trading = new Trading(this);
     this.quests = new Quests(this);
     this.keeper = new Keeper(this);
-    this.cheats = new Cheats(this);
 
     this.debug = {
       moveEvents: [],

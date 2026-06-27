@@ -378,6 +378,17 @@ class UICard extends PIXI.Container {
       duration = 400;
     }
 
+    // pixi-ease computes `delta * time / duration`, which is NaN when duration is 0.
+    // A NaN alpha makes the content render invisible *permanently* (nothing ever
+    // resets _c.alpha afterwards). Set the value directly for instant transitions.
+    if (duration <= 0) {
+      if (this.border) {
+        this.border.alpha = 0.4;
+      }
+      this._c.alpha = 0.4;
+      return null;
+    }
+
     if (this.border) {
       ease.add(this.border, { alpha: 0.4 }, { duration });
     }
@@ -387,6 +398,17 @@ class UICard extends PIXI.Container {
   animateUnused(duration) {
     if (duration === null || duration === undefined) {
       duration = 400;
+    }
+
+    // See animateUse: duration 0 would set alpha to NaN via pixi-ease, leaving the
+    // card content invisible forever. reset() relies on the instant (duration 0)
+    // path every turn, so restore the alpha directly here.
+    if (duration <= 0) {
+      if (this.border) {
+        this.border.alpha = 1;
+      }
+      this._c.alpha = 1;
+      return null;
     }
 
     if (this.border) {

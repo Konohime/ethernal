@@ -1,15 +1,11 @@
 <script>
-  import { dungeon } from 'stores/dungeon';
   import { menuOverlay } from 'stores/screen';
 
   import ContentLayout from 'components/layouts/ContentLayout';
   import BoxButton from 'components/BoxButton';
 
   import IconClose from 'assets/close.png';
-  import IconKey from 'assets/skull-key-white.png';
   import IconDiscord from 'assets/icons/discord_4x.png';
-
-  $: privileged = $dungeon.cache && $dungeon.cache.privileged;
 </script>
 
 <style lang="scss">
@@ -57,11 +53,6 @@
 
   <div slot="footer" class="with-close-button">
     <div>
-      {#if privileged}
-        <BoxButton type="secondary" class="cheats" onClick="{() => menuOverlay.toggle('cheats')}">
-          <img src="{IconKey}" alt="cheats" />
-        </BoxButton>
-      {/if}
       <a class="btn secondary" href="https://discord.gg/EwqKJVd" target="_blank" rel="noopener nofollow">
         <img src={IconDiscord} alt="discord" />
       </a>
